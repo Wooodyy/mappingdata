@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Excel File</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Montserrat', sans-serif;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .upload-container {
+            text-align: center;
+            padding: 20px;
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .autocomplete-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .suggestions {
+            position: absolute;
+            border: 1px solid #ddd;
+            background: white;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+        .suggestion-item {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <h2>Загрузите Excel файл</h2>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <div class="autocomplete-container">
+                <label for="sender">Отправитель:</label>
+                <input type="text" id="sender" name="sender" required>
+                <div id="suggestions" class="suggestions"></div>
+            </div>
+            <input type="file" name="file" accept=".xlsx,.xls" required>
+            <br><br>
+            <button type="submit" class="button">Загрузить</button>
+        </form>
+    </div>
+    <script>
+        document.querySelector('form').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    window.location.href = '/table';
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error uploading file');
+            }
+        };
+
+        const senderInput = document.getElementById('sender');
+        const suggestionsDiv = document.getElementById('suggestions');
+
+        senderInput.addEventListener('input', async () => {
+            const query = senderInput.value;
+            if (query.length < 2) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+
+            const response = await fetch(`/senders?query=${encodeURIComponent(query)}`);
+            const senders = await response.json();
+
+            suggestionsDiv.innerHTML = '';
+            senders.forEach(sender => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = sender;
+                div.onclick = () => {
+                    senderInput.value = sender;
+                    suggestionsDiv.style.display = 'none';
+                };
+                suggestionsDiv.appendChild(div);
+            });
+
+            suggestionsDiv.style.display = senders.length ? 'block' : 'none';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!senderInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

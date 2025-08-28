@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Table</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-family: 'Montserrat', sans-serif;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .totals-summary {
+            font-family: 'Montserrat', sans-serif;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .totals-item {
+            font-family: 'Montserrat', sans-serif;
+            margin: 5px 0;
+            font-weight: 500;
+        }
+        h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Код ТН ВЭД</th>
+                <th>Наименование/модель</th>
+                <th>Кол-во мест</th>
+                <th>Общий вес брутто</th>
+                <th>Общая сумма</th>
+                <th>Тип валюты</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td>{{ row.data["Код ТН ВЭД"] }}</td>
+                <td>{{ row.data["Наименование/модель"] }}</td>
+                <td>{{ row.data["Кол-во мест"] }}</td>
+                <td>{{ row.data["Общий вес брутто"] }}</td>
+                <td>{{ row.data["Общая сумма"] }}</td>
+                <td>{{ row.data["Тип валюты"] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals-summary">
+        <h3>Итоговые значения:</h3>
+        <div class="totals-item">Общее кол-во мест: {{ totals.total_quantity }}</div>
+        <div class="totals-item">Общий вес брутто: {{ totals.total_weight }}</div>
+        <div class="totals-item">Общая сумма: {{ totals.total_amount }} USD</div>
+    </div>
+</body>
+</html>
