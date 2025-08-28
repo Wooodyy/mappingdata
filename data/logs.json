@@ -1,0 +1,244 @@
+{
+  "logs": [
+    {
+      "timestamp": "2025-08-28T14:36:48.693886",
+      "type": "system_event",
+      "message": "Excel Processor API started successfully"
+    },
+    {
+      "timestamp": "2025-08-28T14:36:51.980228",
+      "type": "api_request",
+      "url": "/upload",
+      "method": "POST",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:36:52.211919",
+      "type": "data_operation",
+      "operation": "save",
+      "success": true
+    },
+    {
+      "timestamp": "2025-08-28T14:36:52.217877",
+      "type": "api_request",
+      "url": "/table",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:37:04.522951",
+      "type": "api_request",
+      "url": "/senders",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:37:05.544527",
+      "type": "api_request",
+      "url": "/upload",
+      "method": "POST",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:37:05.566114",
+      "type": "data_operation",
+      "operation": "save",
+      "success": true
+    },
+    {
+      "timestamp": "2025-08-28T14:37:05.573812",
+      "type": "api_request",
+      "url": "/table",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:37:27.783398",
+      "type": "api_request",
+      "url": "/",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:37:42.293818",
+      "type": "api_request",
+      "url": "/upload",
+      "method": "POST",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:37:42.312445",
+      "type": "data_operation",
+      "operation": "save",
+      "success": true
+    },
+    {
+      "timestamp": "2025-08-28T14:37:42.325244",
+      "type": "api_request",
+      "url": "/table",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:38:08.897976",
+      "type": "api_request",
+      "url": "/upload",
+      "method": "POST",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:38:08.935973",
+      "type": "data_operation",
+      "operation": "save",
+      "success": true
+    },
+    {
+      "timestamp": "2025-08-28T14:38:08.950686",
+      "type": "api_request",
+      "url": "/table",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:38:12.605507",
+      "type": "api_request",
+      "url": "/",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:38:15.600462",
+      "type": "api_request",
+      "url": "/senders",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:38:18.890109",
+      "type": "api_request",
+      "url": "/upload",
+      "method": "POST",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:38:18.912979",
+      "type": "data_operation",
+      "operation": "save",
+      "success": true
+    },
+    {
+      "timestamp": "2025-08-28T14:38:18.922819",
+      "type": "api_request",
+      "url": "/table",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:38:29.647609",
+      "type": "api_request",
+      "url": "/",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:38:48.078287",
+      "type": "api_request",
+      "url": "/senders",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:38:48.165933",
+      "type": "api_request",
+      "url": "/senders",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:38:48.537468",
+      "type": "api_request",
+      "url": "/upload",
+      "method": "POST",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:38:48.560384",
+      "type": "data_operation",
+      "operation": "save",
+      "success": true
+    },
+    {
+      "timestamp": "2025-08-28T14:38:48.568172",
+      "type": "api_request",
+      "url": "/table",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:38:53.205415",
+      "type": "api_request",
+      "url": "/",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:40:06.978082",
+      "type": "api_request",
+      "url": "/",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:40:07.396469",
+      "type": "api_request",
+      "url": "/",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:40:08.606628",
+      "type": "api_request",
+      "url": "/senders",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:40:11.648673",
+      "type": "api_request",
+      "url": "/upload",
+      "method": "POST",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:40:11.680442",
+      "type": "data_operation",
+      "operation": "save",
+      "success": true
+    },
+    {
+      "timestamp": "2025-08-28T14:40:11.688933",
+      "type": "api_request",
+      "url": "/table",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:40:30.652968",
+      "type": "api_request",
+      "url": "/",
+      "method": "GET",
+      "client_ip": "127.0.0.1"
+    },
+    {
+      "timestamp": "2025-08-28T14:40:55.920576",
+      "type": "system_event",
+      "message": "Excel Processor API shutting down"
+    }
+  ],
+  "stats": {
+    "api_requests": 26,
+    "data_operations": 7,
+    "system_events": 2,
+    "last_log": "2025-08-28T14:40:55.920576"
+  }
+}

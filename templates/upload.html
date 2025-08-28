@@ -30,25 +30,20 @@
         .button:hover {
             background-color: #45a049;
         }
-        .autocomplete-container {
-            position: relative;
+        .form-row {
             margin-bottom: 20px;
+            text-align: left;
         }
-        .suggestions {
-            position: absolute;
-            border: 1px solid #ddd;
-            background: white;
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        select, input[type="file"] {
             width: 100%;
-            max-height: 200px;
-            overflow-y: auto;
-            display: none;
-        }
-        .suggestion-item {
-            padding: 8px;
-            cursor: pointer;
-        }
-        .suggestion-item:hover {
-            background-color: #f0f0f0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -56,16 +51,23 @@
     <div class="upload-container">
         <h2>Загрузите Excel файл</h2>
         <form action="/upload" method="post" enctype="multipart/form-data">
-            <div class="autocomplete-container">
+            <div class="form-row">
                 <label for="sender">Отправитель:</label>
-                <input type="text" id="sender" name="sender" required>
-                <div id="suggestions" class="suggestions"></div>
+                <select id="sender" name="sender" required>
+                    <!-- варианты подставляются на бэкенде -->
+                    {% for sender in processors %}
+                        <option value="{{ sender }}">{{ sender|capitalize }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <input type="file" name="file" accept=".xlsx,.xls" required>
-            <br><br>
+            <div class="form-row">
+                <label for="file">Файл Excel:</label>
+                <input type="file" id="file" name="file" accept=".xlsx,.xls" required>
+            </div>
             <button type="submit" class="button">Загрузить</button>
         </form>
     </div>
+
     <script>
         document.querySelector('form').onsubmit = async (e) => {
             e.preventDefault();
@@ -87,40 +89,6 @@
                 alert('Error uploading file');
             }
         };
-
-        const senderInput = document.getElementById('sender');
-        const suggestionsDiv = document.getElementById('suggestions');
-
-        senderInput.addEventListener('input', async () => {
-            const query = senderInput.value;
-            if (query.length < 2) {
-                suggestionsDiv.style.display = 'none';
-                return;
-            }
-
-            const response = await fetch(`/senders?query=${encodeURIComponent(query)}`);
-            const senders = await response.json();
-
-            suggestionsDiv.innerHTML = '';
-            senders.forEach(sender => {
-                const div = document.createElement('div');
-                div.className = 'suggestion-item';
-                div.textContent = sender;
-                div.onclick = () => {
-                    senderInput.value = sender;
-                    suggestionsDiv.style.display = 'none';
-                };
-                suggestionsDiv.appendChild(div);
-            });
-
-            suggestionsDiv.style.display = senders.length ? 'block' : 'none';
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!senderInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
-                suggestionsDiv.style.display = 'none';
-            }
-        });
     </script>
 </body>
 </html>

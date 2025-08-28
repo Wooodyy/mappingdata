@@ -4,53 +4,91 @@
     <title>Data Table</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            font-family: 'Montserrat', sans-serif;
-        }
-
         body {
             margin: 0;
-            padding: 20px;
+            padding: 40px;
+            background-color: #f4f6f9;
             font-family: 'Montserrat', sans-serif;
+            color: #333;
+        }
+
+        h2 {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #2c3e50;
         }
 
         table {
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             width: 100%;
             margin: 20px 0;
-            font-family: 'Montserrat', sans-serif;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         }
+
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            padding: 14px 16px;
             text-align: left;
-            font-family: 'Montserrat', sans-serif;
         }
+
         th {
-            background-color: #f2f2f2;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .totals-summary {
-            font-family: 'Montserrat', sans-serif;
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-        }
-        .totals-item {
-            font-family: 'Montserrat', sans-serif;
-            margin: 5px 0;
+            background-color: #2c3e50;
+            color: white;
             font-weight: 500;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
-        h3 {
-            font-family: 'Montserrat', sans-serif;
+
+        tr:nth-child(even) td {
+            background-color: #f9fbfd;
+        }
+
+        tr:hover td {
+            background-color: #eef3f9;
+        }
+
+        td {
+            font-size: 14px;
+            color: #444;
+            border-bottom: 1px solid #eee;
+        }
+
+        .totals-summary {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .totals-summary h3 {
+            margin-top: 0;
+            font-size: 18px;
             font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .totals-item {
+            margin: 8px 0;
+            font-size: 15px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .totals-item span {
+            font-weight: 600;
+            color: #000;
         }
     </style>
 </head>
 <body>
+    <h2>Таблица данных</h2>
     <table>
         <thead>
             <tr>
@@ -78,9 +116,9 @@
 
     <div class="totals-summary">
         <h3>Итоговые значения:</h3>
-        <div class="totals-item">Общее кол-во мест: {{ totals.total_quantity }}</div>
-        <div class="totals-item">Общий вес брутто: {{ totals.total_weight }}</div>
-        <div class="totals-item">Общая сумма: {{ totals.total_amount }} USD</div>
+        <div class="totals-item">Общее кол-во мест: <span>{{ totals.total_quantity }}</span></div>
+        <div class="totals-item">Общий вес брутто: <span>{{ totals.total_weight }}</span></div>
+        <div class="totals-item">Общая сумма: <span>{{ totals.total_amount }}</span> {{ data[0].data["Тип валюты"] if data else "" }}</div>
     </div>
 </body>
 </html>
