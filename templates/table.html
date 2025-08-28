@@ -4,121 +4,98 @@
     <title>Data Table</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            margin: 0;
-            padding: 40px;
-            background-color: #f4f6f9;
-            font-family: 'Montserrat', sans-serif;
-            color: #333;
-        }
-
-        h2 {
-            text-align: center;
-            font-weight: 600;
-            margin-bottom: 30px;
-            color: #2c3e50;
-        }
-
-        table {
-            border-collapse: separate;
-            border-spacing: 0;
-            width: 100%;
-            margin: 20px 0;
-            background: #fff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-        }
-
-        th, td {
-            padding: 14px 16px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #2c3e50;
-            color: white;
-            font-weight: 500;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        tr:nth-child(even) td {
-            background-color: #f9fbfd;
-        }
-
-        tr:hover td {
-            background-color: #eef3f9;
-        }
-
-        td {
-            font-size: 14px;
-            color: #444;
-            border-bottom: 1px solid #eee;
-        }
-
-        .totals-summary {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-        }
-
-        .totals-summary h3 {
-            margin-top: 0;
-            font-size: 18px;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 15px;
-        }
-
-        .totals-item {
-            margin: 8px 0;
-            font-size: 15px;
-            font-weight: 500;
-            color: #555;
-        }
-
-        .totals-item span {
-            font-weight: 600;
-            color: #000;
-        }
+        body { margin: 0; padding: 40px; background-color: #f4f6f9; font-family: 'Montserrat', sans-serif; color: #333; }
+        h2 { text-align: left; font-weight: 200;  color: #2c3e50; }
+        table { border-collapse: separate; border-spacing: 0; width: 100%; margin: 20px 0; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        th, td { padding: 14px 16px; text-align: left; }
+        th { background-color: #2c3e50; color: white; font-weight: 500; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
+        tr:nth-child(even) td { background-color: #f9fbfd; }
+        tr:hover td { background-color: #eef3f9; }
+        td { font-size: 14px; color: #444; border-bottom: 1px solid #eee; }
+        .totals-summary { margin-top: 30px; padding: 20px; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .totals-summary h3 { margin-top: 0; font-size: 18px; font-weight: 600; color: #2c3e50; margin-bottom: 15px; }
+        .totals-item { margin: 8px 0; font-size: 15px; font-weight: 500; color: #555; }
+        .totals-item span { font-weight: 600; color: #000; }
+        .sender-info { padding: 20px; padding-top: 2px; padding-bottom: 2px; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); border: 1px solid #eee; }
     </style>
 </head>
 <body>
-    <h2>Таблица данных</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Код ТН ВЭД</th>
-                <th>Наименование/модель</th>
-                <th>Кол-во мест</th>
-                <th>Общий вес брутто</th>
-                <th>Общая сумма</th>
-                <th>Тип валюты</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in data %}
-            <tr>
-                <td>{{ row.data["Код ТН ВЭД"] }}</td>
-                <td>{{ row.data["Наименование/модель"] }}</td>
-                <td>{{ row.data["Кол-во мест"] }}</td>
-                <td>{{ row.data["Общий вес брутто"] }}</td>
-                <td>{{ row.data["Общая сумма"] }}</td>
-                <td>{{ row.data["Тип валюты"] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+     <div class="sender-info" id="sender-info">
+        <h2>Отправитель:</h2>
+    </div>
+
+    <table id="data-table">
+        <thead></thead>
+        <tbody></tbody>
     </table>
 
-    <div class="totals-summary">
-        <h3>Итоговые значения:</h3>
-        <div class="totals-item">Общее кол-во мест: <span>{{ totals.total_quantity }}</span></div>
-        <div class="totals-item">Общий вес брутто: <span>{{ totals.total_weight }}</span></div>
-        <div class="totals-item">Общая сумма: <span>{{ totals.total_amount }}</span> {{ data[0].data["Тип валюты"] if data else "" }}</div>
+    <div class="totals-summary" id="totals-summary">
+        <h3>Итоговые значения по документу:</h3>
     </div>
+
+    <script>
+        async function fetchData() {
+            const response = await fetch('/table/json');
+            const data = await response.json();
+
+            const table = document.getElementById("data-table");
+            const thead = table.querySelector("thead");
+            const tbody = table.querySelector("tbody");
+
+            // 🔹 Авто генерация заголовков из ключей первого объекта
+            thead.innerHTML = "";
+            if (data.rows.length > 0) {
+                const headerRow = document.createElement("tr");
+                Object.keys(data.rows[0]).forEach(key => {
+                    const th = document.createElement("th");
+                    th.textContent = key;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+            }
+
+            // 🔹 Наполнение таблицы данными
+            tbody.innerHTML = "";
+            data.rows.forEach(row => {
+                const tr = document.createElement("tr");
+                Object.values(row).forEach(value => {
+                    const td = document.createElement("td");
+                    td.textContent = value;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+
+            // 🔹 Словарь для красивых названий итогов
+            const totalsNames = {
+                total_quantity: "Общее кол-во мест",
+                total_weight: "Общий вес брутто",
+                total_amount: "Общая сумма"
+            };
+
+            // 🔹 Итоги
+            const totalsDiv = document.getElementById("totals-summary");
+            totalsDiv.innerHTML = `
+                <h3>Итоговые значения по документу:</h3>
+                ${Object.entries(data.totals).map(([key, val]) => `
+                    <div class="totals-item">${totalsNames[key] || key}: <span>${val}</span></div>
+                `).join('')}
+            `;
+            const SenderInfo = document.getElementById("sender-info");
+            SenderInfo.innerHTML = `
+                <h2>Отправитель: <a style="font-weight: 600;">${data.sender}</a></h2>
+                <h2>Номер контейнера: <a style="font-weight: 600;"></a></h2>
+            `;
+
+            console.log("Data as table:");
+            console.table(data.rows);
+            console.log("Totals:");
+            console.table(data.totals);
+            console.log("Sender:");
+            console.table(data.sender);
+        }
+
+        fetchData();
+    </script>
 </body>
 </html>

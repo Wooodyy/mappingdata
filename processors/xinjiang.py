@@ -1,9 +1,10 @@
 import pandas as pd
 import io
+import re
 from models import ExcelRow, ExcelData, Totals
 
 def process_xinjiang(file_content: bytes) -> dict:
-    storage = ExcelData(rows=[], totals=Totals())
+    storage = ExcelData(rows=[], totals=Totals(), sender="")
 
     column_mapping = {
         "Xinjiang Xindudu \nImport and Export Trading Co.,Ltd": "Наименование/модель",
@@ -24,6 +25,32 @@ def process_xinjiang(file_content: bytes) -> dict:
                 currency = "CNY"
                 break
 
+        # Найдем запись, начинающуюся с 'FROM:' и заканчивающуюся '\n'
+        
+        # Найдем запись, начинающуюся с 'FROM:' до конца строки
+        sender = ""
+        for _, df in sheets.items():
+            for col in df.columns:
+                for cell in df[col]:
+                    if isinstance(cell, str):
+                        # Разбиваем ячейку на строки
+                        lines = cell.split("\n")
+                        for line in lines:
+                            if line.startswith("FROM:"):
+                                sender = line[len("FROM:"):].strip()  # Берем текст после FROM:
+                                break
+                        if sender:
+                            break
+                if sender:
+                    break
+            if sender:
+                break
+
+        storage.sender = sender
+
+
+
+
         for sheet_name, df in sheets.items():
             start_idx = df[df.iloc[:, 0] == "Наименование/модель"].index
 
@@ -35,25 +62,26 @@ def process_xinjiang(file_content: bytes) -> dict:
                 # Последняя строка = итоги
                 last_row = df.iloc[-1]
                 storage.totals = Totals(
-                    total_quantity=float(last_row["Кол-во мест"]),
-                    total_weight=float(last_row["Общий вес брутто"]),
-                    total_amount=float(last_row["Общая сумма"])
+                    total_quantity=float(last_row.get("Кол-во мест", 0)),
+                    total_weight=float(last_row.get("Общий вес брутто", 0)),
+                    total_amount=float(last_row.get("Общая сумма", 0))
                 )
 
                 # Остальные строки
                 records = df.iloc[1:-1].to_dict(orient="records")
                 for record in records:
                     ordered_record = {
-                        "Код ТН ВЭД": record.get("Код ТН ВЭД", ""),
-                        "Наименование/модель": record.get("Наименование/модель", ""),
-                        "Кол-во мест": record.get("Кол-во мест", 0),
-                        "Общий вес брутто": record.get("Общий вес брутто", 0),
-                        "Общая сумма": record.get("Общая сумма", 0),
-                        "Тип валюты": currency
+                        "Код товара": record.get("Код ТН ВЭД", ""),
+                        "Наименование товара": record.get("Наименование/модель", ""),
+                        "Количество грузовых мест": record.get("Кол-во мест", 0),
+                        "Вес брутто": record.get("Общий вес брутто", 0),
+                        "Сумма": record.get("Общая сумма", 0),
+                        "Валюта": currency
                     }
                     storage.rows.append(ExcelRow(data=ordered_record, sheet=sheet_name))
 
     except Exception as e:
         return {"error": str(e)}
 
-    return {"success": True, "storage": storage}
+    # Возвращаем результат и найденный текст 'FROM:'
+    return {"success": True, "storage": storage, "sender": sender}

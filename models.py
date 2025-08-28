@@ -13,3 +13,4 @@ class Totals(BaseModel):
 class ExcelData(BaseModel):
     rows: List[ExcelRow]
     totals: Totals
+    sender: str = ""
