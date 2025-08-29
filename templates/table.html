@@ -29,6 +29,19 @@
         <tbody></tbody>
     </table>
 
+    <!-- 🔘 Кнопка копирования -->
+    <button id="copy-btn" style="
+        margin-top: 15px;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        background-color: #2c3e50;
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    ">Скопировать таблицу</button>
+    
     <div class="totals-summary" id="totals-summary">
         <h3>Итоговые значения по документу:</h3>
     </div>
@@ -98,6 +111,28 @@
         }
 
         fetchData();
+
+        // 🔹 Копирование таблицы в буфер
+        document.getElementById("copy-btn").addEventListener("click", () => {
+            const table = document.getElementById("data-table");
+            let text = "";
+
+            // Заголовки
+            
+
+            // Строки
+            table.querySelectorAll("tbody tr").forEach(row => {
+                const cells = [...row.querySelectorAll("td")].map(td => td.textContent.trim());
+                text += cells.join("\t") + "\n";
+            });
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Таблица скопирована в буфер обмена!");
+            }).catch(err => {
+                console.error("Ошибка копирования:", err);
+            });
+        });
+
     </script>
 </body>
 </html>
