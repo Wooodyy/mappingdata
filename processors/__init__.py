@@ -3,8 +3,7 @@ from .ai import process_ai
 
 # Регистрируем доступные алгоритмы отправителей
 PROCESSORS = {
-    "xinjiang": process_xinjiang,
-    "отправитель 2": process_xinjiang,
+    "xinjiang xindudu import and export trading co.,ltd": process_xinjiang,
     "отправитель 3": process_ai,
 }
 

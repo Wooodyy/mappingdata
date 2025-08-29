@@ -65,7 +65,7 @@ def process_xinjiang(file_content: bytes) -> dict:
                     break
             if truck:
                 break
-        
+        truck = truck.replace(" ", "")
         storage.truck = truck
 
         for sheet_name, df in sheets.items():
@@ -98,7 +98,7 @@ def process_xinjiang(file_content: bytes) -> dict:
                         "Количество упаковок": record.get("Кол-во мест", 0),
                         "Номер контейнера": storage.truck,
                         "Вес брутто": record.get("Общий вес брутто", 0),
-                        "Валют": currency,
+                        "Валюта": currency,
                         "Сумма": record.get("Общая сумма", 0)
                     }
                     storage.rows.append(ExcelRow(data=ordered_record, sheet=sheet_name))
