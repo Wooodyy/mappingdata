@@ -98,7 +98,7 @@ def process_xinjiang(file_content: bytes) -> dict:
                         "Количество упаковок": record.get("Кол-во мест", 0),
                         "Номер контейнера": storage.truck,
                         "Вес брутто": record.get("Общий вес брутто", 0),
-                        "Валюта": currency,
+                        "Валют": currency,
                         "Сумма": record.get("Общая сумма", 0)
                     }
                     storage.rows.append(ExcelRow(data=ordered_record, sheet=sheet_name))
