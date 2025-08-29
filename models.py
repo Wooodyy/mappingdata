@@ -14,3 +14,4 @@ class ExcelData(BaseModel):
     rows: List[ExcelRow]
     totals: Totals
     sender: str = ""
+    truck: str = ""

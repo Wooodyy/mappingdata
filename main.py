@@ -14,7 +14,7 @@ static_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Хранилище данных
-storage: ExcelData = ExcelData(rows=[], totals=Totals(), sender="")
+storage: ExcelData = ExcelData(rows=[], totals=Totals(), sender="", truck="")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -52,6 +52,7 @@ async def get_table_json():
         content={
             "rows": [row.data for row in storage.rows],
             "totals": storage.totals.__dict__,
-            "sender": storage.sender
+            "sender": storage.sender,
+            "truck": storage.truck
         }
     )
