@@ -5,9 +5,11 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from processors import PROCESSORS
 from models import ExcelData, Totals
+from gemini_api import chat_with_gemini
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
+
 
 static_dir = Path("static")
 static_dir.mkdir(parents=True, exist_ok=True)

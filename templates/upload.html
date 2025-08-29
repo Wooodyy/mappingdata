@@ -3,8 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Excel Upload — Inline suggestion + single-file lock</title>
+  <title>Excel Upload — Загрузка файлов</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   <style>
     .autocomplete-wrap { position: relative; }
     .suggestion-layer {
@@ -15,100 +27,171 @@
     .suggestion-prefix { color: transparent; }
     .input-ghost { background: transparent; position: relative; z-index: 2; }
     .sr-only { position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    
+    /* Added modern gradient and animation styles */
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .card-shadow {
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .upload-zone-hover:hover {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border-color: #3b82f6;
+    }
+    
+    .pulse-animation {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
   </style>
 </head>
-<body class="min-h-screen bg-gray-100 flex items-center justify-center p-6">
-  <main class="w-full max-w-2xl">
-    <div class="bg-white rounded-xl shadow-md p-6 sm:p-8">
-      <header class="mb-4 text-center">
-        <h1 class="text-lg font-semibold text-gray-800">Загрузка файла для обработки</h1>
-        <p class="text-sm text-gray-500 mt-1">Выберите отправителя и загрузите Invoice или Packing List</p>
-      </header>
-
-      <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" class="space-y-4" novalidate>
-        <!-- AUTOCOMPLETE -->
-        <div>
-          <label for="senderSearch" class="block text-sm font-medium text-gray-700 mb-1">Отправитель</label>
-
-          <div class="relative autocomplete-wrap">
-            <div id="suggestion" class="suggestion-layer rounded-md border border-transparent px-3 py-2 text-sm"></div>
-
-            <input id="senderSearch" name="senderSearch" type="text"
-                   class="input-ghost w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                   placeholder="Начните вводить имя отправителя..." autocomplete="off" aria-autocomplete="both" />
-
-            <button id="clearBtn" type="button" class="absolute right-2 top-2 text-gray-400 hidden" aria-hidden="true">✕</button>
+<body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 font-sans">
+  <div class="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <main class="w-full max-w-2xl">
+      <div class="bg-white/95 backdrop-blur-sm rounded-2xl card-shadow overflow-hidden">
+        <div class="gradient-bg px-6 sm:px-8 py-6">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-xl font-bold text-white">Загрузка файлов</h1>
+              <p class="text-white/80 text-sm">Выберите отправителя и загрузите документ</p>
+            </div>
           </div>
-
-          <input type="hidden" id="sender" name="sender" required />
-          <p class="text-xs text-gray-500 mt-1">Нажмите <kbd class="px-1 py-0.5 bg-gray-100 rounded border text-xs">Tab</kbd>, чтобы принять подсказку.</p>
         </div>
 
-        <!-- FILE UPLOAD: single-file lock, show file in same zone, remove button -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Файл</label>
+        <div class="p-6 sm:p-8">
+          <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
+            <div class="space-y-2">
+              <label for="senderSearch" class="block text-sm font-semibold text-gray-900">
+                Отправитель
+                <span class="text-red-500 ml-1">*</span>
+              </label>
 
-          <!-- upload zone wrapper -->
-          <div id="uploadWrapper" class="relative">
-            <!-- default upload zone -->
-            <label id="uploadZone" for="file"
-                   class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-md p-6 cursor-pointer bg-white hover:border-blue-400 focus-within:border-blue-400"
-                   tabindex="0" aria-describedby="fileHint">
-              <svg id="uploadIcon" class="w-10 h-10 text-gray-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
-              </svg>
-              <div id="uploadText" class="text-sm font-medium text-gray-700">Перетащите файл сюда или нажмите для выбора</div>
-              <div id="uploadSub" class="text-xs text-gray-500">Поддерживаются форматы .xlsx и .xls</div>
-            </label>
+              <div class="relative autocomplete-wrap">
+                <div id="suggestion" class="suggestion-layer rounded-xl border border-transparent px-4 py-3 text-sm"></div>
 
-            <!-- file-info view (shown when file selected) -->
-            <div id="fileView" class="hidden relative border rounded-md p-4 bg-gray-50 flex items-center justify-between gap-4">
-              <div class="flex items-center gap-3 min-w-0">
-                <svg class="w-6 h-6 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                <input id="senderSearch" name="senderSearch" type="text"
+                       class="input-ghost w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                       placeholder="Начните вводить имя отправителя..." autocomplete="off" aria-autocomplete="both" />
+
+                <button id="clearBtn" type="button" class="absolute right-3 top-3 w-6 h-6 text-gray-400 hover:text-gray-600 hidden rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors" aria-hidden="true">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+
+              <input type="hidden" id="sender" name="sender" required />
+              
+              <div class="flex items-center gap-2 text-xs text-gray-500">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <div class="min-w-0">
-                  <div id="selectedFileName" class="text-sm font-medium text-gray-800 truncate"></div>
-                  <div id="selectedFileSize" class="text-xs text-gray-500 mt-0.5"></div>
+                <span>Нажмите <kbd class="px-2 py-1 bg-gray-100 rounded-md border text-xs font-mono">Tab</kbd> для принятия подсказки</span>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-900">
+                Файл документа
+                <span class="text-red-500 ml-1">*</span>
+              </label>
+
+              <div id="uploadWrapper" class="relative">
+                <label id="uploadZone" for="file"
+                       class="upload-zone-hover flex flex-col items-center justify-center gap-4 border-2 border-dashed border-gray-300 rounded-2xl p-8 cursor-pointer bg-gray-50/50 transition-all duration-300 hover:shadow-lg group"
+                       tabindex="0" aria-describedby="fileHint">
+                  
+                  <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg id="uploadIcon" class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                      <polyline points="14,2 14,8 20,8"/>
+                      <line x1="16" y1="13" x2="8" y2="13"/>
+                      <line x1="16" y1="17" x2="8" y2="17"/>
+                      <polyline points="10,9 9,9 8,9"/>
+                    </svg>
+                  </div>
+                  
+                  <div class="text-center">
+                    <div id="uploadText" class="text-base font-semibold text-gray-700 mb-1">
+                      Перетащите файл сюда или нажмите для выбора
+                    </div>
+                    <div id="uploadSub" class="text-sm text-gray-500">
+                      Поддерживаются форматы .xlsx и .xls
+                    </div>
+                  </div>
+                </label>
+
+                <div id="fileView" class="hidden relative border-2 border-green-200 rounded-2xl p-6 bg-gradient-to-r from-green-50 to-emerald-50">
+                  <div class="flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-4 min-w-0">
+                      <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                          <polyline points="14,2 14,8 20,8"/>
+                        </svg>
+                      </div>
+                      <div class="min-w-0">
+                        <div id="selectedFileName" class="text-base font-semibold text-gray-900 truncate"></div>
+                        <div id="selectedFileSize" class="text-sm text-gray-600 mt-1"></div>
+                      </div>
+                    </div>
+
+                    <button id="removeFileBtn" type="button" 
+                            class="w-10 h-10 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-colors duration-200" 
+                            aria-label="Удалить файл">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <div class="flex items-center gap-2">
-                <!-- remove button -->
-                <button id="removeFileBtn" type="button" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-200" aria-label="Удалить файл">✕</button>
+              <input id="file" name="file" type="file" accept=".xlsx,.xls" class="sr-only" required />
+
+              <div id="fileHint" class="flex items-start gap-2 text-xs text-gray-500 bg-blue-50 rounded-lg p-3">
+                <svg class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Файл появится в зоне выше после выбора. Чтобы загрузить новый файл, сначала удалите текущий.</span>
               </div>
             </div>
-          </div>
 
-          <!-- invisible file input -->
-          <input id="file" name="file" type="file" accept=".xlsx,.xls" class="sr-only" required />
-
-          <p id="fileHint" class="text-xs text-gray-500 mt-2">Файл появится в зоне выше после выбора. Чтобы загрузить новый файл, сначала удалите текущий.</p>
+            <div class="pt-4">
+              <button id="submitBtn" type="submit"
+                      class="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-4 rounded-xl disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl">
+                <svg id="btnSpinner" class="w-5 h-5 hidden pulse-animation" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10" stroke-width="3" stroke="currentColor" />
+                </svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 12l2 2 4-4"/>
+                </svg>
+                Обработать файл
+              </button>
+            </div>
+          </form>
         </div>
-
-        <div>
-          <button id="submitBtn" type="submit"
-                  class="w-full inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-md disabled:opacity-60 disabled:cursor-not-allowed">
-            <svg id="btnSpinner" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="3" stroke="currentColor" /></svg>
-            Обработать
-          </button>
-        </div>
-      </form>
-    </div>
-
-    <!-- Notification -->
-    <div id="notification" class="fixed right-6 top-6 hidden">
-      <div id="notificationInner" class="px-4 py-2 rounded shadow text-white font-semibold"></div>
-    </div>
-
-    <!-- Loading overlay -->
-    <div id="loading" class="fixed inset-0 bg-white/70 flex items-center justify-center hidden z-50">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 border-4 border-gray-300 rounded-full border-t-blue-500 animate-spin"></div>
-        <div class="text-gray-700 font-medium">Загрузка…</div>
       </div>
-    </div>
-  </main>
+
+      <div id="notification" class="fixed right-6 top-6 hidden z-50">
+        <div id="notificationInner" class="px-6 py-4 rounded-xl shadow-2xl text-white font-semibold backdrop-blur-sm"></div>
+      </div>
+
+      <div id="loading" class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-2xl p-8 shadow-2xl flex items-center gap-4">
+          <div class="w-8 h-8 border-4 border-gray-200 rounded-full border-t-blue-500 animate-spin"></div>
+          <div class="text-gray-700 font-semibold">Загрузка файла...</div>
+        </div>
+      </div>
+    </main>
+  </div>
 
 <script>
   // processorsList — Jinja render to JS array НУЖНО ЭТУ ЧАСТЬ ИСПРАВИТЬф
@@ -143,16 +226,18 @@
   const VALID_RE = /\.(xlsx|xls)$/i;
 
   // ---------- Helpers ----------
+
   function normalize(s) { return (s||'').toString().toLowerCase().replace(/\s+/g,' ').trim(); }
   function showNotification(msg, type='success') {
     notification.classList.remove('hidden');
     notificationInner.textContent = msg;
-    notificationInner.className = 'px-4 py-2 rounded shadow text-white font-semibold ' + (type === 'error' ? 'bg-red-600' : 'bg-green-600');
+    notificationInner.className = 'px-6 py-4 rounded-xl shadow-2xl text-white font-semibold backdrop-blur-sm ' + (type === 'error' ? 'bg-red-600' : 'bg-green-600');
     setTimeout(()=> { notification.classList.add('hidden'); }, 3000);
   }
   function setLoading(on) { loading.classList.toggle('hidden', !on); }
 
   // ---------- AUTOCOMPLETE inline suggestion ----------
+
   function findSuggestion(prefix) {
     const nq = normalize(prefix);
     if (!nq) return null;
@@ -246,6 +331,7 @@
   });
 
   // ---------- FILE SELECTION / LOCK LOGIC ----------
+
   function humanFileSize(bytes) {
     if (bytes === 0) return '0 B';
     const units = ['B','KB','MB','GB','TB'];
@@ -357,6 +443,7 @@
   });
 
   // ---------- FORM SUBMISSION ----------
+
   function fetchWithTimeout(url, options = {}, timeout = 25000) {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
@@ -407,56 +494,6 @@
       setLoading(false);
     }
   });
-
-  // ---------- SUGGESTION logic reuse ----------
-  // using functions from previous code (kept here for self-containedness)
-  function findSuggestion(prefix) {
-    const nq = normalize(prefix);
-    if (!nq) return null;
-    for (const p of processorsList) {
-      if (normalize(p).startsWith(nq) && normalize(p) !== nq) return p;
-    }
-    return null;
-  }
-  function remainderFromPrefix(original, prefix) {
-    const target = normalize(prefix);
-    if (!target) return original;
-    let acc = '';
-    let idx = 0;
-    for (let i = 0; i < original.length; i++) {
-      const ch = original[i];
-      if (/\s/.test(ch)) {
-        if (!acc.endsWith(' ')) acc += ' ';
-      } else {
-        acc += ch.toLowerCase();
-      }
-      acc = acc.replace(/\s+/g,' ').trimEnd();
-      if (acc.length >= target.length) { idx = i + 1; break; }
-    }
-    if (idx === 0) idx = original.length;
-    return original.slice(idx);
-  }
-
-  function showSuggestionFor(value) {
-    const sug = findSuggestion(value);
-    currentSuggestion = sug;
-    if (!sug) { suggestionEl.innerHTML = ''; return null; }
-    const prefix = value;
-    const rem = remainderFromPrefix(sug, prefix);
-    suggestionEl.innerHTML = `<span class="suggestion-prefix">${escapeHtml(prefix)}</span><span>${escapeHtml(rem)}</span>`;
-    return sug;
-  }
-  function escapeHtml(s) { return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
-
-  // wire input events for suggestion (re-run to ensure defined)
-  senderSearch.addEventListener('input', () => {
-    senderHidden.value = '';
-    clearBtn.classList.toggle('hidden', !senderSearch.value);
-    showSuggestionFor(senderSearch.value);
-  });
-
-  // initial hide clear
-  clearBtn.classList.add('hidden');
 </script>
 </body>
 </html>
