@@ -1,448 +1,462 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Excel Upload Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #1976d2;
-            --primary-light: #42a5f5;
-            --success: #4caf50;
-            --error: #f44336;
-            --surface: #ffffff;
-            --background: #757575;
-            --text-primary: #212121;
-            --text-secondary: #757575;
-            --divider: #757575;
-            --shadow: 0 2px 4px rgba(0,0,0,0.12);
-            --shadow-raised: 0 8px 16px rgba(0,0,0,0.15);
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--background);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 480px;
-        }
-
-        .card {
-            background: var(--surface);
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            padding: 32px;
-            transition: box-shadow 0.2s ease;
-        }
-
-        .card:hover {
-            box-shadow: var(--shadow-raised);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 500;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-
-        .select-wrapper {
-            position: relative;
-        }
-
-        select {
-            width: 100%;
-            padding: 16px;
-            border: 1px solid var(--divider);
-            border-radius: 4px;
-            background: var(--surface);
-            color: var(--text-primary);
-            font-size: 16px;
-            appearance: none;
-            cursor: pointer;
-            transition: border-color 0.2s ease;
-            padding-right: 48px;
-        }
-
-        select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        select:hover {
-            border-color: var(--text-secondary);
-        }
-
-        .select-arrow {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-            color: var(--text-secondary);
-        }
-
-        .upload-zone {
-            border: 2px dashed var(--divider);
-            border-radius: 4px;
-            padding: 48px 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: var(--surface);
-        }
-
-        .upload-zone:hover {
-            border-color: var(--primary);
-            background-color: rgba(25, 118, 210, 0.04);
-        }
-
-        .upload-zone.drag-over {
-            border-color: var(--primary);
-            background-color: rgba(25, 118, 210, 0.08);
-        }
-
-        .upload-icon {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 16px;
-            color: var(--text-secondary);
-        }
-
-        .upload-text {
-            font-size: 16px;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-
-        .upload-subtext {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        .file-info {
-            display: none;
-            margin-top: 16px;
-            padding: 16px;
-            background-color: rgba(76, 175, 80, 0.1);
-            border: 1px solid rgba(76, 175, 80, 0.3);
-            border-radius: 4px;
-        }
-
-        .file-info.active {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .file-name {
-            color: var(--success);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 16px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s ease, box-shadow 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .submit-btn:hover {
-            background: var(--primary-light);
-            box-shadow: var(--shadow-raised);
-        }
-
-        .submit-btn:disabled {
-            background: var(--text-secondary);
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .loading.active {
-            display: flex;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--divider);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .notification {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            padding: 16px 24px;
-            background: var(--success);
-            color: white;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 500;
-            box-shadow: var(--shadow-raised);
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            z-index: 1001;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification.error {
-            background: var(--error);
-        }
-
-        @media (max-width: 600px) {
-            .card {
-                padding: 24px;
-            }
-            
-            .notification {
-                right: 16px;
-                left: 16px;
-                transform: translateY(-100px);
-            }
-            
-            .notification.show {
-                transform: translateY(0);
-            }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Excel Upload — Inline suggestion + single-file lock</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .autocomplete-wrap { position: relative; }
+    .suggestion-layer {
+      position: absolute; inset: 0; pointer-events: none; display:flex; align-items:center;
+      padding-left:0.75rem; padding-right:2.5rem; color:rgba(107,114,128,0.5);
+      font-size:1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .suggestion-prefix { color: transparent; }
+    .input-ghost { background: transparent; position: relative; z-index: 2; }
+    .sr-only { position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <div class="card">
-            <div class="header">
-                <h1>Загрузка файла для обработки</h1>
-                <p class="subtitle">Выберите отправителя и загрузите файл Invoice или Packing List</p>
-            </div>
+<body class="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+  <main class="w-full max-w-2xl">
+    <div class="bg-white rounded-xl shadow-md p-6 sm:p-8">
+      <header class="mb-4 text-center">
+        <h1 class="text-lg font-semibold text-gray-800">Загрузка файла для обработки</h1>
+        <p class="text-sm text-gray-500 mt-1">Выберите отправителя и загрузите Invoice или Packing List</p>
+      </header>
 
-            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="sender">Отправитель</label>
-                    <div class="select-wrapper">
-                        <select id="sender" name="sender" required>
-                            <option value="">Выберите отправителя</option>
-                            {% for sender in processors %}
-                                <option value="{{ sender }}">{{ sender|capitalize }}</option>
-                            {% endfor %}
-                        </select>
-                        <svg class="select-arrow" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M7 10l5 5 5-5z"/>
-                        </svg>
-                    </div>
-                </div>
+      <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" class="space-y-4" novalidate>
+        <!-- AUTOCOMPLETE -->
+        <div>
+          <label for="senderSearch" class="block text-sm font-medium text-gray-700 mb-1">Отправитель</label>
 
-                <div class="form-group">
-                    <label for="file">Файл</label>
-                    <div class="upload-zone" id="uploadZone">
-                        <svg class="upload-icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
-                        </svg>
-                        <p class="upload-text">Перетащите файл сюда или нажмите для выбора</p>
-                        <p class="upload-subtext">Поддерживаются форматы .xlsx и .xls</p>
-                        <input type="file" id="file" name="file" accept=".xlsx,.xls" required>
-                    </div>
-                    <div class="file-info" id="fileInfo">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                            <polyline points="14,2 14,8 20,8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                            <polyline points="10,9 9,9 8,9"/>
-                        </svg>
-                        <span class="file-name" id="fileName"></span>
-                    </div>
-                </div>
+          <div class="relative autocomplete-wrap">
+            <div id="suggestion" class="suggestion-layer rounded-md border border-transparent px-3 py-2 text-sm"></div>
 
-                <button type="submit" class="submit-btn" id="submitBtn">
-                    Обработать
-                </button>
-            </form>
+            <input id="senderSearch" name="senderSearch" type="text"
+                   class="input-ghost w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                   placeholder="Начните вводить имя отправителя..." autocomplete="off" aria-autocomplete="both" />
+
+            <button id="clearBtn" type="button" class="absolute right-2 top-2 text-gray-400 hidden" aria-hidden="true">✕</button>
+          </div>
+
+          <input type="hidden" id="sender" name="sender" required />
+          <p class="text-xs text-gray-500 mt-1">Нажмите <kbd class="px-1 py-0.5 bg-gray-100 rounded border text-xs">Tab</kbd>, чтобы принять подсказку.</p>
         </div>
+
+        <!-- FILE UPLOAD: single-file lock, show file in same zone, remove button -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Файл</label>
+
+          <!-- upload zone wrapper -->
+          <div id="uploadWrapper" class="relative">
+            <!-- default upload zone -->
+            <label id="uploadZone" for="file"
+                   class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-md p-6 cursor-pointer bg-white hover:border-blue-400 focus-within:border-blue-400"
+                   tabindex="0" aria-describedby="fileHint">
+              <svg id="uploadIcon" class="w-10 h-10 text-gray-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+              </svg>
+              <div id="uploadText" class="text-sm font-medium text-gray-700">Перетащите файл сюда или нажмите для выбора</div>
+              <div id="uploadSub" class="text-xs text-gray-500">Поддерживаются форматы .xlsx и .xls</div>
+            </label>
+
+            <!-- file-info view (shown when file selected) -->
+            <div id="fileView" class="hidden relative border rounded-md p-4 bg-gray-50 flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3 min-w-0">
+                <svg class="w-6 h-6 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                </svg>
+                <div class="min-w-0">
+                  <div id="selectedFileName" class="text-sm font-medium text-gray-800 truncate"></div>
+                  <div id="selectedFileSize" class="text-xs text-gray-500 mt-0.5"></div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <!-- remove button -->
+                <button id="removeFileBtn" type="button" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-200" aria-label="Удалить файл">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- invisible file input -->
+          <input id="file" name="file" type="file" accept=".xlsx,.xls" class="sr-only" required />
+
+          <p id="fileHint" class="text-xs text-gray-500 mt-2">Файл появится в зоне выше после выбора. Чтобы загрузить новый файл, сначала удалите текущий.</p>
+        </div>
+
+        <div>
+          <button id="submitBtn" type="submit"
+                  class="w-full inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-md disabled:opacity-60 disabled:cursor-not-allowed">
+            <svg id="btnSpinner" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="3" stroke="currentColor" /></svg>
+            Обработать
+          </button>
+        </div>
+      </form>
     </div>
 
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
+    <!-- Notification -->
+    <div id="notification" class="fixed right-6 top-6 hidden">
+      <div id="notificationInner" class="px-4 py-2 rounded shadow text-white font-semibold"></div>
     </div>
 
-    <div class="notification" id="notification"></div>
+    <!-- Loading overlay -->
+    <div id="loading" class="fixed inset-0 bg-white/70 flex items-center justify-center hidden z-50">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 border-4 border-gray-300 rounded-full border-t-blue-500 animate-spin"></div>
+        <div class="text-gray-700 font-medium">Загрузка…</div>
+      </div>
+    </div>
+  </main>
 
-    <script>
-        const uploadZone = document.getElementById('uploadZone');
-        const fileInput = document.getElementById('file');
-        const fileInfo = document.getElementById('fileInfo');
-        const fileName = document.getElementById('fileName');
-        const form = document.getElementById('uploadForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const loading = document.getElementById('loading');
-        const notification = document.getElementById('notification');
+<script>
+  // processorsList — Jinja render to JS array НУЖНО ЭТУ ЧАСТЬ ИСПРАВИТЬф
+  const processorsList = [
+    {% for sender in processors %}
+      "{{ sender|replace('"','\\"') }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ];
 
-        // Click to upload
-        uploadZone.addEventListener('click', () => fileInput.click());
+  // Elements — autocomplete
+  const senderSearch = document.getElementById('senderSearch');
+  const senderHidden = document.getElementById('sender');
+  const suggestionEl = document.getElementById('suggestion');
+  const clearBtn = document.getElementById('clearBtn');
 
-        // Drag and drop
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadZone.classList.add('drag-over');
-        });
+  // Elements — file upload
+  const fileInput = document.getElementById('file');
+  const uploadZone = document.getElementById('uploadZone');
+  const uploadWrapper = document.getElementById('uploadWrapper');
+  const fileView = document.getElementById('fileView');
+  const selectedFileName = document.getElementById('selectedFileName');
+  const selectedFileSize = document.getElementById('selectedFileSize');
+  const removeFileBtn = document.getElementById('removeFileBtn');
 
-        uploadZone.addEventListener('dragleave', () => {
-            uploadZone.classList.remove('drag-over');
-        });
+  // Form
+  const form = document.getElementById('uploadForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const loading = document.getElementById('loading');
+  const notification = document.getElementById('notification');
+  const notificationInner = document.getElementById('notificationInner');
 
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('drag-over');
-            
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                const file = files[0];
-                if (file.name.match(/\.(xlsx|xls)$/)) {
-                    fileInput.files = files;
-                    handleFileSelect(file);
-                } else {
-                    showNotification('Пожалуйста, выберите файл Excel (.xlsx или .xls)', 'error');
-                }
-            }
-        });
+  const VALID_RE = /\.(xlsx|xls)$/i;
 
-        // File selection
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFileSelect(e.target.files[0]);
-            }
-        });
+  // ---------- Helpers ----------
+  function normalize(s) { return (s||'').toString().toLowerCase().replace(/\s+/g,' ').trim(); }
+  function showNotification(msg, type='success') {
+    notification.classList.remove('hidden');
+    notificationInner.textContent = msg;
+    notificationInner.className = 'px-4 py-2 rounded shadow text-white font-semibold ' + (type === 'error' ? 'bg-red-600' : 'bg-green-600');
+    setTimeout(()=> { notification.classList.add('hidden'); }, 3000);
+  }
+  function setLoading(on) { loading.classList.toggle('hidden', !on); }
 
-        function handleFileSelect(file) {
-            fileName.textContent = file.name;
-            fileInfo.classList.add('active');
-        }
+  // ---------- AUTOCOMPLETE inline suggestion ----------
+  function findSuggestion(prefix) {
+    const nq = normalize(prefix);
+    if (!nq) return null;
+    for (const p of processorsList) {
+      if (normalize(p).startsWith(nq) && normalize(p) !== nq) return p;
+    }
+    return null;
+  }
+  function escapeHtml(s) { return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 
-        // Form submission
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (!fileInput.files.length) {
-                showNotification('Пожалуйста, выберите файл', 'error');
-                return;
-            }
-            
-            if (!document.getElementById('sender').value) {
-                showNotification('Пожалуйста, выберите отправителя', 'error');
-                return;
-            }
+  // remainderFromPrefix: find how many chars of original correspond to normalized prefix
+  function remainderFromPrefix(original, prefix) {
+    const target = normalize(prefix);
+    if (!target) return original;
+    let acc = '';
+    let idx = 0;
+    for (let i = 0; i < original.length; i++) {
+      const ch = original[i];
+      if (/\s/.test(ch)) {
+        if (!acc.endsWith(' ')) acc += ' ';
+      } else {
+        acc += ch.toLowerCase();
+      }
+      acc = acc.replace(/\s+/g,' ').trimEnd();
+      if (acc.length >= target.length) { idx = i + 1; break; }
+    }
+    if (idx === 0) idx = original.length;
+    return original.slice(idx);
+  }
 
-            const formData = new FormData(form);
-            loading.classList.add('active');
-            submitBtn.disabled = true;
+  let currentSuggestion = null;
 
-            try {
-                const response = await fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showNotification('Файл успешно загружен!', 'success');
-                    setTimeout(() => {
-                        window.location.href = '/table';
-                    }, 1500);
-                } else {
-                    showNotification('Ошибка: ' + result.error, 'error');
-                    submitBtn.disabled = false;
-                }
-            } catch (error) {
-                showNotification('Ошибка при загрузке файла', 'error');
-                submitBtn.disabled = false;
-            } finally {
-                loading.classList.remove('active');
-            }
-        });
+  function showSuggestionFor(value) {
+    const sug = findSuggestion(value);
+    currentSuggestion = sug;
+    if (!sug) { suggestionEl.innerHTML = ''; return null; }
+    const prefix = value;
+    const rem = remainderFromPrefix(sug, prefix);
+    const safePrefix = escapeHtml(prefix);
+    const safeRem = escapeHtml(rem);
+    suggestionEl.innerHTML = `<span class="suggestion-prefix">${safePrefix}</span><span>${safeRem}</span>`;
+    return sug;
+  }
 
-        function showNotification(message, type = 'success') {
-            notification.textContent = message;
-            notification.className = 'notification show';
-            if (type === 'error') {
-                notification.classList.add('error');
-            }
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-    </script>
+  senderSearch.addEventListener('input', () => {
+    senderHidden.value = '';
+    clearBtn.classList.toggle('hidden', !senderSearch.value);
+    showSuggestionFor(senderSearch.value);
+  });
+
+  // Tab accepts suggestion
+  senderSearch.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      if (currentSuggestion) {
+        e.preventDefault();
+        senderSearch.value = currentSuggestion;
+        senderHidden.value = currentSuggestion;
+        currentSuggestion = null;
+        suggestionEl.innerHTML = '';
+        clearBtn.classList.toggle('hidden', !senderSearch.value);
+      }
+    } else if (e.key === 'Enter') {
+      const exact = processorsList.find(s => normalize(s) === normalize(senderSearch.value));
+      if (exact) {
+        senderHidden.value = exact;
+      } else if (currentSuggestion) {
+        senderHidden.value = currentSuggestion;
+        senderSearch.value = currentSuggestion;
+        currentSuggestion = null;
+        suggestionEl.innerHTML = '';
+      }
+    } else if (e.key === 'Escape') {
+      suggestionEl.innerHTML = '';
+      currentSuggestion = null;
+    }
+  });
+
+  senderSearch.addEventListener('blur', () => {
+    const exact = processorsList.find(s => normalize(s) === normalize(senderSearch.value));
+    if (exact) senderHidden.value = exact;
+    setTimeout(()=> { suggestionEl.innerHTML = ''; currentSuggestion = null; }, 120);
+  });
+
+  clearBtn.addEventListener('click', () => {
+    senderSearch.value = '';
+    senderHidden.value = '';
+    clearBtn.classList.add('hidden');
+    suggestionEl.innerHTML = '';
+    currentSuggestion = null;
+    senderSearch.focus();
+  });
+
+  // ---------- FILE SELECTION / LOCK LOGIC ----------
+  function humanFileSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const units = ['B','KB','MB','GB','TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return (bytes / Math.pow(1024, i)).toFixed( (i===0)?0:1 ) + ' ' + units[i];
+  }
+
+  function showSelectedFile(file) {
+    selectedFileName.textContent = file.name;
+    selectedFileSize.textContent = humanFileSize(file.size);
+    fileView.classList.remove('hidden');
+    uploadZone.classList.add('hidden');
+    // disable uploadZone interactivity while file present (prevent click opening)
+    uploadZone.setAttribute('aria-disabled', 'true');
+  }
+
+  function clearSelectedFile() {
+    // reset file input
+    try { fileInput.value = ''; } catch(e) {
+      // in some browsers setting value may throw; recreate input if needed
+      const newInput = fileInput.cloneNode();
+      fileInput.parentNode.replaceChild(newInput, fileInput);
+      // reassign and rebind events (simple way: reload page or handle minimal)
+      location.reload(); // cheap but effective fallback
+    }
+    senderHidden.removeAttribute('data-file'); // not used, but cleanup
+    fileView.classList.add('hidden');
+    uploadZone.classList.remove('hidden');
+    uploadZone.removeAttribute('aria-disabled');
+  }
+
+  // When user selects file via file dialog
+  fileInput.addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    if (!VALID_RE.test(f.name)) {
+      showNotification('Неподдерживаемый формат файла', 'error');
+      fileInput.value = '';
+      return;
+    }
+    showSelectedFile(f);
+  });
+
+  // dragover/drop: blocked if a file is present
+  uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if (!fileView.classList.contains('hidden')) {
+      // show subtle feedback that drop is disabled
+      uploadZone.classList.add('opacity-60');
+      return;
+    }
+    uploadZone.classList.add('ring-2', 'ring-blue-200');
+  });
+  uploadZone.addEventListener('dragleave', () => {
+    uploadZone.classList.remove('ring-2', 'ring-blue-200', 'opacity-60');
+  });
+
+  uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('ring-2', 'ring-blue-200', 'opacity-60');
+    if (!fileView.classList.contains('hidden')) {
+      showNotification('Сначала удалите текущий файл, затем загрузите новый', 'error');
+      return;
+    }
+    const f = e.dataTransfer?.files?.[0];
+    if (f && VALID_RE.test(f.name)) {
+      // set file via DataTransfer
+      try {
+        const dt = new DataTransfer();
+        dt.items.add(f);
+        fileInput.files = dt.files;
+      } catch (err) {
+        // fallback: cannot set file programmatically -> ask user to click
+        showNotification('Браузер не позволяет установить файл автоматически, пожалуйста, используйте кнопку выбора', 'error');
+        return;
+      }
+      showSelectedFile(f);
+    } else {
+      showNotification('Пожалуйста, выберите файл Excel (.xlsx или .xls)', 'error');
+    }
+  });
+
+  // Clicking upload zone opens dialog only if no file selected
+  uploadZone.addEventListener('click', (e) => {
+    if (!fileView.classList.contains('hidden')) {
+      e.preventDefault();
+      showNotification('Удалите текущий файл, чтобы выбрать новый', 'error');
+      return;
+    }
+    // else default label behaviour triggers click on file input
+  });
+
+  // keyboard: allow Enter/Space to open only when no file selected
+  uploadZone.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (!fileView.classList.contains('hidden')) {
+        e.preventDefault();
+        showNotification('Удалите текущий файл, чтобы выбрать новый', 'error');
+      } else {
+        // open file picker
+        fileInput.click();
+      }
+    }
+  });
+
+  // remove button
+  removeFileBtn.addEventListener('click', () => {
+    clearSelectedFile();
+  });
+
+  // ---------- FORM SUBMISSION ----------
+  function fetchWithTimeout(url, options = {}, timeout = 25000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    return fetch(url, {...options, signal: controller.signal}).finally(() => clearTimeout(id));
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!senderHidden.value) {
+      const exact = processorsList.find(s => normalize(s) === normalize(senderSearch.value));
+      if (exact) senderHidden.value = exact;
+      else if (currentSuggestion) { senderHidden.value = currentSuggestion; senderSearch.value = currentSuggestion; }
+    }
+
+    if (!senderHidden.value) { showNotification('Пожалуйста, выберите отправителя из списка', 'error'); return; }
+    // ensure file selected
+    if (fileInput.files.length === 0) { showNotification('Пожалуйста, выберите файл', 'error'); return; }
+
+    submitBtn.disabled = true;
+    setLoading(true);
+
+    const formData = new FormData(form);
+    try {
+      const resp = await fetchWithTimeout(form.action || '/upload', { method: 'POST', body: formData }, 25000);
+      if (!resp.ok) {
+        let errText = `Сервер вернул ${resp.status}`;
+        try { const j = await resp.json(); if (j && j.error) errText = j.error; } catch {}
+        showNotification('Ошибка: ' + errText, 'error');
+        submitBtn.disabled = false;
+        setLoading(false);
+        return;
+      }
+      const result = await resp.json().catch(()=>({success:false}));
+      if (result && result.success) {
+        showNotification('Файл успешно загружен!', 'success');
+        const redirect = result.redirect || '/table';
+        setTimeout(()=> location.href = redirect, 700);
+      } else {
+        showNotification('Ошибка: ' + (result.error || 'Не удалось обработать файл'), 'error');
+        submitBtn.disabled = false;
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') showNotification('Превышено время ожидания сервера', 'error');
+      else showNotification('Ошибка при загрузке файла', 'error');
+      submitBtn.disabled = false;
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  // ---------- SUGGESTION logic reuse ----------
+  // using functions from previous code (kept here for self-containedness)
+  function findSuggestion(prefix) {
+    const nq = normalize(prefix);
+    if (!nq) return null;
+    for (const p of processorsList) {
+      if (normalize(p).startsWith(nq) && normalize(p) !== nq) return p;
+    }
+    return null;
+  }
+  function remainderFromPrefix(original, prefix) {
+    const target = normalize(prefix);
+    if (!target) return original;
+    let acc = '';
+    let idx = 0;
+    for (let i = 0; i < original.length; i++) {
+      const ch = original[i];
+      if (/\s/.test(ch)) {
+        if (!acc.endsWith(' ')) acc += ' ';
+      } else {
+        acc += ch.toLowerCase();
+      }
+      acc = acc.replace(/\s+/g,' ').trimEnd();
+      if (acc.length >= target.length) { idx = i + 1; break; }
+    }
+    if (idx === 0) idx = original.length;
+    return original.slice(idx);
+  }
+
+  function showSuggestionFor(value) {
+    const sug = findSuggestion(value);
+    currentSuggestion = sug;
+    if (!sug) { suggestionEl.innerHTML = ''; return null; }
+    const prefix = value;
+    const rem = remainderFromPrefix(sug, prefix);
+    suggestionEl.innerHTML = `<span class="suggestion-prefix">${escapeHtml(prefix)}</span><span>${escapeHtml(rem)}</span>`;
+    return sug;
+  }
+  function escapeHtml(s) { return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+  // wire input events for suggestion (re-run to ensure defined)
+  senderSearch.addEventListener('input', () => {
+    senderHidden.value = '';
+    clearBtn.classList.toggle('hidden', !senderSearch.value);
+    showSuggestionFor(senderSearch.value);
+  });
+
+  // initial hide clear
+  clearBtn.classList.add('hidden');
+</script>
 </body>
 </html>
