@@ -6,7 +6,7 @@ from gemini_api import detect_currency
 import json
 
 def process_ai(file_content: bytes) -> dict:
-    storage = ExcelData(rows=[], totals=Totals(), sender="", truck="", calc=Calc())
+    storage = ExcelData(rows=[], totals=Totals(), sender="", truck="", calc=Calc(), recipient="")
 
     column_mapping = {
         "Xinjiang Xindudu \nImport and Export Trading Co.,Ltd": "Наименование/модель",
@@ -40,6 +40,26 @@ def process_ai(file_content: bytes) -> dict:
                 break
 
         storage.sender = sender
+        
+        # Найдем запись, начинающуюся с 'TO:' до конца строки
+        recipient = ""
+        for _, df in sheets.items():
+            for col in df.columns:
+                for cell in df[col]:
+                    if isinstance(cell, str):
+                        # Разбиваем ячейку на строки
+                        lines = cell.split("\n")
+                        for line in lines:
+                            if line.startswith("TO:"):
+                                recipient = line[len("TO:"):].strip()  # Берем текст после TO:
+                                break
+                        if recipient:
+                            break
+                if recipient:
+                    break
+            if recipient:
+                break
+        storage.recipient = recipient
 
         # определение валюты по документу
         # Отправляем весь Excel в ИИ для анализа
