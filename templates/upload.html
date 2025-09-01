@@ -805,7 +805,6 @@
         if (result.data) {
           localStorage.setItem('mapato_data', JSON.stringify(result.data));
           localStorage.setItem('mapato_upload_time', new Date().toISOString());
-          showNotification('Файл успешно обработан и сохранён', 'success');
         }
         const redirect = result.redirect || '/table';
         setTimeout(()=> location.href = redirect, 0);

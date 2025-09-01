@@ -1,12 +1,12 @@
 import pandas as pd
 import io
 import re
-from models import ExcelRow, ExcelData, Totals
+from models import ExcelRow, ExcelData, Totals, Calc
 from gemini_api import detect_currency
 import json
 
 def process_xinjiang(file_content: bytes) -> dict:
-    storage = ExcelData(rows=[], totals=Totals(), sender="", truck="")
+    storage = ExcelData(rows=[], totals=Totals(), sender="", truck="", calc=Calc())
 
     column_mapping = {
         "Xinjiang Xindudu \nImport and Export Trading Co.,Ltd": "Наименование/модель",
@@ -89,6 +89,27 @@ def process_xinjiang(file_content: bytes) -> dict:
                     total_amount=float(last_row.get("Общая сумма", 0))
                 )
 
+
+                # Расчетные итоги - считаем вручную по данным таблицы
+                calculated_total_quantity = 0
+                calculated_total_weight = 0
+                calculated_total_amount = 0
+                
+                # Считаем итоги по всем строкам данных (исключая заголовок и последнюю строку)
+                data_rows = df.iloc[1:-1]
+                for _, row in data_rows.iterrows():
+                    calculated_total_quantity += float(row.get("Кол-во мест", 0))
+                    calculated_total_weight += float(row.get("Общий вес брутто", 0))
+                    calculated_total_amount += float(row.get("Общая сумма", 0))
+                
+                storage.calc = Calc(
+                    calc_quantity=calculated_total_quantity,
+                    calc_weight=calculated_total_weight,
+                    calc_amount=calculated_total_amount
+                )
+                
+                
+                
                 # Остальные строки
                 records = df.iloc[1:-1].to_dict(orient="records")
                 for record in records:
@@ -112,4 +133,4 @@ def process_xinjiang(file_content: bytes) -> dict:
         return {"error": str(e)}
 
     # Возвращаем результат и найденный текст 'FROM:'
-    return {"success": True, "storage": storage, "sender": sender, "truck": storage.truck, }
+    return {"success": True, "storage": storage, "truck": storage.truck}
