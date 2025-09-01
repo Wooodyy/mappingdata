@@ -49,7 +49,7 @@
           </h2>
           <button
             onclick="goBackToUpload()"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-white/100 hover:bg-blue-900 hover:text-white/100 text-blue-600 rounded-lg transition-all duration-200 text-sm font-medium"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-white/100 border border-gray-300 hover:bg-blue-900 hover:text-white/100 text-blue-600 rounded-lg transition-all duration-200 text-sm font-medium"
           >
             <svg
               class="w-4 h-4"
@@ -607,7 +607,7 @@
                     ${Object.entries(row)
                       .map(
                         ([key, value]) => `
-                        <td class="px-6 py-4 text-sm text-slate-900 whitespace-nowrap">
+                        <td class="px-6 py-1.5 text-sm text-slate-900 whitespace-nowrap">
                             ${key === "Вид упаковки " ? `
                                 <select 
                                     class="package-type-select text-sm bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
