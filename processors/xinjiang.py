@@ -2,6 +2,8 @@ import pandas as pd
 import io
 import re
 from models import ExcelRow, ExcelData, Totals
+from gemini_api import detect_currency
+import json
 
 def process_xinjiang(file_content: bytes) -> dict:
     storage = ExcelData(rows=[], totals=Totals(), sender="", truck="")
@@ -17,14 +19,6 @@ def process_xinjiang(file_content: bytes) -> dict:
 
     try:
         sheets = pd.read_excel(io.BytesIO(file_content), sheet_name=None)
-
-        # Определяем валюту
-        currency = "USD"
-        for _, df in sheets.items():
-            df_str = df.to_string().lower()
-            if 'cny' in df_str or any('cny' in str(col).lower() for col in df.columns):
-                currency = "CNY"
-                break
         
         # Найдем запись, начинающуюся с 'FROM:' до конца строки
         sender = ""
@@ -47,6 +41,17 @@ def process_xinjiang(file_content: bytes) -> dict:
 
         storage.sender = sender
 
+        # определение валюты по документу
+        # Отправляем весь Excel в ИИ для анализа
+        excel_content_for_ai = ""
+        for sheet_name, df in sheets.items():
+            excel_content_for_ai += f"Лист: {sheet_name}\n"
+            excel_content_for_ai += df.to_string() + "\n\n"
+
+        # Отправляем в ИИ для получения валюты
+        currency = detect_currency(excel_content_for_ai)
+
+        
         # Найдем запись, начинающуюся с 'Truck:№ ' до конца строки
         truck = ""
         for _, df in sheets.items():
@@ -107,4 +112,4 @@ def process_xinjiang(file_content: bytes) -> dict:
         return {"error": str(e)}
 
     # Возвращаем результат и найденный текст 'FROM:'
-    return {"success": True, "storage": storage, "sender": sender, "truck": storage.truck}
+    return {"success": True, "storage": storage, "sender": sender, "truck": storage.truck, }

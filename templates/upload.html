@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Excel Upload — Загрузка файлов</title>
+  <title>Invoice/Packing List</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
@@ -80,11 +80,15 @@
                        class="input-ghost w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                        placeholder="Начните вводить имя отправителя..." autocomplete="off" aria-autocomplete="both" />
 
-                <button id="clearBtn" type="button" class="absolute right-3 top-3 w-6 h-6 text-gray-400 hover:text-gray-600 hidden rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors" aria-hidden="true">
+                <button id="clearBtn" type="button" class="absolute right-3 top-3 w-6 h-6 text-gray-400 hover:text-gray-600 hidden rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors z-10" title="Очистить поле">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                   </svg>
                 </button>
+                
+                <!-- Выпадающий список с вариантами -->
+                <div id="senderDropdown" class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto hidden">
+                </div>
               </div>
 
               <input type="hidden" id="sender" name="sender" required />
@@ -164,7 +168,7 @@
               </div>
             </div>
 
-            <div class="pt-4">
+            <div class="pt-0">
               <button id="submitBtn" type="submit"
                       class="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-4 rounded-xl disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl">
                 <svg id="btnSpinner" class="w-5 h-5 hidden pulse-animation" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -193,19 +197,28 @@
     </main>
   </div>
 
+<script type="application/json" id="processors-data">
+{{ processors|tojson|safe }}
+</script>
+
 <script>
-  // processorsList — Jinja render to JS array НУЖНО ЭТУ ЧАСТЬ ИСПРАВИТЬф
-  const processorsList = [
-    {% for sender in processors %}
-      "{{ sender|replace('"','\\"') }}"{% if not loop.last %},{% endif %}
-    {% endfor %}
-  ];
+  // Список доступных процессоров/отправителей
+  const processorsData = document.getElementById('processors-data').textContent;
+  const processorsList = JSON.parse(processorsData);
 
   // Elements — autocomplete
   const senderSearch = document.getElementById('senderSearch');
   const senderHidden = document.getElementById('sender');
   const suggestionEl = document.getElementById('suggestion');
   const clearBtn = document.getElementById('clearBtn');
+  const senderDropdown = document.getElementById('senderDropdown');
+  
+  // Проверяем, что все элементы найдены
+  if (!clearBtn) {
+    console.error('Clear button not found!');
+  } else {
+    console.log('Clear button found:', clearBtn);
+  }
 
   // Elements — file upload
   const fileInput = document.getElementById('file');
@@ -241,39 +254,84 @@
   function findSuggestion(prefix) {
     const nq = normalize(prefix);
     if (!nq) return null;
+    
+    // Сначала ищем точное совпадение начала
     for (const p of processorsList) {
-      if (normalize(p).startsWith(nq) && normalize(p) !== nq) return p;
+      const normalized = normalize(p);
+      if (normalized.startsWith(nq) && normalized !== nq) {
+        return p;
+      }
+    }
+    
+    // Если не найдено, ищем частичное совпадение
+    for (const p of processorsList) {
+      const normalized = normalize(p);
+      if (normalized.includes(nq) && normalized !== nq) {
+        return p;
+      }
+    }
+    
+    return null;
+  }
+  
+  function findExactMatch(input) {
+    const nq = normalize(input);
+    for (const p of processorsList) {
+      if (normalize(p) === nq) {
+        return p;
+      }
     }
     return null;
   }
-  function escapeHtml(s) { return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+  
+  function escapeHtml(s) { 
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); 
+  }
 
   // remainderFromPrefix: find how many chars of original correspond to normalized prefix
   function remainderFromPrefix(original, prefix) {
     const target = normalize(prefix);
     if (!target) return original;
-    let acc = '';
-    let idx = 0;
+    
+    const originalNorm = normalize(original);
+    const startIndex = originalNorm.indexOf(target);
+    
+    if (startIndex === -1) return original;
+    
+    // Находим соответствующий индекс в оригинальной строке
+    let charCount = 0;
+    let realIndex = 0;
+    
     for (let i = 0; i < original.length; i++) {
       const ch = original[i];
       if (/\s/.test(ch)) {
-        if (!acc.endsWith(' ')) acc += ' ';
+        if (charCount > 0 && !normalize(original.slice(0, i)).endsWith(' ')) {
+          charCount++;
+        }
       } else {
-        acc += ch.toLowerCase();
+        charCount++;
       }
-      acc = acc.replace(/\s+/g,' ').trimEnd();
-      if (acc.length >= target.length) { idx = i + 1; break; }
+      
+      if (charCount > startIndex + target.length) {
+        realIndex = i;
+        break;
+      }
     }
-    if (idx === 0) idx = original.length;
-    return original.slice(idx);
+    
+    return original.slice(realIndex);
   }
 
   let currentSuggestion = null;
+  let selectedDropdownIndex = -1;
 
   function showSuggestionFor(value) {
     const sug = findSuggestion(value);
     currentSuggestion = sug;
-    if (!sug) { suggestionEl.innerHTML = ''; return null; }
+    if (!sug) { 
+      suggestionEl.innerHTML = ''; 
+      return null; 
+    }
+    
     const prefix = value;
     const rem = remainderFromPrefix(sug, prefix);
     const safePrefix = escapeHtml(prefix);
@@ -282,52 +340,292 @@
     return sug;
   }
 
-  senderSearch.addEventListener('input', () => {
+  function getFilteredProcessors(query) {
+    if (!query) return processorsList;
+    
+    const nq = normalize(query);
+    const exactMatches = [];
+    const startsWithMatches = [];
+    const containsMatches = [];
+    
+    for (const p of processorsList) {
+      const normalized = normalize(p);
+      if (normalized === nq) {
+        exactMatches.push(p);
+      } else if (normalized.startsWith(nq)) {
+        startsWithMatches.push(p);
+      } else if (normalized.includes(nq)) {
+        containsMatches.push(p);
+      }
+    }
+    
+    return [...exactMatches, ...startsWithMatches, ...containsMatches];
+  }
+
+  function showDropdown(query = '') {
+    const filtered = getFilteredProcessors(query);
+    selectedDropdownIndex = -1;
+    
+    if (filtered.length === 0) {
+      senderDropdown.classList.add('hidden');
+      return;
+    }
+    
+    senderDropdown.innerHTML = filtered.map((processor, index) => {
+      const highlighted = highlightMatch(processor, query);
+      return `
+        <div class="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors duration-150 border-b border-gray-100 last:border-b-0" 
+             data-value="${escapeHtml(processor)}" data-index="${index}">
+          ${highlighted}
+        </div>
+      `;
+    }).join('');
+    
+    senderDropdown.classList.remove('hidden');
+  }
+
+  function highlightMatch(text, query) {
+    if (!query) return escapeHtml(text);
+    
+    const nq = normalize(query);
+    const nt = normalize(text);
+    const index = nt.indexOf(nq);
+    
+    if (index === -1) return escapeHtml(text);
+    
+    // Найдем соответствующие позиции в оригинальном тексте
+    let realStart = 0;
+    let realEnd = text.length;
+    
+    // Упрощенная версия для выделения
+    const escapedText = escapeHtml(text);
+    const escapedQuery = escapeHtml(query);
+    
+    return escapedText.replace(new RegExp(`(${escapedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'), 
+      '<mark class="bg-yellow-200 font-semibold">$1</mark>');
+  }
+
+  function hideDropdown() {
+    senderDropdown.classList.add('hidden');
+    selectedDropdownIndex = -1;
+  }
+
+  function selectDropdownItem(index) {
+    const items = senderDropdown.querySelectorAll('[data-value]');
+    if (items.length > 0 && index >= 0 && index < items.length) {
+      const value = items[index].dataset.value;
+      senderSearch.value = value;
+      senderHidden.value = value;
+      hideDropdown();
+      suggestionEl.innerHTML = '';
+      currentSuggestion = null;
+      updateInputState();
+      return true;
+    }
+    return false;
+  }
+
+  // Функция для обновления визуального состояния поля
+  function updateInputState() {
+    const input = senderSearch;
+    const hasValue = input.value.length > 0;
+    const hasValidSelection = senderHidden.value.length > 0;
+    
+    // Удаляем все классы состояния
+    input.classList.remove('border-green-500', 'border-red-500', 'border-yellow-500');
+    
+    if (!hasValue) {
+      // Поле пустое - стандартное состояние
+      input.classList.add('border-gray-200');
+    } else if (hasValidSelection) {
+      // Валидный выбор
+      input.classList.remove('border-gray-200');
+      input.classList.add('border-green-500');
+    } else if (currentSuggestion) {
+      // Есть подсказка
+      input.classList.remove('border-gray-200');
+      input.classList.add('border-yellow-500');
+    } else {
+      // Введено что-то, но нет совпадений
+      input.classList.remove('border-gray-200');
+      input.classList.add('border-red-500');
+    }
+  }
+
+  senderSearch.addEventListener('input', (e) => {
+    const value = e.target.value;
     senderHidden.value = '';
-    clearBtn.classList.toggle('hidden', !senderSearch.value);
-    showSuggestionFor(senderSearch.value);
+    clearBtn.classList.toggle('hidden', !value);
+    
+    // Проверяем на точное совпадение
+    const exactMatch = findExactMatch(value);
+    if (exactMatch) {
+      senderHidden.value = exactMatch;
+      suggestionEl.innerHTML = '';
+      currentSuggestion = null;
+      hideDropdown();
+    } else {
+      showSuggestionFor(value);
+      showDropdown(value);
+    }
+    
+    // Обновляем визуальное состояние
+    updateInputState();
   });
 
   // Tab accepts suggestion
   senderSearch.addEventListener('keydown', (e) => {
-    if (e.key === 'Tab') {
+    const dropdownVisible = !senderDropdown.classList.contains('hidden');
+    const dropdownItems = senderDropdown.querySelectorAll('[data-value]');
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (dropdownVisible && dropdownItems.length > 0) {
+        selectedDropdownIndex = Math.min(selectedDropdownIndex + 1, dropdownItems.length - 1);
+        updateDropdownSelection();
+      } else {
+        showDropdown(senderSearch.value);
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (dropdownVisible && dropdownItems.length > 0) {
+        selectedDropdownIndex = Math.max(selectedDropdownIndex - 1, -1);
+        updateDropdownSelection();
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (dropdownVisible && selectedDropdownIndex >= 0) {
+        selectDropdownItem(selectedDropdownIndex);
+      } else {
+        const exact = findExactMatch(senderSearch.value);
+        if (exact) {
+          senderHidden.value = exact;
+          suggestionEl.innerHTML = '';
+          currentSuggestion = null;
+          hideDropdown();
+        } else if (currentSuggestion) {
+          senderSearch.value = currentSuggestion;
+          senderHidden.value = currentSuggestion;
+          currentSuggestion = null;
+          suggestionEl.innerHTML = '';
+          hideDropdown();
+        }
+      }
+      clearBtn.classList.toggle('hidden', !senderSearch.value);
+      updateInputState();
+    } else if (e.key === 'Tab') {
+      // Приоритет 1: Если есть inline подсказка, используем её
       if (currentSuggestion) {
         e.preventDefault();
         senderSearch.value = currentSuggestion;
         senderHidden.value = currentSuggestion;
         currentSuggestion = null;
         suggestionEl.innerHTML = '';
+        hideDropdown();
         clearBtn.classList.toggle('hidden', !senderSearch.value);
-      }
-    } else if (e.key === 'Enter') {
-      const exact = processorsList.find(s => normalize(s) === normalize(senderSearch.value));
-      if (exact) {
-        senderHidden.value = exact;
-      } else if (currentSuggestion) {
-        senderHidden.value = currentSuggestion;
-        senderSearch.value = currentSuggestion;
-        currentSuggestion = null;
-        suggestionEl.innerHTML = '';
+        updateInputState();
+      } 
+      // Приоритет 2: Если dropdown открыт и что-то выделено
+      else if (dropdownVisible && selectedDropdownIndex >= 0) {
+        e.preventDefault();
+        selectDropdownItem(selectedDropdownIndex);
+      } 
+      // Приоритет 3: Если dropdown открыт, но ничего не выделено - выбираем первый элемент
+      else if (dropdownVisible && selectedDropdownIndex === -1) {
+        e.preventDefault();
+        if (!selectDropdownItem(0)) {
+          // Если не удалось выбрать первый элемент (нет элементов), закрываем dropdown
+          hideDropdown();
+        }
+      } 
+      // Иначе просто закрываем dropdown и даем Tab сработать нормально
+      else {
+        hideDropdown();
       }
     } else if (e.key === 'Escape') {
       suggestionEl.innerHTML = '';
       currentSuggestion = null;
+      hideDropdown();
+      updateInputState();
     }
   });
 
+  function updateDropdownSelection() {
+    const items = senderDropdown.querySelectorAll('[data-value]');
+    items.forEach((item, index) => {
+      if (index === selectedDropdownIndex) {
+        item.classList.add('bg-blue-100');
+        item.scrollIntoView({ block: 'nearest' });
+      } else {
+        item.classList.remove('bg-blue-100');
+      }
+    });
+  }
+
   senderSearch.addEventListener('blur', () => {
-    const exact = processorsList.find(s => normalize(s) === normalize(senderSearch.value));
-    if (exact) senderHidden.value = exact;
-    setTimeout(()=> { suggestionEl.innerHTML = ''; currentSuggestion = null; }, 120);
+    // Даем немного времени для обработки кликов по dropdown
+    setTimeout(() => {
+      const exact = findExactMatch(senderSearch.value);
+      if (exact) {
+        senderSearch.value = exact;
+        senderHidden.value = exact;
+      }
+      suggestionEl.innerHTML = '';
+      currentSuggestion = null;
+      hideDropdown();
+      updateInputState();
+    }, 200);
   });
 
-  clearBtn.addEventListener('click', () => {
+  // Обработчик фокуса
+  senderSearch.addEventListener('focus', () => {
+    if (senderSearch.value) {
+      showSuggestionFor(senderSearch.value);
+      showDropdown(senderSearch.value);
+    } else {
+      showDropdown('');
+    }
+    updateInputState();
+  });
+
+  // Обработчик кликов по dropdown
+  senderDropdown.addEventListener('click', (e) => {
+    const item = e.target.closest('[data-value]');
+    if (item) {
+      const value = item.dataset.value;
+      senderSearch.value = value;
+      senderHidden.value = value;
+      hideDropdown();
+      suggestionEl.innerHTML = '';
+      currentSuggestion = null;
+      clearBtn.classList.toggle('hidden', !value);
+      updateInputState();
+      senderSearch.focus();
+    }
+  });
+
+  clearBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('Clear button clicked'); // Отладка
+    
     senderSearch.value = '';
     senderHidden.value = '';
     clearBtn.classList.add('hidden');
     suggestionEl.innerHTML = '';
     currentSuggestion = null;
+    hideDropdown();
+    updateInputState();
     senderSearch.focus();
+  });
+
+  // Закрытие dropdown при клике вне элемента
+  document.addEventListener('click', (e) => {
+    const autocompleteWrap = senderSearch.closest('.autocomplete-wrap');
+    if (autocompleteWrap && !autocompleteWrap.contains(e.target)) {
+      hideDropdown();
+    }
   });
 
   // ---------- FILE SELECTION / LOCK LOGIC ----------
@@ -453,15 +751,39 @@
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    // Проверяем отправителя
     if (!senderHidden.value) {
-      const exact = processorsList.find(s => normalize(s) === normalize(senderSearch.value));
-      if (exact) senderHidden.value = exact;
-      else if (currentSuggestion) { senderHidden.value = currentSuggestion; senderSearch.value = currentSuggestion; }
+      const exact = findExactMatch(senderSearch.value);
+      if (exact) {
+        senderHidden.value = exact;
+        senderSearch.value = exact;
+      } else if (currentSuggestion) { 
+        senderHidden.value = currentSuggestion; 
+        senderSearch.value = currentSuggestion; 
+      }
     }
 
-    if (!senderHidden.value) { showNotification('Пожалуйста, выберите отправителя из списка', 'error'); return; }
-    // ensure file selected
-    if (fileInput.files.length === 0) { showNotification('Пожалуйста, выберите файл', 'error'); return; }
+    // Валидация отправителя
+    if (!senderHidden.value) { 
+      showNotification('Пожалуйста, выберите отправителя из списка', 'error'); 
+      senderSearch.focus();
+      return; 
+    }
+    
+    // Проверяем, что выбранный отправитель действительно есть в списке
+    const validSender = findExactMatch(senderHidden.value);
+    if (!validSender) {
+      showNotification('Выбранный отправитель не найден в списке доступных', 'error');
+      senderSearch.focus();
+      senderSearch.select();
+      return;
+    }
+    
+    // Валидация файла
+    if (fileInput.files.length === 0) { 
+      showNotification('Пожалуйста, выберите файл', 'error'); 
+      return; 
+    }
 
     submitBtn.disabled = true;
     setLoading(true);
@@ -479,9 +801,14 @@
       }
       const result = await resp.json().catch(()=>({success:false}));
       if (result && result.success) {
-        showNotification('Файл успешно загружен!', 'success');
+        // Сохраняем данные в localStorage
+        if (result.data) {
+          localStorage.setItem('mapato_data', JSON.stringify(result.data));
+          localStorage.setItem('mapato_upload_time', new Date().toISOString());
+          showNotification('Файл успешно обработан и сохранён', 'success');
+        }
         const redirect = result.redirect || '/table';
-        setTimeout(()=> location.href = redirect, 700);
+        setTimeout(()=> location.href = redirect, 0);
       } else {
         showNotification('Ошибка: ' + (result.error || 'Не удалось обработать файл'), 'error');
         submitBtn.disabled = false;

@@ -4,31 +4,23 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from processors import PROCESSORS
-from models import ExcelData, Totals
-from gemini_api import chat_with_gemini
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
-
 
 static_dir = Path("static")
 static_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Хранилище данных
-storage: ExcelData = ExcelData(rows=[], totals=Totals(), sender="", truck="")
-
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse(
         "upload.html",
-        {"request": request, "processors": PROCESSORS.keys()}
+        {"request": request, "processors": list(PROCESSORS.keys())}
     )
 
 @app.post("/upload")
 async def upload_file(sender: str = Form(...), file: UploadFile = File(...)):
-    global storage
-
     processor = PROCESSORS.get(sender.strip().lower())
     if processor is None:
         return {"error": f"Алгоритм для отправителя '{sender}' ещё не готов"}
@@ -39,22 +31,30 @@ async def upload_file(sender: str = Form(...), file: UploadFile = File(...)):
     if "error" in result:
         return result
 
+    # Возвращаем обработанные данные клиенту для сохранения в localStorage
     storage = result["storage"]
-    return {"success": True}
+    return {
+        "success": True,
+        "data": {
+            "rows": [row.data for row in storage.rows],
+            "totals": storage.totals.__dict__,
+            "sender": storage.sender,
+            "truck": storage.truck
+        }
+    }
 
 # Страница с таблицей
 @app.get("/table", response_class=HTMLResponse)
 async def table_page(request: Request):
     return templates.TemplateResponse("table.html", {"request": request})
 
-# JSON с данными для таблицы
+# Этот endpoint больше не используется, данные хранятся в localStorage
 @app.get("/table/json")
 async def get_table_json():
     return JSONResponse(
         content={
-            "rows": [row.data for row in storage.rows],
-            "totals": storage.totals.__dict__,
-            "sender": storage.sender,
-            "truck": storage.truck
-        }
+            "error": "Данные больше не хранятся на сервере. Используйте localStorage.",
+            "message": "Data is now stored in localStorage for each user separately."
+        },
+        status_code=410
     )
