@@ -1074,6 +1074,11 @@
           if (result && result.success) {
             // Сохраняем данные в localStorage
             if (result.data) {
+              // Clear localStorage data
+              function clearLocalData() {
+                localStorage.removeItem("mapato_data");
+                localStorage.removeItem("mapato_upload_time");
+              }
               localStorage.setItem("mapato_data", JSON.stringify(result.data));
               localStorage.setItem(
                 "mapato_upload_time",
