@@ -40,7 +40,8 @@ async def upload_file(sender: str = Form(...), file: UploadFile = File(...)):
             "totals": storage.totals.__dict__,
             "calc": storage.calc.__dict__,
             "sender": storage.sender,
-            "truck": storage.truck
+            "truck": storage.truck,
+            "recipient": storage.recipient,
         }
     }
 

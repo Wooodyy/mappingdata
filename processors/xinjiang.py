@@ -6,7 +6,7 @@ from gemini_api import detect_currency
 import json
 
 def process_xinjiang(file_content: bytes) -> dict:
-    storage = ExcelData(rows=[], totals=Totals(), sender="", truck="", calc=Calc())
+    storage = ExcelData(rows=[], totals=Totals(), sender="", truck="", calc=Calc(), recipient="")
 
     column_mapping = {
         "Xinjiang Xindudu \nImport and Export Trading Co.,Ltd": "Наименование/модель",
@@ -20,7 +20,7 @@ def process_xinjiang(file_content: bytes) -> dict:
     try:
         sheets = pd.read_excel(io.BytesIO(file_content), sheet_name=None)
         
-        # Найдем запись, начинающуюся с 'FROM:' до конца строки
+        # Найдем запись, начинающуюся с 'Отправитель:' до конца строки
         sender = ""
         for _, df in sheets.items():
             for col in df.columns:
@@ -29,8 +29,8 @@ def process_xinjiang(file_content: bytes) -> dict:
                         # Разбиваем ячейку на строки
                         lines = cell.split("\n")
                         for line in lines:
-                            if line.startswith("FROM:"):
-                                sender = line[len("FROM:"):].strip()  # Берем текст после FROM:
+                            if line.startswith("Отправитель:"):
+                                sender = line[len("Отправитель:"):].strip()  # Берем текст после Отправитель:
                                 break
                         if sender:
                             break
@@ -40,6 +40,26 @@ def process_xinjiang(file_content: bytes) -> dict:
                 break
 
         storage.sender = sender
+        
+        # Найдем запись, начинающуюся с 'Получатель:' до конца строки
+        recipient = ""
+        for _, df in sheets.items():
+            for col in df.columns:
+                for cell in df[col]:
+                    if isinstance(cell, str):
+                        # Разбиваем ячейку на строки
+                        lines = cell.split("\n")
+                        for line in lines:
+                            if line.startswith("Получатель:"):
+                                recipient = line[len("Получатель:"):].strip()  # Берем текст после Получатель:
+                                break
+                        if recipient:
+                            break
+                if recipient:
+                    break
+            if recipient:
+                break
+        storage.recipient = recipient
 
         # определение валюты по документу
         # Отправляем весь Excel в ИИ для анализа
@@ -133,4 +153,4 @@ def process_xinjiang(file_content: bytes) -> dict:
         return {"error": str(e)}
 
     # Возвращаем результат и найденный текст 'FROM:'
-    return {"success": True, "storage": storage, "truck": storage.truck}
+    return {"success": True, "storage": storage}

@@ -21,4 +21,4 @@ class ExcelData(BaseModel):
     calc: Calc
     sender: str = ""
     truck: str = ""
-    sender: str = ""
+    recipient: str = ""
