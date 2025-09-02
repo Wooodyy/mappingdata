@@ -409,6 +409,16 @@
     </script>
 
     <script>
+      // Очистка кеша и сохраненных данных при открытии страницы
+      function clearAllCache() {
+        localStorage.removeItem("mapato_data");
+        localStorage.removeItem("mapato_upload_time");
+        console.log("Cache cleared on page load");
+      }
+
+      // Очищаем кеш при загрузке страницы
+      clearAllCache();
+
       // Список доступных процессоров/отправителей
       const processorsData =
         document.getElementById("processors-data").textContent;
@@ -1074,11 +1084,6 @@
           if (result && result.success) {
             // Сохраняем данные в localStorage
             if (result.data) {
-              // Clear localStorage data
-              function clearLocalData() {
-                localStorage.removeItem("mapato_data");
-                localStorage.removeItem("mapato_upload_time");
-              }
               localStorage.setItem("mapato_data", JSON.stringify(result.data));
               localStorage.setItem(
                 "mapato_upload_time",

@@ -570,7 +570,7 @@
                     ${headers
                       .map(
                         (header) => `
-                        <th class="px-6 py-1 text-left text-xs font-semibold text-slate-700 tracking-normal">
+                        <th class="px-6 py-2 text-left text-xs font-semibold text-slate-700 tracking-normal">
                             ${
                               header === "Вид упаковки "
                                 ? `
@@ -584,6 +584,7 @@
                                         <option value="">Выбрать для всех</option>
                                         <option value="CT">CT</option>
                                         <option value="PK">PK</option>
+                                        <option value="CS">CS</option>
                                     </select>
                                 </div>
                             `
@@ -606,7 +607,7 @@
                     ${Object.entries(row)
                       .map(
                         ([key, value]) => `
-                        <td class="px-6 py-1.5 text-sm text-slate-900 whitespace-nowrap">
+                        <td class="px-6 py-1 text-sm text-slate-900 whitespace-nowrap">
                             ${
                               key === "Вид упаковки "
                                 ? `
@@ -621,6 +622,9 @@
                                     <option value="PK" ${
                                       value === "PK" ? "selected" : ""
                                     }>PK</option>
+                                    <option value="CS" ${
+                                      value === "CS" ? "selected" : ""
+                                    }>CS</option>
                                 </select>
                             `
                                 : value

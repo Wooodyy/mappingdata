@@ -1,10 +1,10 @@
 from .xinjiang import process_xinjiang
-from .ai import process_ai
+from .mtl import process_mtl
 
 # Регистрируем доступные алгоритмы отправителей
 PROCESSORS = {
     "xinjiang xindudu import and export trading co.,ltd": process_xinjiang,
-    "отправитель 3": process_ai,
+    "отправитель 3": process_mtl,
 }
 
 def get_processor(sender: str):
