@@ -4,7 +4,7 @@ from .mtl import process_mtl
 # Регистрируем доступные алгоритмы отправителей
 PROCESSORS = {
     "xinjiang xindudu import and export trading co.,ltd": process_xinjiang,
-    "отправитель 3": process_mtl,
+    "mtl шаблон": process_mtl,
 }
 
 def get_processor(sender: str):

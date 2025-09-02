@@ -94,8 +94,6 @@ def process_mtl(file_content: bytes) -> dict:
                 #"Case total N/W": round(float(row.get("Case total N/W", 0)), 2) if pd.notna(row.get("Case total N/W")) else 0,
             }
             
-            # Добавляем запись в хранилище
-
             # Проверяем, есть ли уже элемент с таким же Case No
             case_no = record_data["Case No"]
             case_already_exists = any(row.data.get("Case No") == case_no for row in storage.rows)
@@ -113,12 +111,34 @@ def process_mtl(file_content: bytes) -> dict:
             storage.rows.append(ExcelRow(data=record_data, sheet="PACKING LIST(Weight)"))
             processed_count += 1
         
-
-        # Группировка строк по столбцу Container No 
+        
         # ВЫВОД Количество записей
         storage.sender = f"Count:{processed_count}"
         # ВЫВОД Количество мест
         storage.calc.calc_quantity = calculated_total_quantity
+
+        # Список контейнеров
+        containers_list = {}
+
+
+        # Группируем данные по номерам контейнеров
+        containers_grouped = {}
+        for row in storage.rows:
+            container_no = row.data.get("Номер контейнера", "").strip()
+            containers_list[container_no] = containers_list.get(container_no, 0) + 1
+            if not container_no:
+                container_no = "Без номера контейнера"
+            
+            if container_no not in containers_grouped:
+                containers_grouped[container_no] = []
+            
+            containers_grouped[container_no].append(row.data)
+        # Сохраняем сгруппированные данные
+        storage.containers = containers_grouped
+
+        # Количество контейнеров
+        print(len(containers_list))
+        storage.truck = f"Количество контейнеров: {len(containers_list)}"
 
     except Exception as e:
         return {"error": str(e)}

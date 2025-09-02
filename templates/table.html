@@ -495,7 +495,9 @@
           updateSenderInfo(data.sender, data.truck, uploadTime, data.recipient);
 
           // Generate table
-          generateTable(data.rows);
+          generateTable(data.containers || data.rows);
+
+          console.log(data.containers || data.rows);
 
           // Generate totals
           generateTotals(data.totals);
@@ -561,7 +563,27 @@
       }
 
       // Generate table headers and rows
-      function generateTable(rows) {
+      function generateTable(data) {
+        const thead = document.getElementById("table-head");
+        const tbody = document.getElementById("table-body");
+
+        // Проверяем, является ли data объектом (сгруппированные данные) или массивом (старый формат)
+        if (Array.isArray(data)) {
+          // Старый формат - массив строк
+          if (data.length === 0) {
+            tbody.innerHTML =
+              '<tr><td colspan="100%" class="text-center py-8 text-slate-500">Нет данных для отображения</td></tr>';
+            return;
+          }
+          generateSingleTable(data);
+        } else {
+          // Новый формат - объект с группированными данными
+          generateGroupedTables(data);
+        }
+      }
+
+      // Генерация одной таблицы (старый формат)
+      function generateSingleTable(rows) {
         const thead = document.getElementById("table-head");
         const tbody = document.getElementById("table-body");
 
@@ -569,6 +591,12 @@
           tbody.innerHTML =
             '<tr><td colspan="100%" class="text-center py-8 text-slate-500">Нет данных для отображения</td></tr>';
           return;
+        }
+
+        // Показываем общую кнопку копирования для одиночной таблицы
+        const generalCopyBtn = document.getElementById("copy-btn");
+        if (generalCopyBtn) {
+          generalCopyBtn.style.display = 'inline-flex';
         }
 
         // Generate headers
@@ -645,6 +673,192 @@
             `
           )
           .join("");
+      }
+      
+      // Генерация таблиц по группам контейнеров
+      function generateGroupedTables(containerData) {
+        const tableContainer = document.querySelector('.bg-white.rounded-xl.shadow-sm.border.border-slate-200.overflow-hidden:nth-child(2)');
+        
+        if (Object.keys(containerData).length === 0) {
+          document.getElementById("table-body").innerHTML =
+            '<tr><td colspan="100%" class="text-center py-8 text-slate-500">Нет данных для отображения</td></tr>';
+          return;
+        }
+
+        // Очищаем существующую таблицу
+        const tableWrapper = tableContainer.querySelector('.overflow-x-auto');
+        tableWrapper.innerHTML = '';
+
+        // Скрываем общую кнопку копирования для группированных данных
+        const generalCopyBtn = document.getElementById("copy-btn");
+        if (generalCopyBtn) {
+          generalCopyBtn.style.display = 'none';
+        }
+
+        let globalRowIndex = 0;
+
+        // Создаем отдельную таблицу для каждого контейнера
+        Object.entries(containerData).forEach(([containerNo, rows]) => {
+          if (rows.length === 0) return;
+
+          const headers = Object.keys(rows[0]);
+          
+          const tableHtml = `
+            <div class="mb-0 border-t border-slate-400 pb-0">
+              <div class="flex justify-between items-center px-6 py-2 bg-slate-200 rounded mb-0">
+                <div class="flex items-center">
+                  <button
+                    onclick="toggleContainer('${containerNo}')"
+                    class="mr-3 p-1 hover:bg-slate-300 rounded transition-colors duration-200"
+                    id="toggle-btn-${containerNo}"
+                  >
+                    <svg class="w-5 h-5 text-slate-600 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="toggle-icon-${containerNo}" style="transform: rotate(-90deg);">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </button>
+                  <h3 class="text-lg font-semibold text-slate-800">
+                    Контейнер ${Object.keys(containerData).indexOf(containerNo) + 1}: ${containerNo}
+                    <span class="text-sm font-normal text-slate-600 ml-2">(${rows.length} позиций)</span>
+                  </h3>
+                </div>
+                <div class="flex space-x-2">
+                  <button
+                    onclick="copyContainerNoToClipboard('${containerNo}')"
+                    class="inline-flex items-center px-3 py-1 bg-white text-slate-800 text-sm border border-gray-300 font-medium rounded-lg hover:bg-blue-600 hover:text-white transition-colors duration-200 shadow-sm"
+                  >
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                    Скопировать номер контейнера
+                  </button>
+                  <button
+                    onclick="copyContainerToClipboard('${containerNo}')"
+                    class="inline-flex items-center px-3 py-1 bg-white text-slate-800 text-sm border border-gray-300 font-medium rounded-lg hover:bg-blue-600 hover:text-white transition-colors duration-200 shadow-sm"
+                  >
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                    Скопировать таблицу
+                  </button>
+                </div>
+              </div>
+              <div class="overflow-x-auto transition-all duration-300" id="container-content-${containerNo}" style="display: none;">
+                <table class="w-full container-table table-fixed" data-container="${containerNo}">
+                  <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                      ${headers
+                        .map(
+                          (header) => `
+                          <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 tracking-normal ${
+                            header === "Коммерческое описание товара" 
+                              ? "w-1/4 min-w-0" 
+                              : "w-auto"
+                          }">
+                              ${
+                                header === "Вид упаковки "
+                                  ? `
+                                  <div class="flex flex-col space-y-2">
+                                      <span>${header}</span>
+                                      <select 
+                                          class="bulk-package-select" 
+                                          data-container="${containerNo}"
+                                          onchange="changeBulkPackageTypeForContainer('${containerNo}', this.value)"
+                                          class="text-xs bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                      >
+                                          <option value="">Выбрать для всех</option>
+                                          <option value="CT">CT</option>
+                                          <option value="PK">PK</option>
+                                          <option value="CS">CS</option>
+                                      </select>
+                                  </div>
+                              `
+                                  : header
+                              }
+                          </th>
+                      `
+                        )
+                        .join("")}
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-200">
+                    ${rows
+                      .map(
+                        (row, index) => `
+                        <tr class="hover:bg-slate-50 transition-colors duration-150 ${
+                          index % 2 === 0 ? "bg-white" : "bg-slate-25"
+                        }">
+                            ${Object.entries(row)
+                              .map(
+                                ([key, value]) => `
+                                <td class="px-2 py-1 text-sm text-slate-900 ${
+                                  key === "Коммерческое описание товара" 
+                                    ? "min-w-0 relative" 
+                                    : "whitespace-nowrap"
+                                }">
+                                    ${
+                                      key === "Коммерческое описание товара"
+                                        ? `
+                                        <div 
+                                            class="cursor-pointer overflow-hidden text-ellipsis"
+                                            style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; line-height: 1.2em; max-height: 3.6em;"
+                                            onclick="toggleTextExpansion(this)"
+                                            title="Нажмите для развертывания/свертывания"
+                                        >
+                                            ${value}
+                                        </div>
+                                        `
+                                        : key === "Вид упаковки "
+                                        ? `
+                                        <select 
+                                            class="package-type-select text-sm bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+                                            onchange="updatePackageType(${globalRowIndex}, this.value)"
+                                            data-row-index="${globalRowIndex}"
+                                            data-container="${containerNo}"
+                                        >
+                                            <option value="CT" ${
+                                              value === "CT" ? "selected" : ""
+                                            }>CT</option>
+                                            <option value="PK" ${
+                                              value === "PK" ? "selected" : ""
+                                            }>PK</option>
+                                            <option value="CS" ${
+                                              value === "CS" ? "selected" : ""
+                                            }>CS</option>
+                                        </select>
+                                    `
+                                        : value
+                                    }
+                                </td>
+                            `
+                              )
+                              .join("")}
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+          
+          globalRowIndex += rows.length;
+          tableWrapper.insertAdjacentHTML('beforeend', tableHtml);
+        });
+        
+        // Добавляем функцию для сворачивания/разворачивания контейнеров
+        window.toggleContainer = function(containerNo) {
+          const content = document.getElementById(`container-content-${containerNo}`);
+          const icon = document.getElementById(`toggle-icon-${containerNo}`);
+          
+          if (content.style.display === 'none') {
+            content.style.display = 'block';
+            icon.style.transform = 'rotate(0deg)';
+          } else {
+            content.style.display = 'none';
+            icon.style.transform = 'rotate(-90deg)';
+          }
+        };
       }
 
       // Generate totals summary
@@ -796,15 +1010,79 @@
 
       // Copy table to clipboard
       function copyTableToClipboard() {
-        const table = document.getElementById("data-table");
         let text = "";
 
-        // Get headers
-        //const headers = [...table.querySelectorAll("thead th")].map(th => th.textContent.trim());
-        //text += headers.join("\t") + "\n";
+        // Проверяем, есть ли группированные таблицы
+        const containerTables = document.querySelectorAll('.container-table');
+        
+        if (containerTables.length > 0) {
+          // Новый формат - копируем все таблицы контейнеров
+          containerTables.forEach((table, tableIndex) => {
+            const containerNo = table.getAttribute('data-container');
+            
+            if (tableIndex > 0) text += "\n"; // Разделитель между контейнерами
+            text += `Контейнер: ${containerNo}\n`;
+            
+            // Get rows for this container
+            table.querySelectorAll("tbody tr").forEach((row) => {
+              const cells = [...row.querySelectorAll("td")].map((td) => {
+                // Проверяем, есть ли в ячейке селект
+                const select = td.querySelector("select.package-type-select");
+                if (select) {
+                  // Если есть селект, берем его выбранное значение
+                  return select.value;
+                } else {
+                  // Иначе берем обычный текст
+                  return td.textContent.trim();
+                }
+              });
+              text += cells.join("\t") + "\n";
+            });
+          });
+        } else {
+          // Старый формат - одна таблица
+          const table = document.getElementById("data-table");
+          if (table) {
+            table.querySelectorAll("tbody tr").forEach((row) => {
+              const cells = [...row.querySelectorAll("td")].map((td) => {
+                const select = td.querySelector("select.package-type-select");
+                if (select) {
+                  return select.value;
+                } else {
+                  return td.textContent.trim();
+                }
+              });
+              text += cells.join("\t") + "\n";
+            });
+          }
+        }
 
-        // Get rows
-        table.querySelectorAll("tbody tr").forEach((row) => {
+        text = text.replace(/\./g, ","); // Заменить все точки на запятые
+
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            showToast("Таблица скопирована в буфер обмена!");
+          })
+          .catch((err) => {
+            console.error("Ошибка копирования:", err);
+            showToast("Ошибка копирования данных", "error");
+          });
+      }
+
+      // Copy specific container table to clipboard
+      function copyContainerToClipboard(containerNo) {
+        const containerTable = document.querySelector(`[data-container="${containerNo}"]`);
+        
+        if (!containerTable) {
+          showToast("Контейнер не найден", "error");
+          return;
+        }
+
+        let text = `Контейнер: ${containerNo}\n`;
+
+        // Get rows for this container
+        containerTable.querySelectorAll("tbody tr").forEach((row) => {
           const cells = [...row.querySelectorAll("td")].map((td) => {
             // Проверяем, есть ли в ячейке селект
             const select = td.querySelector("select.package-type-select");
@@ -824,7 +1102,7 @@
         navigator.clipboard
           .writeText(text)
           .then(() => {
-            showToast("Таблица скопирована в буфер обмена!");
+            showToast(`Контейнер ${containerNo} скопирован в буфер обмена!`);
           })
           .catch((err) => {
             console.error("Ошибка копирования:", err);
@@ -867,6 +1145,23 @@
             .writeText(containerNumber)
             .then(() => {
               showToast("Номер контейнера скопирован в буфер обмена!");
+            })
+            .catch((err) => {
+              console.error("Ошибка копирования:", err);
+              showToast("Ошибка копирования номера контейнера", "error");
+            });
+        } else {
+          showToast("Нет данных для копирования", "error");
+        }
+      }
+
+      // Copy specific container number to clipboard
+      function copyContainerNoToClipboard(containerNo) {
+        if (containerNo && containerNo !== "Не указан") {
+          navigator.clipboard
+            .writeText(containerNo)
+            .then(() => {
+              showToast(`Номер контейнера ${containerNo} скопирован в буфер обмена!`);
             })
             .catch((err) => {
               console.error("Ошибка копирования:", err);
@@ -960,6 +1255,29 @@
         document.getElementById("bulk-package-select").value = "";
 
         showToast(`Вид упаковки изменен на ${value} для всех товаров`);
+      }
+
+      // Функция для смены упаковки для конкретного контейнера
+      function changeBulkPackageTypeForContainer(containerNo, value) {
+        if (!value) return;
+
+        // Обновляем все селекты в конкретном контейнере
+        const containerTable = document.querySelector(`[data-container="${containerNo}"]`);
+        const packageSelects = containerTable.querySelectorAll(".package-type-select");
+        
+        packageSelects.forEach((select) => {
+          select.value = value;
+          const rowIndex = parseInt(select.getAttribute("data-row-index"));
+          updatePackageTypeInData(rowIndex, value);
+        });
+
+        // Сбрасываем выбор в bulk селекте для этого контейнера
+        const bulkSelect = containerTable.querySelector('.bulk-package-select');
+        if (bulkSelect) {
+          bulkSelect.value = "";
+        }
+
+        showToast(`Вид упаковки изменен на ${value} для контейнера ${containerNo}`);
       }
 
       function updatePackageType(rowIndex, value) {

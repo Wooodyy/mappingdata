@@ -37,6 +37,7 @@ async def upload_file(sender: str = Form(...), file: UploadFile = File(...)):
         "success": True,
         "data": {
             "rows": [row.data for row in storage.rows],
+            "containers": storage.containers,  # Добавляем сгруппированные данные
             "totals": storage.totals.__dict__,
             "calc": storage.calc.__dict__,
             "sender": storage.sender,

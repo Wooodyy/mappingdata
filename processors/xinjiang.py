@@ -149,6 +149,21 @@ def process_xinjiang(file_content: bytes) -> dict:
                     }
                     storage.rows.append(ExcelRow(data=ordered_record, sheet=sheet_name))
 
+        # Группируем данные по номерам контейнеров
+        containers_grouped = {}
+        for row in storage.rows:
+            container_no = row.data.get("Номер контейнера", "").strip()
+            if not container_no:
+                container_no = "Без номера контейнера"
+            
+            if container_no not in containers_grouped:
+                containers_grouped[container_no] = []
+            
+            containers_grouped[container_no].append(row.data)
+        
+        # Сохраняем сгруппированные данные
+        storage.containers = containers_grouped
+
     except Exception as e:
         return {"error": str(e)}
 
