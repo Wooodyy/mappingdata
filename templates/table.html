@@ -74,7 +74,7 @@
             <div class="flex items-center space-x-3">
               <div class="flex-shrink-0">
                 <div
-                  class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center"
+                  class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center border-2 border-blue-200"
                 >
                   <svg
                     class="w-5 h-5 text-blue-600"
@@ -102,7 +102,7 @@
               </div>
               <button
                 onclick="copySenderName()"
-                class="flex-shrink-0 p-2 text-slate-400 border border-gray-300 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                class="flex-shrink-0 p-2 text-slate-400 border-2 border-gray-300 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
                 title="Скопировать отправителя"
               >
                 <svg
@@ -125,7 +125,7 @@
             <div class="flex items-center space-x-3">
               <div class="flex-shrink-0">
                 <div
-                  class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center"
+                  class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center border-2 border-green-200"
                 >
                   <svg
                     class="w-5 h-5 text-green-600"
@@ -155,7 +155,7 @@
               </div>
               <button
                 onclick="copyContainerNumber()"
-                class="flex-shrink-0 p-2 text-slate-400 border border-gray-300 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
+                class="flex-shrink-0 p-2 text-slate-400 border-2 border-gray-300 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
                 title="Скопировать номер контейнера"
               >
                 <svg
@@ -177,13 +177,13 @@
         </div>
 
         <!-- Блок дополнительной информации -->
-        <div class="p-6 py-4" id="additional-info">
+        <div class="p-6 py-4 pt-0" id="additional-info">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Получатель -->
             <div class="flex items-center space-x-3">
               <div class="flex-shrink-0">
                 <div
-                  class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center"
+                  class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center border-2 border-orange-200"
                 >
                   <svg
                     class="w-5 h-5 text-orange-600"
@@ -217,7 +217,7 @@
               </div>
               <button
                 onclick="copyRecipientName()"
-                class="flex-shrink-0 p-2 text-slate-400 border border-gray-300 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors duration-200"
+                class="flex-shrink-0 p-2 text-slate-400 border-2 border-gray-300 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors duration-200"
                 title="Скопировать получателя"
               >
                 <svg
@@ -240,7 +240,7 @@
             <div class="flex items-center space-x-3">
               <div class="flex-shrink-0">
                 <div
-                  class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center"
+                  class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center border-2 border-purple-200"
                 >
                   <svg
                     class="w-5 h-5 text-purple-600"
@@ -267,6 +267,112 @@
                 >
                   Загрузка...
                 </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Блок итоговых значений -->
+        <div
+          class="border-t border-slate-400 bg-slate-100 from-slate-50 to-slate-100"
+        >
+          <div class="px-6 py-4">
+            <div class="flex items-center justify-between cursor-pointer hover:bg-slate-200 transition-colors duration-200 rounded-lg p-2 -m-2" onclick="toggleTotalsSection()">
+              <div class="flex items-center">
+                <button
+                  onclick="event.stopPropagation(); toggleTotalsSection()"
+                  class="mr-3 p-1 bg-white border-2 border-slate-300 rounded-lg transition-colors duration-200 text-slate-600 hover:text-white hover:bg-slate-600"
+                  id="totals-toggle-btn"
+                >
+                  <svg
+                    class="w-5 h-5 transform transition-transform duration-200"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    id="totals-toggle-icon"
+                    style="transform: rotate(-90deg)"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    ></path>
+                  </svg>
+                </button>
+
+                <div
+                  class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center mr-3 border-2 border-emerald-200"
+                >
+                  <svg
+                    class="w-5 h-5 text-emerald-600 "
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                    ></path>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900">
+                  Итоговые значения
+                </h3>
+              </div>
+
+              <!-- Статус схождения данных -->
+              <div
+                id="totals-status"
+                class="flex items-center space-x-3 hidden"
+                onclick="event.stopPropagation()"
+              >
+                <div
+                  id="status-badge"
+                  class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium shadow-sm"
+                >
+                  <div id="status-icon" class="w-4 h-4 mr-2">
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 13l4 4L19 7"
+                      ></path>
+                    </svg>
+                  </div>
+                  <span id="status-text"></span>
+                </div>
+              </div>
+            </div>
+
+            <div id="totals-content" class="hidden mt-4">
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-3">
+                  <div class="flex items-center mb-3 px-2">
+                    <div class="w-4 h-4 bg-emerald-500 rounded mr-2"></div>
+                    <h4 class="text-sm font-semibold text-slate-800">
+                      Итоговые данные по документу
+                    </h4>
+                  </div>
+                  <div id="totals-summary" class="space-y-2"></div>
+                </div>
+                <div class="space-y-3">
+                  <div class="flex items-center mb-3 px-2">
+                    <div class="w-4 h-4 bg-purple-500 rounded mr-2"></div>
+                    <h4 class="text-sm font-semibold text-slate-800">
+                      Рассчитанные данные
+                    </h4>
+                  </div>
+                  <div id="totals-calc" class="space-y-2"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -341,76 +447,9 @@
           </div>
         </div>
       </div>
-
-      <div
-        class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
-      >
-        <div class="bg-gradient-to-r from-emerald-600 to-emerald-700 px-6 py-4">
-          <h2 class="text-xl font-semibold text-white flex items-center">
-            <svg
-              class="w-6 h-6 mr-3"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-              ></path>
-            </svg>
-            Итоговые значения
-          </h2>
-        </div>
-        <div class="p-6">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="space-y-3">
-              <div class="flex items-center mb-3">
-                <div class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
-                <h3 class="text-sm font-semibold text-slate-700">
-                  Итоговые данные по документу
-                </h3>
-              </div>
-              <div id="totals-summary" class="space-y-2"></div>
-            </div>
-            <div class="space-y-3">
-              <div class="flex items-center mb-3">
-                <div class="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                <h3 class="text-sm font-semibold text-slate-700">
-                  Рассчитанные данные
-                </h3>
-              </div>
-              <div id="totals-calc" class="space-y-2"></div>
-            </div>
-          </div>
-          <div
-            id="discrepancy-alert"
-            class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg hidden"
-          >
-            <div class="flex items-center">
-              <svg
-                class="w-4 h-4 text-red-500 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-              <span class="text-sm font-medium text-red-800"
-                >Несхождение данных, проверьте исходные данные</span
-              >
-            </div>
-          </div>
-        </div>
-      </div>
+    
     </main>
-
+    <!-- уведомление -->
     <div
       id="toast"
       class="fixed top-4 right-4 transform translate-x-full transition-transform duration-300 ease-in-out z-50"
@@ -436,6 +475,21 @@
     </div>
 
     <script>
+      // Function to format numbers with thousand separators
+      function formatNumber(value) {
+        // Проверяем, является ли значение числом
+        const num = parseFloat(value);
+        if (isNaN(num)) {
+          return value; // Возвращаем исходное значение, если это не число
+        }
+        
+        // Форматируем число с разделителями тысячников и обязательно 2 знака после запятой
+        return num.toLocaleString('ru-RU', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+
       // Toast notification function
       function showToast(message, type = "success") {
         const toast = document.getElementById("toast");
@@ -596,7 +650,7 @@
         // Показываем общую кнопку копирования для одиночной таблицы
         const generalCopyBtn = document.getElementById("copy-btn");
         if (generalCopyBtn) {
-          generalCopyBtn.style.display = 'inline-flex';
+          generalCopyBtn.style.display = "inline-flex";
         }
 
         // Generate headers
@@ -674,11 +728,13 @@
           )
           .join("");
       }
-      
+
       // Генерация таблиц по группам контейнеров
       function generateGroupedTables(containerData) {
-        const tableContainer = document.querySelector('.bg-white.rounded-xl.shadow-sm.border.border-slate-200.overflow-hidden:nth-child(2)');
-        
+        const tableContainer = document.querySelector(
+          ".bg-white.rounded-xl.shadow-sm.border.border-slate-200.overflow-hidden:nth-child(2)"
+        );
+
         if (Object.keys(containerData).length === 0) {
           document.getElementById("table-body").innerHTML =
             '<tr><td colspan="100%" class="text-center py-8 text-slate-500">Нет данных для отображения</td></tr>';
@@ -686,13 +742,13 @@
         }
 
         // Очищаем существующую таблицу
-        const tableWrapper = tableContainer.querySelector('.overflow-x-auto');
-        tableWrapper.innerHTML = '';
+        const tableWrapper = tableContainer.querySelector(".overflow-x-auto");
+        tableWrapper.innerHTML = "";
 
         // Скрываем общую кнопку копирования для группированных данных
         const generalCopyBtn = document.getElementById("copy-btn");
         if (generalCopyBtn) {
-          generalCopyBtn.style.display = 'none';
+          generalCopyBtn.style.display = "none";
         }
 
         let globalRowIndex = 0;
@@ -702,26 +758,31 @@
           if (rows.length === 0) return;
 
           const headers = Object.keys(rows[0]);
-          
+
           const tableHtml = `
             <div class="mb-0 border-t border-slate-400 pb-0">
-              <div class="flex justify-between items-center px-6 py-2 bg-slate-200 rounded mb-0">
+              <div class="flex justify-between items-center px-6 py-2 bg-slate-200 rounded mb-0 cursor-pointer hover:bg-slate-300 transition-colors duration-200" onclick="toggleContainer('${containerNo}')">
                 <div class="flex items-center">
                   <button
-                    onclick="toggleContainer('${containerNo}')"
-                    class="mr-3 p-1 hover:bg-slate-300 rounded transition-colors duration-200"
+                    onclick="event.stopPropagation(); toggleContainer('${containerNo}')"
+                    class="mr-3 p-1 bg-white border-2 border-slate-300 rounded-lg transition-colors duration-200
+         text-slate-600 hover:text-white hover:bg-slate-600"
                     id="toggle-btn-${containerNo}"
                   >
-                    <svg class="w-5 h-5 text-slate-600 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="toggle-icon-${containerNo}" style="transform: rotate(-90deg);">
+                    <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="toggle-icon-${containerNo}" style="transform: rotate(-90deg);">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                   </button>
                   <h3 class="text-lg font-semibold text-slate-800">
-                    Контейнер ${Object.keys(containerData).indexOf(containerNo) + 1}: ${containerNo}
-                    <span class="text-sm font-normal text-slate-600 ml-2">(${rows.length} позиций)</span>
+                    Контейнер ${
+                      Object.keys(containerData).indexOf(containerNo) + 1
+                    }: ${containerNo}
+                    <span class="text-sm font-normal text-slate-600 ml-2">(${
+                      rows.length
+                    } позиций)</span>
                   </h3>
                 </div>
-                <div class="flex space-x-2">
+                <div class="flex space-x-2" onclick="event.stopPropagation()">
                   <button
                     onclick="copyContainerNoToClipboard('${containerNo}')"
                     class="inline-flex items-center px-3 py-1 bg-white text-slate-800 text-sm border border-gray-300 font-medium rounded-lg hover:bg-blue-600 hover:text-white transition-colors duration-200 shadow-sm"
@@ -747,11 +808,12 @@
                   <thead class="bg-slate-50 border-b border-slate-200">
                     <tr>
                       ${headers
+                        .filter((header) => header !== "Case No")
                         .map(
                           (header) => `
                           <th class="px-2 py-2 text-left text-xs font-semibold text-slate-700 tracking-normal ${
-                            header === "Коммерческое описание товара" 
-                              ? "w-1/4 min-w-0" 
+                            header === "Коммерческое описание товара"
+                              ? "w-1/4 min-w-0"
                               : "w-auto"
                           }">
                               ${
@@ -788,11 +850,12 @@
                           index % 2 === 0 ? "bg-white" : "bg-slate-25"
                         }">
                             ${Object.entries(row)
+                              .filter(([key, value]) => key !== "Case No")
                               .map(
                                 ([key, value]) => `
                                 <td class="px-2 py-1 text-sm text-slate-900 ${
-                                  key === "Коммерческое описание товара" 
-                                    ? "min-w-0 relative" 
+                                  key === "Коммерческое описание товара"
+                                    ? "min-w-0 relative"
                                     : "whitespace-nowrap"
                                 }">
                                     ${
@@ -841,22 +904,24 @@
               </div>
             </div>
           `;
-          
+
           globalRowIndex += rows.length;
-          tableWrapper.insertAdjacentHTML('beforeend', tableHtml);
+          tableWrapper.insertAdjacentHTML("beforeend", tableHtml);
         });
-        
+
         // Добавляем функцию для сворачивания/разворачивания контейнеров
-        window.toggleContainer = function(containerNo) {
-          const content = document.getElementById(`container-content-${containerNo}`);
+        window.toggleContainer = function (containerNo) {
+          const content = document.getElementById(
+            `container-content-${containerNo}`
+          );
           const icon = document.getElementById(`toggle-icon-${containerNo}`);
-          
-          if (content.style.display === 'none') {
-            content.style.display = 'block';
-            icon.style.transform = 'rotate(0deg)';
+
+          if (content.style.display === "none") {
+            content.style.display = "block";
+            icon.style.transform = "rotate(0deg)";
           } else {
-            content.style.display = 'none';
-            icon.style.transform = 'rotate(-90deg)';
+            content.style.display = "none";
+            icon.style.transform = "rotate(-90deg)";
           }
         };
       }
@@ -878,7 +943,7 @@
                         <span class="text-sm font-medium text-slate-600">${
                           totalsNames[key] || key
                         }</span>
-                        <span class="text-sm font-bold text-slate-900">${value}</span>
+                        <span class="text-sm font-bold text-slate-900">${formatNumber(value)}</span>
                     </div>
                 `
                   )
@@ -903,7 +968,7 @@
                         <span class="text-sm font-medium text-slate-600">${
                           calcNames[key] || key
                         }</span>
-                        <span class="text-sm font-bold text-slate-900">${value}</span>
+                        <span class="text-sm font-bold text-slate-900">${formatNumber(value)}</span>
                     </div>
                 `
                   )
@@ -920,11 +985,7 @@
         const data = JSON.parse(savedData);
         const totals = data.totals;
 
-        //const comparisonResult = document.getElementById("comparison-result");
-        const discrepancyAlert = document.getElementById("discrepancy-alert");
-
         let hasDiscrepancies = false;
-        let statusHtml = "";
 
         // Compare values and highlight discrepancies
         const comparisons = [
@@ -938,7 +999,10 @@
             calcKey: "calc_weight",
             name: "Вес брутто",
           },
-          { totalKey: "total_amount", calcKey: "calc_amount", name: "Сумма" },
+          { totalKey: "total_amount", 
+            calcKey: "calc_amount", 
+            name: "Сумма" 
+          },
         ];
 
         comparisons.forEach((comp) => {
@@ -959,7 +1023,7 @@
               totalElement.classList.add(
                 "bg-red-100",
                 "border",
-                "border-red-200"
+                "border-red-300"
               );
             }
             if (calcElement) {
@@ -967,13 +1031,13 @@
               calcElement.classList.add(
                 "bg-red-100",
                 "border",
-                "border-red-200"
+                "border-red-300"
               );
             }
           }
 
           if (isMatch) {
-            // Highlight discrepant values
+            // Highlight matching values
             const totalElement = document.getElementById(
               `total-${comp.totalKey}`
             );
@@ -984,7 +1048,7 @@
               totalElement.classList.add(
                 "bg-green-100",
                 "border",
-                "border-green-200"
+                "border-green-500"
               );
             }
             if (calcElement) {
@@ -992,19 +1056,57 @@
               calcElement.classList.add(
                 "bg-green-100",
                 "border",
-                "border-green-200"
+                "border-green-500"
               );
             }
           }
-
-          // Create status indicator
         });
 
-        // Show/hide compact discrepancy alert
+        // Update status indicator
+        updateTotalsStatus(hasDiscrepancies);
+      }
+
+      // Update totals status indicator
+      function updateTotalsStatus(hasDiscrepancies) {
+        const statusElement = document.getElementById("totals-status");
+        const statusBadge = document.getElementById("status-badge");
+        const statusIcon = document.getElementById("status-icon");
+        const statusText = document.getElementById("status-text");
+
         if (hasDiscrepancies) {
-          discrepancyAlert.classList.remove("hidden");
+          statusElement.classList.remove("hidden");
+          statusBadge.className =
+            "inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium shadow-sm bg-red-100 border-2 border-red-300 text-red-800 animate-pulse-fast";
+          statusIcon.innerHTML = `
+            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+          `;
+          statusText.textContent = "Несхождение данных";
         } else {
-          discrepancyAlert.classList.add("hidden");
+          statusElement.classList.remove("hidden");
+          statusBadge.className =
+            "inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium shadow-sm bg-green-100 border-2 border-green-300 text-green-800";
+          statusIcon.innerHTML = `
+            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          `;
+          statusText.textContent = "Схождение данных";
+        }
+      }
+
+      // Toggle totals section
+      function toggleTotalsSection() {
+        const content = document.getElementById("totals-content");
+        const icon = document.getElementById("totals-toggle-icon");
+
+        if (content.classList.contains("hidden")) {
+          content.classList.remove("hidden");
+          icon.style.transform = "rotate(0deg)";
+        } else {
+          content.classList.add("hidden");
+          icon.style.transform = "rotate(-90deg)";
         }
       }
 
@@ -1013,33 +1115,11 @@
         let text = "";
 
         // Проверяем, есть ли группированные таблицы
-        const containerTables = document.querySelectorAll('.container-table');
-        
-        if (containerTables.length > 0) {
-          // Новый формат - копируем все таблицы контейнеров
-          containerTables.forEach((table, tableIndex) => {
-            const containerNo = table.getAttribute('data-container');
-            
-            if (tableIndex > 0) text += "\n"; // Разделитель между контейнерами
-            text += `Контейнер: ${containerNo}\n`;
-            
-            // Get rows for this container
-            table.querySelectorAll("tbody tr").forEach((row) => {
-              const cells = [...row.querySelectorAll("td")].map((td) => {
-                // Проверяем, есть ли в ячейке селект
-                const select = td.querySelector("select.package-type-select");
-                if (select) {
-                  // Если есть селект, берем его выбранное значение
-                  return select.value;
-                } else {
-                  // Иначе берем обычный текст
-                  return td.textContent.trim();
-                }
-              });
-              text += cells.join("\t") + "\n";
-            });
-          });
-        } else {
+        const containerTables = document.querySelectorAll(".container-table");
+
+        // Копируем таблицу
+        const table = document.getElementById("data-table");
+        if (table) {
           // Старый формат - одна таблица
           const table = document.getElementById("data-table");
           if (table) {
@@ -1072,14 +1152,17 @@
 
       // Copy specific container table to clipboard
       function copyContainerToClipboard(containerNo) {
-        const containerTable = document.querySelector(`[data-container="${containerNo}"]`);
-        
+        const containerTable = document.querySelector(
+          `[data-container="${containerNo}"]`
+        );
+
         if (!containerTable) {
           showToast("Контейнер не найден", "error");
           return;
         }
 
-        let text = `Контейнер: ${containerNo}\n`;
+        //let text = `Контейнер: ${containerNo}\n`;
+        let text = "";
 
         // Get rows for this container
         containerTable.querySelectorAll("tbody tr").forEach((row) => {
@@ -1161,7 +1244,9 @@
           navigator.clipboard
             .writeText(containerNo)
             .then(() => {
-              showToast(`Номер контейнера ${containerNo} скопирован в буфер обмена!`);
+              showToast(
+                `Номер контейнера ${containerNo} скопирован в буфер обмена!`
+              );
             })
             .catch((err) => {
               console.error("Ошибка копирования:", err);
@@ -1262,9 +1347,13 @@
         if (!value) return;
 
         // Обновляем все селекты в конкретном контейнере
-        const containerTable = document.querySelector(`[data-container="${containerNo}"]`);
-        const packageSelects = containerTable.querySelectorAll(".package-type-select");
-        
+        const containerTable = document.querySelector(
+          `[data-container="${containerNo}"]`
+        );
+        const packageSelects = containerTable.querySelectorAll(
+          ".package-type-select"
+        );
+
         packageSelects.forEach((select) => {
           select.value = value;
           const rowIndex = parseInt(select.getAttribute("data-row-index"));
@@ -1272,12 +1361,14 @@
         });
 
         // Сбрасываем выбор в bulk селекте для этого контейнера
-        const bulkSelect = containerTable.querySelector('.bulk-package-select');
+        const bulkSelect = containerTable.querySelector(".bulk-package-select");
         if (bulkSelect) {
           bulkSelect.value = "";
         }
 
-        showToast(`Вид упаковки изменен на ${value} для контейнера ${containerNo}`);
+        showToast(
+          `Вид упаковки изменен на ${value} для контейнера ${containerNo}`
+        );
       }
 
       function updatePackageType(rowIndex, value) {
