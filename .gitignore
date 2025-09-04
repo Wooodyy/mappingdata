@@ -9,6 +9,7 @@ __pycache__/
 # Virtual environment folders (на случай, если ты создашь venv)
 venv/
 env/
+.env
 .venv/
 
 # Logs and temp files
