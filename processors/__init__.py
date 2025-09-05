@@ -5,6 +5,8 @@ from .mtl import process_mtl
 PROCESSORS = {
     "xinjiang xindudu import and export trading co.,ltd": process_xinjiang,
     "mtl шаблон": process_mtl,
+    "mtl шаблон1": process_mtl,
+    "mtl шаблон2": process_mtl,
 }
 
 def get_processor(sender: str):
