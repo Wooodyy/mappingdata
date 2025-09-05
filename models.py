@@ -27,3 +27,4 @@ class ExcelData(BaseModel):
     sender: str = ""
     truck: str = ""
     recipient: str = ""
+    buyer: str = ""

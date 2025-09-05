@@ -193,17 +193,3 @@ def process_mtl(file_content: bytes) -> dict:
     # Возвращаем результат обработки
     return {"success": True, "storage": storage}
 
-def _build_product_description(row):
-    """Формирует описание товара из Part No и Part Name(RUS)"""
-    part_no = str(row.get("Part No", "")) if pd.notna(row.get("Part No")) else ""
-    part_name_rus = str(row.get("Part Name(RUS)", "")) if pd.notna(row.get("Part Name(RUS)")) else ""
-    return f"{part_no} {part_name_rus}".strip()
-
-def _determine_packaging_info(row):
-    """Определяет информацию об упаковке на основе веса брутто и нетто"""
-    gross_weight = row.get("Case total G/W")
-    net_weight = row.get("Case total N/W")
-    
-    if pd.notna(gross_weight) and pd.notna(net_weight):
-        return 1 if float(gross_weight) > float(net_weight) else 0
-    return 0

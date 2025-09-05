@@ -48,7 +48,7 @@ def detect_currency(file_content: str):
         return "USD"
 
 def detect_recipient(file_content: str):
-    prompt = f"""Проанализируй следующий документ и определи For Account & Risk of Messrs, нужно определить получателя. 
+    prompt = f"""Проанализируй следующий документ и определи For Account & Risk of Messrs в общем нужно определить получателя. 
     Подумай о том, чтобы определить только название компании.
     Ответь только Названием компании, адрес и номер телефона вообще не нужен (например: MTL TECHNOLOGY CO., LTD.).
     Если получатель не найден, ответь Не опознан.

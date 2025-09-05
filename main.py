@@ -43,6 +43,7 @@ async def upload_file(sender: str = Form(...), file: UploadFile = File(...)):
             "sender": storage.sender,
             "truck": storage.truck,
             "recipient": storage.recipient,
+            "buyer": storage.buyer,
         }
     }
 
