@@ -73,8 +73,12 @@ def process_changan(file_content: bytes) -> dict:
         buyer = "Не опознан"  # значение по умолчанию
         buyer_value = sheets[list(sheets.keys())[0]].iloc[5]["Unnamed: 12"]
         buyer_value = buyer_value.split("\n")
-        buyer = buyer_value[0]
-        storage.buyer = buyer
+        storage.buyer = buyer_value[0]
+        
+        # Определяем контейнер
+        truck = "Не опознан"  # значение по умолчанию
+        truck_value = sheets[list(sheets.keys())[0]].iloc[9]["Unnamed: 2"]
+        storage.truck = truck_value
         
         # Обрабатываем строки данных (кроме последней, если она итоги)
         data_rows = df  # df уже обрезан выше
@@ -104,7 +108,7 @@ def process_changan(file_content: bytes) -> dict:
                 "Вид информации об упаковке (всегда 0)": 0,
                 "Вид упаковки ": "PP",
                 "Количество упаковок": row.get("Количество грузовых мест", 0) if not pd.isna(row.get("Количество грузовых мест", 0)) else 0,
-                "Номер контейнера": "15",
+                "Номер контейнера": truck,
                 "Вес брутто": round(float(row.get("Вес брутто", 0)), 2) if not pd.isna(row.get("Вес брутто", 0)) else 0,
                 "Валюта": currency,
                 "Сумма": round(float(row.get("Сумма", 0)), 2)*row.get("Количество грузовых мест", 0) if not pd.isna(row.get("Сумма", 0)) else 0,
@@ -119,6 +123,12 @@ def process_changan(file_content: bytes) -> dict:
             calc_quantity=calculated_total_quantity,
             calc_weight=calculated_total_weight,
             calc_amount=calculated_total_amount
+        )
+        
+        storage.totals = Totals(
+            total_quantity=calculated_total_quantity,
+            total_weight=calculated_total_weight,
+            total_amount=calculated_total_amount
         )
     
         # Адаптируем группировку: считаем количество мест по каждому контейнеру и сохраняем сгруппированные данные

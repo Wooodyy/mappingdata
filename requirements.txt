@@ -6,3 +6,6 @@ pydantic
 pandas
 openpyxl
 requests
+python-dotenv
+sqlalchemy
+psycopg2-binary
