@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Invoice/Packing List</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
@@ -21,9 +18,7 @@
       };
     </script>
     <style>
-      .autocomplete-wrap {
-        position: relative;
-      }
+      .autocomplete-wrap { position: relative; }
       .suggestion-layer {
         position: absolute;
         inset: 0;
@@ -38,9 +33,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      .suggestion-prefix {
-        color: transparent;
-      }
+      .suggestion-prefix { color: transparent; }
       .input-ghost {
         background: transparent;
         position: relative;
@@ -57,125 +50,52 @@
         white-space: nowrap;
         border: 0;
       }
-
-      /* Added modern gradient and animation styles */
-      .gradient-bg {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      }
-
-      .card-shadow {
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-          0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      }
-
+      .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+      .card-shadow { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
       .upload-zone-hover:hover {
         background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         border-color: #3b82f6;
       }
-
-      .pulse-animation {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-      }
+      .pulse-animation { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     </style>
   </head>
-  <body
-    class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 font-sans"
-  >
-    <div
-      class="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8"
-    >
+  <body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 font-sans">
+    <div class="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <main class="w-full max-w-2xl">
-        <div
-          class="bg-white/95 backdrop-blur-sm rounded-2xl card-shadow overflow-hidden"
-        >
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl card-shadow overflow-hidden">
           <div class="gradient-bg px-6 sm:px-8 py-6">
             <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center"
-              >
-                <svg
-                  class="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                  />
+              <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                 </svg>
               </div>
               <div>
                 <h1 class="text-xl font-bold text-white">Загрузка файлов</h1>
-                <p class="text-white/80 text-sm">
-                  Выберите отправителя и загрузите документ
-                </p>
+                <p class="text-white/80 text-sm">Выберите отправителя и загрузите документ</p>
               </div>
             </div>
           </div>
 
           <div class="p-6 sm:p-8">
-            <form
-              id="uploadForm"
-              action="/upload"
-              method="post"
-              enctype="multipart/form-data"
-              class="space-y-6"
-              novalidate
-            >
+            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
               <div class="space-y-2">
-                <label
-                  for="senderSearch"
-                  class="block text-sm font-semibold text-gray-900"
-                >
+                <label for="senderSearch" class="block text-sm font-semibold text-gray-900">
                   Отправитель
                   <span class="text-red-500 ml-1">*</span>
                 </label>
 
                 <div class="relative autocomplete-wrap">
-                  <div
-                    id="suggestion"
-                    class="suggestion-layer rounded-xl border border-transparent px-4 py-3 text-sm"
-                  ></div>
+                  <div id="suggestion" class="suggestion-layer rounded-xl border border-transparent px-4 py-3 text-sm"></div>
+                  <input id="senderSearch" name="senderSearch" type="text" class="input-ghost w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200" placeholder="Начните вводить имя отправителя..." autocomplete="off" aria-autocomplete="both"/>
 
-                  <input
-                    id="senderSearch"
-                    name="senderSearch"
-                    type="text"
-                    class="input-ghost w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
-                    placeholder="Начните вводить имя отправителя..."
-                    autocomplete="off"
-                    aria-autocomplete="both"
-                  />
-
-                  <button
-                    id="clearBtn"
-                    type="button"
-                    class="absolute right-3 top-3 w-6 h-6 text-gray-400 hover:text-gray-600 hidden rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors z-10"
-                    title="Очистить поле"
-                  >
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
+                  <button id="clearBtn" type="button" class="absolute right-3 top-3 w-6 h-6 text-gray-400 hover:text-gray-600 hidden rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors z-10" title="Очистить поле">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                   </button>
 
-                  <!-- Выпадающий список с вариантами -->
-                  <div
-                    id="senderDropdown"
-                    class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto hidden"
-                  ></div>
+                  <div id="senderDropdown" class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto hidden"></div>
                 </div>
 
                 <input type="hidden" id="sender" name="sender" required />
@@ -210,169 +130,65 @@
                   Файл документа
                   <span class="text-red-500 ml-1">*</span>
                 </label>
-
                 <div id="uploadWrapper" class="relative">
-                  <label
-                    id="uploadZone"
-                    for="file"
-                    class="upload-zone-hover flex flex-col items-center justify-center gap-4 border-2 border-dashed border-gray-300 rounded-2xl p-8 cursor-pointer bg-gray-50/50 transition-all duration-300 hover:shadow-lg group"
-                    tabindex="0"
-                    aria-describedby="fileHint"
-                  >
-                    <div
-                      class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
-                    >
-                      <svg
-                        id="uploadIcon"
-                        class="w-8 h-8 text-white"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path
-                          d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
-                        />
-                        <polyline points="14,2 14,8 20,8" />
-                        <line x1="16" y1="13" x2="8" y2="13" />
-                        <line x1="16" y1="17" x2="8" y2="17" />
-                        <polyline points="10,9 9,9 8,9" />
+                  <label id="uploadZone" for="file" class="upload-zone-hover flex flex-col items-center justify-center gap-4 border-2 border-dashed border-gray-300 rounded-2xl p-8 cursor-pointer bg-gray-50/50 transition-all duration-300 hover:shadow-lg group" tabindex="0" aria-describedby="fileHint">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <svg id="uploadIcon" class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10,9 9,9 8,9"/>
                       </svg>
                     </div>
 
                     <div class="text-center">
-                      <div
-                        id="uploadText"
-                        class="text-base font-semibold text-gray-700 mb-1"
-                      >
-                        Перетащите файл сюда или нажмите для выбора
-                      </div>
-                      <div id="uploadSub" class="text-sm text-gray-500">
-                        Поддерживаются форматы .xlsx и .xls
-                      </div>
+                      <div id="uploadText" class="text-base font-semibold text-gray-700 mb-1">Перетащите файл сюда или нажмите для выбора</div>
+                      <div id="uploadSub" class="text-sm text-gray-500">Поддерживаются форматы .xlsx и .xls</div>
                     </div>
                   </label>
 
-                  <div
-                    id="fileView"
-                    class="hidden relative border-2 border-green-200 rounded-2xl p-6 bg-gradient-to-r from-green-50 to-emerald-50"
-                  >
+                  <div id="fileView" class="hidden relative border-2 border-green-200 rounded-2xl p-6 bg-gradient-to-r from-green-50 to-emerald-50">
                     <div class="flex items-center justify-between gap-4">
                       <div class="flex items-center gap-4 min-w-0">
-                        <div
-                          class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0"
-                        >
-                          <svg
-                            class="w-6 h-6 text-white"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                          >
-                            <path
-                              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
-                            />
-                            <polyline points="14,2 14,8 20,8" />
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                            <polyline points="14,2 14,8 20,8"/>
                           </svg>
                         </div>
                         <div class="min-w-0">
-                          <div
-                            id="selectedFileName"
-                            class="text-base font-semibold text-gray-900 truncate"
-                          ></div>
-                          <div
-                            id="selectedFileSize"
-                            class="text-sm text-gray-600 mt-1"
-                          ></div>
+                          <div id="selectedFileName" class="text-base font-semibold text-gray-900 truncate"></div>
+                          <div id="selectedFileSize" class="text-sm text-gray-600 mt-1"></div>
                         </div>
                       </div>
 
-                      <button
-                        id="removeFileBtn"
-                        type="button"
-                        class="w-10 h-10 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-colors duration-200"
-                        aria-label="Удалить файл"
-                      >
-                        <svg
-                          class="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12"
-                          />
+                      <button id="removeFileBtn" type="button" class="w-10 h-10 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-colors duration-200" aria-label="Удалить файл">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                       </button>
                     </div>
                   </div>
                 </div>
 
-                <input
-                  id="file"
-                  name="file"
-                  type="file"
-                  accept=".xlsx,.xls"
-                  class="sr-only"
-                  required
-                />
+                <input id="file" name="file" type="file" accept=".xlsx,.xls" class="sr-only" required/>
 
-                <div
-                  id="fileHint"
-                  class="flex items-start gap-2 text-xs text-gray-500 bg-blue-50 rounded-lg p-3"
-                >
-                  <svg
-                    class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
+                <div id="fileHint" class="flex items-start gap-2 text-xs text-gray-500 bg-blue-50 rounded-lg p-3">
+                  <svg class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
-                  <span
-                    >Файл появится в зоне выше после выбора. Чтобы загрузить
-                    новый файл, сначала удалите текущий.</span
-                  >
+                  <span>Файл появится в зоне выше после выбора. Чтобы загрузить новый файл, сначала удалите текущий.</span>
                 </div>
               </div>
 
               <div class="pt-0">
-                <button
-                  id="submitBtn"
-                  type="submit"
-                  class="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-4 rounded-xl disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
-                >
-                  <svg
-                    id="btnSpinner"
-                    class="w-5 h-5 hidden pulse-animation"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke-width="3"
-                      stroke="currentColor"
-                    />
+                <button id="submitBtn" type="submit" class="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-4 rounded-xl disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl">
+                  <svg id="btnSpinner" class="w-5 h-5 hidden pulse-animation" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" stroke-width="3" stroke="currentColor"/>
                   </svg>
-                  <svg
-                    class="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 12l2 2 4-4"
-                    />
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 12l2 2 4-4"/>
                   </svg>
                   Обработать файл
                 </button>
@@ -382,22 +198,11 @@
         </div>
 
         <div id="notification" class="fixed right-6 top-6 hidden z-50">
-          <div
-            id="notificationInner"
-            class="px-6 py-4 rounded-xl shadow-2xl text-white font-semibold backdrop-blur-sm"
-          ></div>
+          <div id="notificationInner" class="px-6 py-4 rounded-xl shadow-2xl text-white font-semibold backdrop-blur-sm"></div>
         </div>
-
-        <div
-          id="loading"
-          class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center hidden z-50"
-        >
-          <div
-            class="bg-white rounded-2xl p-8 shadow-2xl flex items-center gap-4"
-          >
-            <div
-              class="w-8 h-8 border-4 border-gray-200 rounded-full border-t-blue-500 animate-spin"
-            ></div>
+        <div id="loading" class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center hidden z-50">
+          <div class="bg-white rounded-2xl p-8 shadow-2xl flex items-center gap-4">
+            <div class="w-8 h-8 border-4 border-gray-200 rounded-full border-t-blue-500 animate-spin"></div>
             <div class="text-gray-700 font-semibold">Загрузка файла...</div>
           </div>
         </div>
@@ -409,36 +214,21 @@
     </script>
 
     <script>
-      // Очистка кеша и сохраненных данных при открытии страницы
       function clearAllCache() {
         localStorage.removeItem("mapato_data");
         localStorage.removeItem("mapato_upload_time");
-        console.log("Cache cleared on page load");
       }
-
-      // Очищаем кеш при загрузке страницы
       clearAllCache();
 
-      // Список доступных процессоров/отправителей
-      const processorsData =
-        document.getElementById("processors-data").textContent;
+      const processorsData = document.getElementById("processors-data").textContent;
       const processorsList = JSON.parse(processorsData);
 
-      // Elements — autocomplete
       const senderSearch = document.getElementById("senderSearch");
       const senderHidden = document.getElementById("sender");
       const suggestionEl = document.getElementById("suggestion");
       const clearBtn = document.getElementById("clearBtn");
       const senderDropdown = document.getElementById("senderDropdown");
 
-      // Проверяем, что все элементы найдены
-      if (!clearBtn) {
-        console.error("Clear button not found!");
-      } else {
-        console.log("Clear button found:", clearBtn);
-      }
-
-      // Elements — file upload
       const fileInput = document.getElementById("file");
       const uploadZone = document.getElementById("uploadZone");
       const uploadWrapper = document.getElementById("uploadWrapper");
@@ -446,8 +236,6 @@
       const selectedFileName = document.getElementById("selectedFileName");
       const selectedFileSize = document.getElementById("selectedFileSize");
       const removeFileBtn = document.getElementById("removeFileBtn");
-
-      // Form
       const form = document.getElementById("uploadForm");
       const submitBtn = document.getElementById("submitBtn");
       const loading = document.getElementById("loading");
@@ -456,101 +244,74 @@
 
       const VALID_RE = /\.(xlsx|xls)$/i;
 
-      // ---------- Helpers ----------
-
       function normalize(s) {
         return (s || "").toString().toLowerCase().replace(/\s+/g, " ").trim();
       }
+      
       function showNotification(msg, type = "success") {
         notification.classList.remove("hidden");
         notificationInner.textContent = msg;
-        notificationInner.className =
-          "px-6 py-4 rounded-xl shadow-2xl text-white font-semibold backdrop-blur-sm " +
-          (type === "error" ? "bg-red-600" : "bg-green-600");
-        setTimeout(() => {
-          notification.classList.add("hidden");
-        }, 3000);
+        notificationInner.className = "px-6 py-4 rounded-xl shadow-2xl text-white font-semibold backdrop-blur-sm " + (type === "error" ? "bg-red-600" : "bg-green-600");
+        setTimeout(() => notification.classList.add("hidden"), 3000);
       }
+      
       function setLoading(on) {
         loading.classList.toggle("hidden", !on);
       }
 
-      // ---------- AUTOCOMPLETE inline suggestion ----------
-
       function findSuggestion(prefix) {
         const nq = normalize(prefix);
         if (!nq) return null;
-
-        // Сначала ищем точное совпадение начала
+        
         for (const p of processorsList) {
           const normalized = normalize(p);
-          if (normalized.startsWith(nq) && normalized !== nq) {
-            return p;
-          }
+          if (normalized.startsWith(nq) && normalized !== nq) return p;
         }
-
-        // Если не найдено, ищем частичное совпадение
+        
         for (const p of processorsList) {
           const normalized = normalize(p);
-          if (normalized.includes(nq) && normalized !== nq) {
-            return p;
-          }
+          if (normalized.includes(nq) && normalized !== nq) return p;
         }
-
+        
         return null;
       }
 
       function findExactMatch(input) {
         const nq = normalize(input);
-        for (const p of processorsList) {
-          if (normalize(p) === nq) {
-            return p;
-          }
-        }
-        return null;
+        return processorsList.find(p => normalize(p) === nq) || null;
       }
 
       function escapeHtml(s) {
-        return s
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;");
+        return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
       }
 
-      // remainderFromPrefix: find how many chars of original correspond to normalized prefix
       function remainderFromPrefix(original, prefix) {
         const target = normalize(prefix);
         if (!target) return original;
-
+        
         const originalNorm = normalize(original);
         const startIndex = originalNorm.indexOf(target);
-
         if (startIndex === -1) return original;
-
-        // Находим соответствующий индекс в оригинальной строке
+        
         let charCount = 0;
         let realIndex = 0;
-
+        
         for (let i = 0; i < original.length; i++) {
           const ch = original[i];
           if (/\s/.test(ch)) {
-            if (
-              charCount > 0 &&
-              !normalize(original.slice(0, i)).endsWith(" ")
-            ) {
+            if (charCount > 0 && !normalize(original.slice(0, i)).endsWith(" ")) {
               charCount++;
             }
           } else {
             charCount++;
           }
-
+          
           if (charCount > startIndex + target.length) {
             realIndex = i;
             break;
           }
         }
-
+        
         return original.slice(realIndex);
       }
 
@@ -564,7 +325,7 @@
           suggestionEl.innerHTML = "";
           return null;
         }
-
+        
         const prefix = value;
         const rem = remainderFromPrefix(sug, prefix);
         const safePrefix = escapeHtml(prefix);
@@ -575,12 +336,12 @@
 
       function getFilteredProcessors(query) {
         if (!query) return processorsList;
-
+        
         const nq = normalize(query);
         const exactMatches = [];
         const startsWithMatches = [];
         const containsMatches = [];
-
+        
         for (const p of processorsList) {
           const normalized = normalize(p);
           if (normalized === nq) {
@@ -591,56 +352,37 @@
             containsMatches.push(p);
           }
         }
-
+        
         return [...exactMatches, ...startsWithMatches, ...containsMatches];
       }
 
       function showDropdown(query = "") {
         const filtered = getFilteredProcessors(query);
         selectedDropdownIndex = -1;
-
+        
         if (filtered.length === 0) {
           senderDropdown.classList.add("hidden");
           return;
         }
-
+        
         senderDropdown.innerHTML = filtered
           .map((processor, index) => {
             const highlighted = highlightMatch(processor, query);
-            return `
-        <div class="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors duration-150 border-b border-gray-100 last:border-b-0" 
-             data-value="${escapeHtml(processor)}" data-index="${index}">
-          ${highlighted}
-        </div>
-      `;
+            return `<div class="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors duration-150 border-b border-gray-100 last:border-b-0" data-value="${escapeHtml(processor)}" data-index="${index}">${highlighted}</div>`;
           })
           .join("");
-
+        
         senderDropdown.classList.remove("hidden");
       }
 
       function highlightMatch(text, query) {
         if (!query) return escapeHtml(text);
-
-        const nq = normalize(query);
-        const nt = normalize(text);
-        const index = nt.indexOf(nq);
-
-        if (index === -1) return escapeHtml(text);
-
-        // Найдем соответствующие позиции в оригинальном тексте
-        let realStart = 0;
-        let realEnd = text.length;
-
-        // Упрощенная версия для выделения
+        
         const escapedText = escapeHtml(text);
         const escapedQuery = escapeHtml(query);
-
+        
         return escapedText.replace(
-          new RegExp(
-            `(${escapedQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
-            "gi"
-          ),
+          new RegExp(`(${escapedQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi"),
           '<mark class="bg-yellow-200 font-semibold">$1</mark>'
         );
       }
@@ -665,32 +407,22 @@
         return false;
       }
 
-      // Функция для обновления визуального состояния поля
       function updateInputState() {
         const input = senderSearch;
         const hasValue = input.value.length > 0;
         const hasValidSelection = senderHidden.value.length > 0;
-
-        // Удаляем все классы состояния
-        input.classList.remove(
-          "border-green-500",
-          "border-red-500",
-          "border-yellow-500"
-        );
-
+        
+        input.classList.remove("border-green-500", "border-red-500", "border-yellow-500");
+        
         if (!hasValue) {
-          // Поле пустое - стандартное состояние
           input.classList.add("border-gray-200");
         } else if (hasValidSelection) {
-          // Валидный выбор
           input.classList.remove("border-gray-200");
           input.classList.add("border-green-500");
         } else if (currentSuggestion) {
-          // Есть подсказка
           input.classList.remove("border-gray-200");
           input.classList.add("border-yellow-500");
         } else {
-          // Введено что-то, но нет совпадений
           input.classList.remove("border-gray-200");
           input.classList.add("border-red-500");
         }
@@ -854,9 +586,6 @@
       clearBtn.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
-
-        console.log("Clear button clicked"); // Отладка
-
         senderSearch.value = "";
         senderHidden.value = "";
         clearBtn.classList.add("hidden");
@@ -875,15 +604,11 @@
         }
       });
 
-      // ---------- FILE SELECTION / LOCK LOGIC ----------
-
       function humanFileSize(bytes) {
         if (bytes === 0) return "0 B";
         const units = ["B", "KB", "MB", "GB", "TB"];
         const i = Math.floor(Math.log(bytes) / Math.log(1024));
-        return (
-          (bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1) + " " + units[i]
-        );
+        return (bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1) + " " + units[i];
       }
 
       function showSelectedFile(file) {
@@ -891,22 +616,18 @@
         selectedFileSize.textContent = humanFileSize(file.size);
         fileView.classList.remove("hidden");
         uploadZone.classList.add("hidden");
-        // disable uploadZone interactivity while file present (prevent click opening)
         uploadZone.setAttribute("aria-disabled", "true");
       }
 
       function clearSelectedFile() {
-        // reset file input
         try {
           fileInput.value = "";
         } catch (e) {
-          // in some browsers setting value may throw; recreate input if needed
           const newInput = fileInput.cloneNode();
           fileInput.parentNode.replaceChild(newInput, fileInput);
-          // reassign and rebind events (simple way: reload page or handle minimal)
-          location.reload(); // cheap but effective fallback
+          location.reload();
         }
-        senderHidden.removeAttribute("data-file"); // not used, but cleanup
+        senderHidden.removeAttribute("data-file");
         fileView.classList.add("hidden");
         uploadZone.classList.remove("hidden");
         uploadZone.removeAttribute("aria-disabled");
@@ -1006,20 +727,15 @@
         clearSelectedFile();
       });
 
-      // ---------- FORM SUBMISSION ----------
-
       function fetchWithTimeout(url, options = {}, timeout = 25000) {
         const controller = new AbortController();
         const id = setTimeout(() => controller.abort(), timeout);
-        return fetch(url, { ...options, signal: controller.signal }).finally(
-          () => clearTimeout(id)
-        );
+        return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
       }
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-
-        // Проверяем отправителя
+        
         if (!senderHidden.value) {
           const exact = findExactMatch(senderSearch.value);
           if (exact) {
@@ -1030,30 +746,21 @@
             senderSearch.value = currentSuggestion;
           }
         }
-
-        // Валидация отправителя
+        
         if (!senderHidden.value) {
-          showNotification(
-            "Пожалуйста, выберите отправителя из списка",
-            "error"
-          );
+          showNotification("Пожалуйста, выберите отправителя из списка", "error");
           senderSearch.focus();
           return;
         }
-
-        // Проверяем, что выбранный отправитель действительно есть в списке
+        
         const validSender = findExactMatch(senderHidden.value);
         if (!validSender) {
-          showNotification(
-            "Выбранный отправитель не найден в списке доступных",
-            "error"
-          );
+          showNotification("Выбранный отправитель не найден в списке доступных", "error");
           senderSearch.focus();
           senderSearch.select();
           return;
         }
-
-        // Валидация файла
+        
         if (fileInput.files.length === 0) {
           showNotification("Пожалуйста, выберите файл", "error");
           return;
@@ -1061,14 +768,10 @@
 
         submitBtn.disabled = true;
         setLoading(true);
-
+        
         const formData = new FormData(form);
         try {
-          const resp = await fetchWithTimeout(
-            form.action || "/upload",
-            { method: "POST", body: formData },
-            25000
-          );
+          const resp = await fetchWithTimeout(form.action || "/upload", { method: "POST", body: formData }, 25000);
           if (!resp.ok) {
             let errText = `Сервер вернул ${resp.status}`;
             try {
@@ -1082,27 +785,22 @@
           }
           const result = await resp.json().catch(() => ({ success: false }));
           if (result && result.success) {
-            // Сохраняем данные в localStorage
             if (result.data) {
               localStorage.setItem("mapato_data", JSON.stringify(result.data));
-              localStorage.setItem(
-                "mapato_upload_time",
-                new Date().toISOString()
-              );
+              localStorage.setItem("mapato_upload_time", new Date().toISOString());
             }
             const redirect = result.redirect || "/table";
             setTimeout(() => (location.href = redirect), 0);
           } else {
-            showNotification(
-              "Ошибка: " + (result.error || "Не удалось обработать файл"),
-              "error"
-            );
+            showNotification("Ошибка: " + (result.error || "Не удалось обработать файл"), "error");
             submitBtn.disabled = false;
           }
         } catch (err) {
-          if (err.name === "AbortError")
+          if (err.name === "AbortError") {
             showNotification("Превышено время ожидания сервера", "error");
-          else showNotification("Ошибка при загрузке файла", "error");
+          } else {
+            showNotification("Ошибка при загрузке файла", "error");
+          }
           submitBtn.disabled = false;
         } finally {
           setLoading(false);

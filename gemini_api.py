@@ -6,7 +6,7 @@ load_dotenv()
 
 API_KEY = os.getenv("GOOGLE_API_KEY")
 MODEL = "gemini-2.0-flash-lite"
-URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={API_KEY}"
+URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key=AIzaSyA-hM5QWer-jOGZP86l9e91PIBc1BTfpn4"
 
 def chat_with_gemini(prompt: str):
     payload = {

@@ -1,11 +1,11 @@
 import pandas as pd
 import io
-from models import ExcelRow, ExcelData, Totals, Calc
+from models import ExcelData, Totals, Calc
 from gemini_api import detect_currency, detect_recipient, detect_sender
 
 def process_changan(file_content: bytes) -> dict:
     
-    storage = ExcelData(rows=[], totals=Totals(), truck="", calc=Calc(), recipient="", sender="")
+    storage = ExcelData(containers={}, totals=Totals(), truck="", calc=Calc(), recipient="", sender="")
     
     column_mapping = {
         "Unnamed: 2": "Код ТН ВЭД",
@@ -79,12 +79,22 @@ def process_changan(file_content: bytes) -> dict:
         truck = "Не опознан"  # значение по умолчанию
         truck_value = sheets[list(sheets.keys())[0]].iloc[9]["Unnamed: 2"]
         storage.truck = truck_value
+        print(truck_value)
         
         # Обрабатываем строки данных (кроме последней, если она итоги)
         data_rows = df  # df уже обрезан выше
         calculated_total_quantity = 0
         calculated_total_weight = 0
         calculated_total_amount = 0
+        
+        # Определяем номер контейнера для группировки
+        container_no = storage.truck.strip()
+        if not container_no:
+            container_no = "Без номера контейнера"
+        
+        # Инициализируем контейнер если его еще нет
+        if container_no not in storage.containers:
+            storage.containers[container_no] = []
 
         for _, row in data_rows.iterrows():
             # Создаем запись с данными (убираем все NaN значения для JSON совместимости)
@@ -108,7 +118,7 @@ def process_changan(file_content: bytes) -> dict:
                 "Вид информации об упаковке (всегда 0)": 0,
                 "Вид упаковки ": "PP",
                 "Количество упаковок": row.get("Количество грузовых мест", 0) if not pd.isna(row.get("Количество грузовых мест", 0)) else 0,
-                "Номер контейнера": truck,
+                "Номер контейнера": storage.truck,
                 "Вес брутто": round(float(row.get("Вес брутто", 0)), 2) if not pd.isna(row.get("Вес брутто", 0)) else 0,
                 "Валюта": currency,
                 "Сумма": round(float(row.get("Сумма", 0)), 2)*row.get("Количество грузовых мест", 0) if not pd.isna(row.get("Сумма", 0)) else 0,
@@ -116,7 +126,9 @@ def process_changan(file_content: bytes) -> dict:
             calculated_total_quantity += float(record_data["Количество грузовых мест"])
             calculated_total_weight += float(record_data["Вес брутто"])
             calculated_total_amount += float(record_data["Сумма"])
-            storage.rows.append(ExcelRow(data=record_data, sheet="CHANGAN"))
+            
+            # Добавляем данные напрямую в контейнер
+            storage.containers[container_no].append(record_data)
 
         # Итоги
         storage.calc = Calc(
@@ -130,25 +142,9 @@ def process_changan(file_content: bytes) -> dict:
             total_weight=calculated_total_weight,
             total_amount=calculated_total_amount
         )
-    
-        # Адаптируем группировку: считаем количество мест по каждому контейнеру и сохраняем сгруппированные данные
-        containers_grouped = {}
-        containers_count = {}
-
-        for row in storage.rows:
-            container_no = row.data.get("Номер контейнера", "").strip()
-            if not container_no:
-                container_no = "Без номера контейнера"
-            
-            if container_no not in containers_grouped:
-                containers_grouped[container_no] = []
-                containers_count[container_no] = 0
-
-            containers_grouped[container_no].append(row.data)
-            containers_count[container_no] += float(row.data.get("Количество грузовых мест", 0))
-
-        storage.containers = containers_grouped
-        storage.truck = f"Количество контейнеров: {len(containers_grouped)}"
+        
+        # Обновляем информацию о контейнерах
+        storage.truck = f"Количество контейнеров: {len(storage.containers)}"
 
     except Exception as e:
         return {"error": str(e)}

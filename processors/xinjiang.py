@@ -1,12 +1,12 @@
 import pandas as pd
 import io
 import re
-from models import ExcelRow, ExcelData, Totals, Calc
+from models import ExcelData, Totals, Calc
 from gemini_api import detect_currency
 import json
 
 def process_xinjiang(file_content: bytes) -> dict:
-    storage = ExcelData(rows=[], totals=Totals(), sender="", truck="", calc=Calc(), recipient="")
+    storage = ExcelData(containers={}, totals=Totals(), sender="", truck="", calc=Calc(), recipient="")
 
     column_mapping = {
         "Xinjiang Xindudu \nImport and Export Trading Co.,Ltd": "Наименование/модель",
@@ -147,22 +147,18 @@ def process_xinjiang(file_content: bytes) -> dict:
                         "Валюта": currency,
                         "Сумма": record.get("Общая сумма", 0)
                     }
-                    storage.rows.append(ExcelRow(data=ordered_record, sheet=sheet_name))
-
-        # Группируем данные по номерам контейнеров
-        containers_grouped = {}
-        for row in storage.rows:
-            container_no = row.data.get("Номер контейнера", "").strip()
-            if not container_no:
-                container_no = "Без номера контейнера"
-            
-            if container_no not in containers_grouped:
-                containers_grouped[container_no] = []
-            
-            containers_grouped[container_no].append(row.data)
-        
-        # Сохраняем сгруппированные данные
-        storage.containers = containers_grouped
+                    
+                    # Определяем номер контейнера для группировки
+                    container_no = storage.truck.strip()
+                    if not container_no:
+                        container_no = "Без номера контейнера"
+                    
+                    # Инициализируем контейнер если его еще нет
+                    if container_no not in storage.containers:
+                        storage.containers[container_no] = []
+                    
+                    # Добавляем данные напрямую в контейнер
+                    storage.containers[container_no].append(ordered_record)
 
     except Exception as e:
         return {"error": str(e)}

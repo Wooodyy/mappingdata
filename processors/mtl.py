@@ -1,6 +1,6 @@
 import pandas as pd
 import io
-from models import ExcelRow, ExcelData, Totals, Calc
+from models import ExcelData, Totals, Calc
 from gemini_api import detect_currency, detect_recipient, detect_sender
 
 def process_mtl(file_content: bytes) -> dict:
@@ -17,7 +17,7 @@ def process_mtl(file_content: bytes) -> dict:
     Returns:
         dict: Результат обработки с ключами 'success' и 'storage' или 'error'
     """
-    storage = ExcelData(rows=[], totals=Totals(), truck="", calc=Calc(), recipient="", sender="")
+    storage = ExcelData(containers={}, totals=Totals(), truck="", calc=Calc(), recipient="", sender="")
 
     column_mapping = {
         "Unnamed: 0": "No",
@@ -140,9 +140,15 @@ def process_mtl(file_content: bytes) -> dict:
                 #"Case total N/W": round(float(row.get("Case total N/W", 0)), 2) if pd.notna(row.get("Case total N/W")) else 0,
             }
             
-            # Проверяем, есть ли уже элемент с таким же Case No
+            # Проверяем, есть ли уже элемент с таким же Case No в контейнерах
             case_no = record_data["Case No"]
-            case_already_exists = any(row.data.get("Case No") == case_no for row in storage.rows)
+            case_already_exists = False
+            
+            # Проверяем во всех контейнерах
+            for container_rows in storage.containers.values():
+                if any(row.get("Case No") == case_no for row in container_rows):
+                    case_already_exists = True
+                    break
             
             # Если Case No уже встречался, устанавливаем количество грузовых мест в 0
             if case_already_exists:
@@ -151,12 +157,24 @@ def process_mtl(file_content: bytes) -> dict:
             else:
                 record_data["Количество грузовых мест"] = 1
                 record_data["Количество упаковок"] = 1  
+            
             # Количество мест
             calculated_total_quantity += record_data["Количество грузовых мест"]
             calculated_total_weight += record_data["Вес брутто"]
             calculated_total_amount += record_data["Сумма"]
             
-            storage.rows.append(ExcelRow(data=record_data, sheet="PACKING LIST(Weight)"))
+            # Определяем номер контейнера для группировки из данных строки
+            container_no = record_data["Номер контейнера"].strip()
+            if not container_no:
+                container_no = "Без номера контейнера"
+            
+            
+            # Инициализируем контейнер если его еще нет
+            if container_no not in storage.containers:
+                storage.containers[container_no] = []
+            
+            # Добавляем данные напрямую в контейнер
+            storage.containers[container_no].append(record_data)
             processed_count += 1
         
         # ВЫВОД Количество мест
@@ -164,24 +182,11 @@ def process_mtl(file_content: bytes) -> dict:
         storage.calc.calc_weight = round(calculated_total_weight, 2)
         storage.calc.calc_amount = round(calculated_total_amount, 2)
 
-        # Список контейнеров
+        # Список контейнеров для статистики
         containers_list = {}
-
-
-        # Группируем данные по номерам контейнеров
-        containers_grouped = {}
-        for row in storage.rows:
-            container_no = row.data.get("Номер контейнера", "").strip()
-            containers_list[container_no] = containers_list.get(container_no, 0) + 1
-            if not container_no:
-                container_no = "Без номера контейнера"
-            
-            if container_no not in containers_grouped:
-                containers_grouped[container_no] = []
-            
-            containers_grouped[container_no].append(row.data)
-        # Сохраняем сгруппированные данные
-        storage.containers = containers_grouped
+        for container_no, rows in storage.containers.items():
+            containers_list[container_no] = len(rows)
+        
 
         # Количество контейнеров
         print(len(containers_list))

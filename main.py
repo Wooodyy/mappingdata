@@ -4,6 +4,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from processors import PROCESSORS
+from data_handler import RawDataRequest, handle_raw_data
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -36,8 +37,7 @@ async def upload_file(sender: str = Form(...), file: UploadFile = File(...)):
     return {
         "success": True,
         "data": {
-            "rows": [row.data for row in storage.rows],
-            "containers": storage.containers,  # Добавляем сгруппированные данные
+            "containers": storage.containers,  # Основные данные в контейнерах
             "totals": storage.totals.__dict__,
             "calc": storage.calc.__dict__,
             "sender": storage.sender,
@@ -62,3 +62,29 @@ async def get_table_json():
         },
         status_code=410
     )
+
+# Endpoint для сохранения данных
+@app.post("/save")
+async def save_data(request: RawDataRequest):
+    """
+    Endpoint для сохранения данных из localStorage
+    Принимает сырые данные и преобразует их в формат 1.json на сервере
+    """
+    try:
+        # Используем функцию для обработки сырых данных
+        result = handle_raw_data(request)
+        
+        if result["success"]:
+            return result
+        else:
+            return JSONResponse(
+                content=result,
+                status_code=400
+            )
+            
+    except Exception as e:
+        print(f"Критическая ошибка при обработке данных: {e}")
+        return JSONResponse(
+            content={"success": False, "error": f"Критическая ошибка: {str(e)}"},
+            status_code=500
+        )
