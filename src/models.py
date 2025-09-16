@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Dict, List, Any
+from datetime import date
 
 class Totals(BaseModel):
     total_quantity: float = 0
@@ -25,6 +26,8 @@ class RawDataRequest(BaseModel):
     containers: Dict[str, List[Dict[str, Any]]]
     sender: str
     recipient: str
+    invoice: str
+    date_invoice: date  # формат: "25.02.2025"
     seller: str = None
     buyer: str = None
     truck: str = ""
