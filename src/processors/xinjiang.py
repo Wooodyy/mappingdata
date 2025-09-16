@@ -1,8 +1,8 @@
 import pandas as pd
 import io
 import re
-from models import ExcelData, Totals, Calc
-from gemini_api import detect_currency
+from src.models import ExcelData, Totals, Calc
+from src.gemini_api import detect_currency
 import json
 
 def process_xinjiang(file_content: bytes) -> dict:

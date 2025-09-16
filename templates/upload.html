@@ -78,7 +78,15 @@
           </div>
 
           <div class="p-6 sm:p-8">
-            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
+            <div class="mb-6 flex items-center justify-center">
+              <div class="inline-flex bg-gray-100 rounded-xl p-1">
+                <a href="/" id="mode1Btn" class="px-4 py-2 rounded-lg bg-white shadow text-gray-900 font-semibold">Импорт из Инвойса</a>
+                <a href="/compare" id="mode2Btn" class="px-4 py-2 rounded-lg text-gray-600">Сравнение ТД с Инвойсом</a>
+              </div>
+            </div>
+
+            <div id="mode1Panel">
+              <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
               <div class="space-y-2">
                 <label for="senderSearch" class="block text-sm font-semibold text-gray-900">
                   Отправитель
@@ -193,7 +201,130 @@
                   Обработать файл
                 </button>
               </div>
-            </form>
+              </form>
+            </div>
+
+            <div id="mode2Panel" class="hidden">
+              <form id="compareForm" action="/compare" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-gray-900">
+                    Отправитель
+                    <span class="text-red-500 ml-1">*</span>
+                  </label>
+                  <div class="relative autocomplete-wrap">
+                    <div id="compareSuggestion" class="suggestion-layer rounded-xl border border-transparent px-4 py-3 text-sm"></div>
+                    <input id="compareSenderSearch" type="text" class="input-ghost w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200" placeholder="Начните вводить имя отправителя..." autocomplete="off" aria-autocomplete="both"/>
+                    <button id="compareClearBtn" type="button" class="absolute right-3 top-3 w-6 h-6 text-gray-400 hover:text-gray-600 hidden rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors z-10" title="Очистить поле">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                    </button>
+                    <div id="compareSenderDropdown" class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto hidden"></div>
+                  </div>
+                  <input type="hidden" id="compareSenderHidden" name="sender" required />
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-gray-900">
+                    Инвойс (Excel)
+                    <span class="text-red-500 ml-1">*</span>
+                  </label>
+                  <div id="invoiceWrapper2" class="relative">
+                    <label id="invoiceZone2" for="invoiceFile" class="upload-zone-hover flex flex-col items-center justify-center gap-4 border-2 border-dashed border-gray-300 rounded-2xl p-8 cursor-pointer bg-gray-50/50 transition-all duration-300 hover:shadow-lg group" tabindex="0">
+                      <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                          <polyline points="14,2 14,8 20,8"/>
+                          <line x1="16" y1="13" x2="8" y2="13"/>
+                          <line x1="16" y1="17" x2="8" y2="17"/>
+                          <polyline points="10,9 9,9 8,9"/>
+                        </svg>
+                      </div>
+                      <div class="text-center">
+                        <div class="text-base font-semibold text-gray-700 mb-1">Перетащите файл сюда или нажмите для выбора</div>
+                        <div class="text-sm text-gray-500">Поддерживаются форматы .xlsx и .xls</div>
+                      </div>
+                    </label>
+                    <div id="invoiceView2" class="hidden relative border-2 border-green-200 rounded-2xl p-6 bg-gradient-to-r from-green-50 to-emerald-50">
+                      <div class="flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-4 min-w-0">
+                          <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                              <polyline points="14,2 14,8 20,8"/>
+                            </svg>
+                          </div>
+                          <div class="min-w-0">
+                            <div id="invoiceFileName2" class="text-base font-semibold text-gray-900 truncate"></div>
+                            <div id="invoiceFileSize2" class="text-sm text-gray-600 mt-1"></div>
+                          </div>
+                        </div>
+                        <button id="removeInvoiceBtn2" type="button" class="w-10 h-10 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-colors duration-200" aria-label="Удалить файл">
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <input id="invoiceFile" name="invoice" type="file" accept=".xlsx,.xls" class="sr-only" required />
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-gray-900">
+                    Таможенная декларация (XML)
+                    <span class="text-red-500 ml-1">*</span>
+                  </label>
+                  <div id="declWrapper2" class="relative">
+                    <label id="declZone2" for="declFile" class="upload-zone-hover flex flex-col items-center justify-center gap-4 border-2 border-dashed border-gray-300 rounded-2xl p-8 cursor-pointer bg-gray-50/50 transition-all duration-300 hover:shadow-lg group" tabindex="0">
+                      <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                          <polyline points="14,2 14,8 20,8"/>
+                        </svg>
+                      </div>
+                      <div class="text-center">
+                        <div class="text-base font-semibold text-gray-700 mb-1">Перетащите XML сюда или нажмите для выбора</div>
+                        <div class="text-sm text-gray-500">Поддерживается формат .xml</div>
+                      </div>
+                    </label>
+                    <div id="declView2" class="hidden relative border-2 border-green-200 rounded-2xl p-6 bg-gradient-to-r from-green-50 to-emerald-50">
+                      <div class="flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-4 min-w-0">
+                          <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                              <polyline points="14,2 14,8 20,8"/>
+                            </svg>
+                          </div>
+                          <div class="min-w-0">
+                            <div id="declFileName2" class="text-base font-semibold text-gray-900 truncate"></div>
+                            <div id="declFileSize2" class="text-sm text-gray-600 mt-1"></div>
+                          </div>
+                        </div>
+                        <button id="removeDeclBtn2" type="button" class="w-10 h-10 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-colors duration-200" aria-label="Удалить файл">
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <input id="declFile" name="declaration" type="file" accept=".xml" class="sr-only" required />
+                </div>
+
+                <div class="pt-0">
+                  <button id="compareSubmit" type="submit" class="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-4 rounded-xl disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl">
+                    <svg id="compareSpinner" class="w-5 h-5 hidden pulse-animation" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <circle cx="12" cy="12" r="10" stroke-width="3" stroke="currentColor"/>
+                    </svg>
+                    Показать имена файлов
+                  </button>
+                </div>
+              </form>
+
+              <div id="compareResult" class="hidden mt-4 text-sm text-gray-800 bg-blue-50 border border-blue-200 rounded-xl p-4"></div>
+            </div>
           </div>
         </div>
 
@@ -212,6 +343,9 @@
     <script type="application/json" id="processors-data">
       {{ processors|tojson|safe }}
     </script>
+    <script type="application/json" id="compare-senders-data">
+      {{ compare_senders|tojson|safe }}
+    </script>
 
     <script>
       function clearAllCache() {
@@ -222,6 +356,8 @@
 
       const processorsData = document.getElementById("processors-data").textContent;
       const processorsList = JSON.parse(processorsData);
+      const compareSendersData = document.getElementById("compare-senders-data").textContent || "[]";
+      const compareSendersList = JSON.parse(compareSendersData);
 
       const senderSearch = document.getElementById("senderSearch");
       const senderHidden = document.getElementById("sender");
@@ -242,7 +378,130 @@
       const notification = document.getElementById("notification");
       const notificationInner = document.getElementById("notificationInner");
 
+      // Tabs (toggle locally without navigation)
+      const mode1Btn = document.getElementById("mode1Btn");
+      const mode2Btn = document.getElementById("mode2Btn");
+      const mode1Panel = document.getElementById("mode1Panel");
+      const mode2Panel = document.getElementById("mode2Panel");
+
+      // Compare elements
+      const compareForm = document.getElementById("compareForm");
+      const compareSubmit = document.getElementById("compareSubmit");
+      const compareSpinner = document.getElementById("compareSpinner");
+      const compareResult = document.getElementById("compareResult");
+      const cSuggest = document.getElementById("compareSuggestion");
+      const cSearch = document.getElementById("compareSenderSearch");
+      const cHidden = document.getElementById("compareSenderHidden");
+      const cClear = document.getElementById("compareClearBtn");
+      const cDropdown = document.getElementById("compareSenderDropdown");
+      const invoiceFile2 = document.getElementById("invoiceFile");
+      const invoiceZone2 = document.getElementById("invoiceZone2");
+      const invoiceView2 = document.getElementById("invoiceView2");
+      const invoiceFileName2 = document.getElementById("invoiceFileName2");
+      const invoiceFileSize2 = document.getElementById("invoiceFileSize2");
+      const removeInvoiceBtn2 = document.getElementById("removeInvoiceBtn2");
+      const declFile2 = document.getElementById("declFile");
+      const declZone2 = document.getElementById("declZone2");
+      const declView2 = document.getElementById("declView2");
+      const declFileName2 = document.getElementById("declFileName2");
+      const declFileSize2 = document.getElementById("declFileSize2");
+      const removeDeclBtn2 = document.getElementById("removeDeclBtn2");
+
       const VALID_RE = /\.(xlsx|xls)$/i;
+      // Compare sender autocomplete (copy behaviour from mode1)
+      let cCurrentSuggestion = null;
+      let cSelectedDropdownIndex = -1;
+      function cFindExactMatch(input) { const nq = normalize(input); return compareSendersList.find(p => normalize(p) === nq) || null; }
+      function cFindSuggestion(prefix) {
+        const nq = normalize(prefix); if (!nq) return null;
+        for (const p of compareSendersList) { const n = normalize(p); if (n.startsWith(nq) && n !== nq) return p; }
+        for (const p of compareSendersList) { const n = normalize(p); if (n.includes(nq) && n !== nq) return p; }
+        return null;
+      }
+      function cShowSuggestionFor(value) {
+        const sug = cFindSuggestion(value); cCurrentSuggestion = sug; if (!sug) { cSuggest.innerHTML = ""; return null; }
+        const prefix = value; const rem = remainderFromPrefix(sug, prefix);
+        cSuggest.innerHTML = `<span class="suggestion-prefix">${escapeHtml(prefix)}</span><span>${escapeHtml(rem)}</span>`; return sug;
+      }
+      function cGetFiltered(query) {
+        if (!query) return compareSendersList; const nq = normalize(query); const exact = [], starts = [], contains = [];
+        for (const p of compareSendersList) { const n = normalize(p); if (n === nq) exact.push(p); else if (n.startsWith(nq)) starts.push(p); else if (n.includes(nq)) contains.push(p); }
+        return [...exact, ...starts, ...contains];
+      }
+      function cShowDropdown(query = "") {
+        const filtered = cGetFiltered(query); cSelectedDropdownIndex = -1; if (filtered.length === 0) { cDropdown.classList.add("hidden"); return; }
+        cDropdown.innerHTML = filtered.map((processor, index) => {
+          const highlighted = highlightMatch(processor, query);
+          return `<div class="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors duration-150 border-b border-gray-100 last:border-b-0" data-value="${escapeHtml(processor)}" data-index="${index}">${highlighted}</div>`;
+        }).join("");
+        cDropdown.classList.remove("hidden");
+      }
+      function cHideDropdown() { cDropdown.classList.add("hidden"); cSelectedDropdownIndex = -1; }
+      function cSelectDropdownItem(index) {
+        const items = cDropdown.querySelectorAll("[data-value]");
+        if (items.length > 0 && index >= 0 && index < items.length) {
+          const value = items[index].dataset.value; cSearch.value = value; cHidden.value = value; cHideDropdown(); cSuggest.innerHTML = ""; cCurrentSuggestion = null; cUpdateCompareInputState(); return true;
+        }
+        return false;
+      }
+      function cUpdateCompareInputState() {
+        const hasValue = cSearch?.value?.length > 0; const hasValidSelection = cHidden?.value?.length > 0;
+        if (!cSearch) return;
+        cSearch.classList.remove("border-green-500", "border-red-500", "border-yellow-500");
+        if (!hasValue) cSearch.classList.add("border-gray-200");
+        else if (hasValidSelection) { cSearch.classList.remove("border-gray-200"); cSearch.classList.add("border-green-500"); }
+        else if (cCurrentSuggestion) { cSearch.classList.remove("border-gray-200"); cSearch.classList.add("border-yellow-500"); }
+        else { cSearch.classList.remove("border-gray-200"); cSearch.classList.add("border-red-500"); }
+      }
+      if (cSearch) {
+        cSearch.addEventListener("input", (e) => {
+          const value = e.target.value; cHidden.value = ""; cClear.classList.toggle("hidden", !value);
+          const exactMatch = cFindExactMatch(value);
+          if (exactMatch) { cHidden.value = exactMatch; cSuggest.innerHTML = ""; cCurrentSuggestion = null; cHideDropdown(); }
+          else { cShowSuggestionFor(value); cShowDropdown(value); }
+          cUpdateCompareInputState();
+        });
+        cSearch.addEventListener("keydown", (e) => {
+          const dropdownVisible = !cDropdown.classList.contains("hidden"); const dropdownItems = cDropdown.querySelectorAll("[data-value]");
+          if (e.key === "ArrowDown") { e.preventDefault(); if (dropdownVisible && dropdownItems.length > 0) { cSelectedDropdownIndex = Math.min(cSelectedDropdownIndex + 1, dropdownItems.length - 1); cUpdateDropdownSelection(); } else { cShowDropdown(cSearch.value); } }
+          else if (e.key === "ArrowUp") { e.preventDefault(); if (dropdownVisible && dropdownItems.length > 0) { cSelectedDropdownIndex = Math.max(cSelectedDropdownIndex - 1, -1); cUpdateDropdownSelection(); } }
+          else if (e.key === "Enter") { e.preventDefault(); if (dropdownVisible && cSelectedDropdownIndex >= 0) { cSelectDropdownItem(cSelectedDropdownIndex); } else { const exact = cFindExactMatch(cSearch.value); if (exact) { cHidden.value = exact; cSuggest.innerHTML = ""; cCurrentSuggestion = null; cHideDropdown(); } else if (cCurrentSuggestion) { cSearch.value = cCurrentSuggestion; cHidden.value = cCurrentSuggestion; cCurrentSuggestion = null; cSuggest.innerHTML = ""; cHideDropdown(); } } cClear.classList.toggle("hidden", !cSearch.value); cUpdateCompareInputState(); }
+          else if (e.key === "Tab") { if (cCurrentSuggestion) { e.preventDefault(); cSearch.value = cCurrentSuggestion; cHidden.value = cCurrentSuggestion; cCurrentSuggestion = null; cSuggest.innerHTML = ""; cHideDropdown(); cClear.classList.toggle("hidden", !cSearch.value); cUpdateCompareInputState(); } else if (dropdownVisible && cSelectedDropdownIndex >= 0) { e.preventDefault(); cSelectDropdownItem(cSelectedDropdownIndex); } else if (dropdownVisible && cSelectedDropdownIndex === -1) { e.preventDefault(); if (!cSelectDropdownItem(0)) cHideDropdown(); } else { cHideDropdown(); } }
+          else if (e.key === "Escape") { cSuggest.innerHTML = ""; cCurrentSuggestion = null; cHideDropdown(); cUpdateCompareInputState(); }
+        });
+        function cUpdateDropdownSelection() {
+          const items = cDropdown.querySelectorAll("[data-value]"); items.forEach((item, index) => { if (index === cSelectedDropdownIndex) { item.classList.add("bg-blue-100"); item.scrollIntoView({ block: "nearest" }); } else { item.classList.remove("bg-blue-100"); } });
+        }
+        cSearch.addEventListener("blur", () => { setTimeout(() => { const exact = cFindExactMatch(cSearch.value); if (exact) { cSearch.value = exact; cHidden.value = exact; } cSuggest.innerHTML = ""; cCurrentSuggestion = null; cHideDropdown(); cUpdateCompareInputState(); }, 200); });
+        cSearch.addEventListener("focus", () => { if (cSearch.value) { cShowSuggestionFor(cSearch.value); cShowDropdown(cSearch.value); } else { cShowDropdown(""); } cUpdateCompareInputState(); });
+        cDropdown.addEventListener("click", (e) => { const item = e.target.closest("[data-value]"); if (item) { const value = item.dataset.value; cSearch.value = value; cHidden.value = value; cHideDropdown(); cSuggest.innerHTML = ""; cCurrentSuggestion = null; cClear.classList.toggle("hidden", !value); cUpdateCompareInputState(); cSearch.focus(); } });
+        cClear.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); cSearch.value = ""; cHidden.value = ""; cClear.classList.add("hidden"); cSuggest.innerHTML = ""; cCurrentSuggestion = null; cHideDropdown(); cUpdateCompareInputState(); cSearch.focus(); });
+        document.addEventListener("click", (e) => { const wrap = cSearch.closest(".autocomplete-wrap"); if (wrap && !wrap.contains(e.target)) cHideDropdown(); });
+      }
+
+      // Compare file zones (like mode1 style)
+      function showSelectedFile2(file) { invoiceFileName2.textContent = file.name; invoiceFileSize2.textContent = humanFileSize(file.size); invoiceView2.classList.remove("hidden"); invoiceZone2.classList.add("hidden"); invoiceZone2.setAttribute("aria-disabled", "true"); }
+      function clearSelectedFile2() { try { invoiceFile2.value = ""; } catch (e) { const newInput = invoiceFile2.cloneNode(); invoiceFile2.parentNode.replaceChild(newInput, invoiceFile2); location.reload(); } invoiceView2.classList.add("hidden"); invoiceZone2.classList.remove("hidden"); invoiceZone2.removeAttribute("aria-disabled"); }
+      function showSelectedDecl2(file) { declFileName2.textContent = file.name; declFileSize2.textContent = humanFileSize(file.size); declView2.classList.remove("hidden"); declZone2.classList.add("hidden"); declZone2.setAttribute("aria-disabled", "true"); }
+      function clearSelectedDecl2() { try { declFile2.value = ""; } catch (e) { const newInput = declFile2.cloneNode(); declFile2.parentNode.replaceChild(newInput, declFile2); location.reload(); } declView2.classList.add("hidden"); declZone2.classList.remove("hidden"); declZone2.removeAttribute("aria-disabled"); }
+      if (invoiceFile2) { invoiceFile2.addEventListener("change", (e) => { const f = e.target.files[0]; if (!f) return; if (!VALID_RE.test(f.name)) { showNotification("Инвойс должен быть Excel (.xlsx/.xls)", "error"); invoiceFile2.value = ""; return; } showSelectedFile2(f); }); }
+      if (invoiceZone2) {
+        invoiceZone2.addEventListener("dragover", (e) => { e.preventDefault(); if (!invoiceView2.classList.contains("hidden")) { invoiceZone2.classList.add("opacity-60"); return; } invoiceZone2.classList.add("ring-2", "ring-blue-200"); });
+        invoiceZone2.addEventListener("dragleave", () => { invoiceZone2.classList.remove("ring-2", "ring-blue-200", "opacity-60"); });
+        invoiceZone2.addEventListener("drop", (e) => { e.preventDefault(); invoiceZone2.classList.remove("ring-2", "ring-blue-200", "opacity-60"); if (!invoiceView2.classList.contains("hidden")) { showNotification("Сначала удалите текущий файл", "error"); return; } const f = e.dataTransfer?.files?.[0]; if (f && VALID_RE.test(f.name)) { try { const dt = new DataTransfer(); dt.items.add(f); invoiceFile2.files = dt.files; } catch {} showSelectedFile2(f); } else { showNotification("Пожалуйста, выберите Excel (.xlsx/.xls)", "error"); } });
+        invoiceZone2.addEventListener("click", (e) => { if (!invoiceView2.classList.contains("hidden")) { e.preventDefault(); showNotification("Удалите текущий файл", "error"); } });
+        invoiceZone2.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && invoiceView2.classList.contains("hidden")) { invoiceFile2.click(); } });
+      }
+      if (removeInvoiceBtn2) removeInvoiceBtn2.addEventListener("click", clearSelectedFile2);
+      if (declFile2) { declFile2.addEventListener("change", (e) => { const f = e.target.files[0]; if (!f) return; if (!/\.xml$/i.test(f.name)) { showNotification("Декларация должна быть XML", "error"); declFile2.value = ""; return; } showSelectedDecl2(f); }); }
+      if (declZone2) {
+        declZone2.addEventListener("dragover", (e) => { e.preventDefault(); if (!declView2.classList.contains("hidden")) { declZone2.classList.add("opacity-60"); return; } declZone2.classList.add("ring-2", "ring-blue-200"); });
+        declZone2.addEventListener("dragleave", () => { declZone2.classList.remove("ring-2", "ring-blue-200", "opacity-60"); });
+        declZone2.addEventListener("drop", (e) => { e.preventDefault(); declZone2.classList.remove("ring-2", "ring-blue-200", "opacity-60"); if (!declView2.classList.contains("hidden")) { showNotification("Сначала удалите текущий файл", "error"); return; } const f = e.dataTransfer?.files?.[0]; if (f && /\.xml$/i.test(f.name)) { try { const dt = new DataTransfer(); dt.items.add(f); declFile2.files = dt.files; } catch {} showSelectedDecl2(f); } else { showNotification("Пожалуйста, выберите XML", "error"); } });
+        declZone2.addEventListener("click", (e) => { if (!declView2.classList.contains("hidden")) { e.preventDefault(); showNotification("Удалите текущий файл", "error"); } });
+        declZone2.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && declView2.classList.contains("hidden")) { declFile2.click(); } });
+      }
+      if (removeDeclBtn2) removeDeclBtn2.addEventListener("click", clearSelectedDecl2);
 
       function normalize(s) {
         return (s || "").toString().toLowerCase().replace(/\s+/g, " ").trim();
@@ -257,6 +516,83 @@
       
       function setLoading(on) {
         loading.classList.toggle("hidden", !on);
+      }
+
+      function setActiveMode(mode) {
+        const activeBtnClasses = ["bg-white", "shadow", "text-gray-900", "font-semibold"]; 
+        const inactiveBtnClasses = ["bg-transparent", "text-gray-600", "font-normal", "shadow-none"]; 
+
+        if (mode === 1) {
+          mode1Panel.classList.remove("hidden");
+          mode2Panel.classList.add("hidden");
+          mode1Btn.classList.add(...activeBtnClasses);
+          mode1Btn.classList.remove(...inactiveBtnClasses);
+          mode2Btn.classList.remove(...activeBtnClasses);
+          mode2Btn.classList.add(...inactiveBtnClasses);
+        } else {
+          mode1Panel.classList.add("hidden");
+          mode2Panel.classList.remove("hidden");
+          mode2Btn.classList.add(...activeBtnClasses);
+          mode2Btn.classList.remove(...inactiveBtnClasses);
+          mode1Btn.classList.remove(...activeBtnClasses);
+          mode1Btn.classList.add(...inactiveBtnClasses);
+        }
+      }
+
+      async function submitCompareForm(e) {
+        e.preventDefault();
+        if (!compareForm) return;
+        const inv = document.getElementById("invoiceFile");
+        const decl = document.getElementById("declFile");
+        if (!cHidden.value) {
+          const exact = cFindExactMatch(cSearch.value);
+          if (exact) { cHidden.value = exact; cSearch.value = exact; }
+          else if (cCurrentSuggestion) { cHidden.value = cCurrentSuggestion; cSearch.value = cCurrentSuggestion; }
+        }
+        if (!cHidden.value) { showNotification("Пожалуйста, выберите отправителя", "error"); cSearch?.focus(); return; }
+        if (!inv.files.length) {
+          showNotification("Пожалуйста, выберите файл инвойса", "error");
+          return;
+        }
+        if (!/\.(xlsx|xls)$/i.test(inv.files[0].name)) {
+          showNotification("Инвойс должен быть Excel (.xlsx/.xls)", "error");
+          return;
+        }
+        if (!decl.files.length) {
+          showNotification("Пожалуйста, выберите файл декларации", "error");
+          return;
+        }
+        if (!/\.xml$/i.test(decl.files[0].name)) {
+          showNotification("Декларация должна быть XML", "error");
+          return;
+        }
+
+        compareSubmit.disabled = true;
+        compareSpinner.classList.remove("hidden");
+        setLoading(true);
+
+        try {
+          const fd = new FormData(compareForm);
+          const resp = await fetch(compareForm.action || "/compare", { method: "POST", body: fd });
+          const j = await resp.json().catch(() => ({}));
+          if (!resp.ok || !j.success) {
+            showNotification("Ошибка: " + (j.error || ("Сервер вернул " + resp.status)), "error");
+          } else {
+            try {
+              localStorage.setItem(
+                "mapato_compare_result",
+                JSON.stringify({ invoice_file: j.data.invoice_file || "", declaration_file: j.data.declaration_file || "" })
+              );
+            } catch {}
+            location.href = "/compare";
+          }
+        } catch (err) {
+          showNotification("Ошибка при отправке формы сравнения", "error");
+        } finally {
+          setLoading(false);
+          compareSpinner.classList.add("hidden");
+          compareSubmit.disabled = false;
+        }
       }
 
       function findSuggestion(prefix) {
@@ -448,6 +784,22 @@
         // Обновляем визуальное состояние
         updateInputState();
       });
+
+      // Intercept nav to toggle panels without leaving the page
+      if (mode1Btn && mode2Btn) {
+        mode1Btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          setActiveMode(1);
+        });
+        mode2Btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          setActiveMode(2);
+        });
+      }
+
+      if (compareForm) {
+        compareForm.addEventListener("submit", submitCompareForm);
+      }
 
       // Tab accepts suggestion
       senderSearch.addEventListener("keydown", (e) => {

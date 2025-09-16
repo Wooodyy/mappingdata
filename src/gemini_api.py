@@ -4,9 +4,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_KEY = os.getenv("GOOGLE_API_KEY")
+API_KEY = "AIzaSyA-hM5QWer-jOGZP86l9e91PIBc1BTfpn4"
 MODEL = "gemini-2.0-flash-lite"
-URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key=AIzaSyA-hM5QWer-jOGZP86l9e91PIBc1BTfpn4"
+URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={API_KEY}"
 
 def chat_with_gemini(prompt: str):
     payload = {
@@ -37,9 +37,7 @@ def detect_currency(file_content: str):
     data = resp.json()
     try:
         currency = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-        # Убираем лишние символы и возвращаем только код валюты
         currency = currency.replace('\n', '').replace('\r', '').upper()
-        # Проверяем что это валидный код валюты (3 символа)
         if len(currency) == 3 and currency.isalpha():
             return currency
         else:
@@ -64,10 +62,7 @@ def detect_recipient(file_content: str):
     data = resp.json()
     try:
         recipient = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-        # Убираем лишние символы и возвращаем только получателя
         recipient = recipient.replace('\n', '').replace('\r', '').upper()
-        # Проверяем что это валидный получатель
-
         if len(recipient) > 0:
             return recipient
         else:
@@ -92,10 +87,7 @@ def detect_sender(file_content: str):
     data = resp.json()
     try:
         sender = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-        # Убираем лишние символы и возвращаем только отправителя
         sender = sender.replace('\n', '').replace('\r', '').upper()
-        # Проверяем что это валидный отправителя
-        
         if len(sender) > 0:
             return sender
         else:

@@ -498,6 +498,22 @@
                                       </select>
                                   </div>
                               `
+                                  : header === "Информация об упаковке (0-БЕЗ, 1 С)"
+                                  ? `
+                                  <div class="flex flex-col space-y-2">
+                                      <span>${header}</span>
+                                      <select 
+                                          class="bulk-package-info-select" 
+                                          data-container="${containerNo}"
+                                          onchange="changeBulkPackageInfoForContainer('${containerNo}', this.value)"
+                                          class="text-xs bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                      >
+                                          <option value="">Выбрать для всех</option>
+                                          <option value="0">0 - БЕЗ</option>
+                                          <option value="1">1 - С</option>
+                                      </select>
+                                  </div>
+                              `
                                   : header
                               }
                           </th>
@@ -554,6 +570,22 @@
                                             <option value="PP" ${
                                               value === "PP" ? "selected" : ""
                                             }>PP</option>
+                                        </select>
+                                    `
+                                        : key === "Информация об упаковке (0-БЕЗ, 1 С)"
+                                        ? `
+                                        <select 
+                                            class="package-info-select text-sm bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+                                            onchange="updatePackageInfo('${containerNo}', ${index}, this.value)"
+                                            data-row-index="${globalRowIndex}"
+                                            data-container="${containerNo}"
+                                        >
+                                            <option value="0" ${
+                                              value == 0 ? "selected" : ""
+                                            }>0 - БЕЗ</option>
+                                            <option value="1" ${
+                                              value == 1 ? "selected" : ""
+                                            }>1 - С</option>
                                         </select>
                                     `
                                         : value
@@ -786,12 +818,15 @@
           if (table) {
             table.querySelectorAll("tbody tr").forEach((row) => {
               const cells = [...row.querySelectorAll("td")].map((td) => {
-                const select = td.querySelector("select.package-type-select");
-                if (select) {
-                  return select.value;
-                } else {
-                  return td.textContent.trim();
+                const packageSelect = td.querySelector("select.package-type-select");
+                if (packageSelect) {
+                  return packageSelect.value;
                 }
+                const packageInfoSelect = td.querySelector("select.package-info-select");
+                if (packageInfoSelect) {
+                  return packageInfoSelect.value;
+                }
+                return td.textContent.trim();
               });
               text += cells.join("\t") + "\n";
             });
@@ -828,15 +863,20 @@
         // Get rows for this container
         containerTable.querySelectorAll("tbody tr").forEach((row) => {
           const cells = [...row.querySelectorAll("td")].map((td) => {
-            // Проверяем, есть ли в ячейке селект
-            const select = td.querySelector("select.package-type-select");
-            if (select) {
-              // Если есть селект, берем его выбранное значение
-              return select.value;
-            } else {
-              // Иначе берем обычный текст
-              return td.textContent.trim();
+            // Проверяем, есть ли в ячейке селект для вида упаковки
+            const packageSelect = td.querySelector("select.package-type-select");
+            if (packageSelect) {
+              // Если есть селект вида упаковки, берем его выбранное значение
+              return packageSelect.value;
             }
+            // Проверяем, есть ли в ячейке селект для информации об упаковке
+            const packageInfoSelect = td.querySelector("select.package-info-select");
+            if (packageInfoSelect) {
+              // Если есть селект информации об упаковке, берем его выбранное значение
+              return packageInfoSelect.value;
+            }
+            // Иначе берем обычный текст
+            return td.textContent.trim();
           });
           text += cells.join("\t") + "\n";
         });
@@ -1041,6 +1081,81 @@
         showToast(`Вид упаковки изменен на ${value} для контейнера ${containerNo}`);
       }
 
+      function updatePackageInfo(containerNo, rowIndex, value) {
+        console.log("updatePackageInfo вызвана с параметрами:", {containerNo, rowIndex, value, type: typeof rowIndex});
+        
+        // Преобразуем rowIndex в число, если это строка
+        const numericRowIndex = parseInt(rowIndex, 10);
+        console.log("Преобразованный rowIndex:", numericRowIndex);
+        
+        // Преобразуем value в число
+        const numericValue = parseInt(value, 10);
+        
+        // Обновляем данные в localStorage
+        const savedData = localStorage.getItem("mapato_data");
+        if (savedData) {
+          const data = JSON.parse(savedData);
+          console.log("Данные из localStorage:", data);
+          console.log("Контейнеры:", data.containers);
+          console.log("Конкретный контейнер:", data.containers?.[containerNo]);
+          console.log("Строка для обновления:", data.containers?.[containerNo]?.[numericRowIndex]);
+          
+          if (data.containers && data.containers[containerNo] && data.containers[containerNo][numericRowIndex]) {
+            // Проверяем текущее значение перед изменением
+            const currentValue = data.containers[containerNo][numericRowIndex]["Информация об упаковке (0-БЕЗ, 1 С)"];
+            console.log("Текущее значение:", currentValue, "Новое значение:", numericValue);
+            
+            data.containers[containerNo][numericRowIndex]["Информация об упаковке (0-БЕЗ, 1 С)"] = numericValue;
+            localStorage.setItem("mapato_data", JSON.stringify(data));
+            
+            // Проверяем, что значение действительно сохранилось
+            const savedData = JSON.parse(localStorage.getItem("mapato_data"));
+            const savedValue = savedData.containers[containerNo][numericRowIndex]["Информация об упаковке (0-БЕЗ, 1 С)"];
+            console.log("Сохраненное значение:", savedValue);
+            
+            showToast(`Информация об упаковке изменена на ${value} для товара в контейнере ${containerNo}`);
+            console.log("Обновление успешно выполнено");
+          } else {
+            console.error("Не удалось найти данные для обновления:", {containerNo, rowIndex: numericRowIndex, value});
+            showToast("Ошибка при обновлении информации об упаковке", "error");
+          }
+        } else {
+          console.error("Нет данных в localStorage");
+          showToast("Нет данных для обновления", "error");
+        }
+      }
+
+      function changeBulkPackageInfoForContainer(containerNo, value) {
+        if (!value) return;
+        
+        // Преобразуем value в число
+        const numericValue = parseInt(value, 10);
+        
+        // Обновляем данные в localStorage
+        const savedData = localStorage.getItem("mapato_data");
+        if (savedData) {
+          const data = JSON.parse(savedData);
+          if (data.containers && data.containers[containerNo]) {
+            // Обновляем все товары в этом контейнере
+            data.containers[containerNo].forEach(row => {
+              row["Информация об упаковке (0-БЕЗ, 1 С)"] = numericValue;
+            });
+            localStorage.setItem("mapato_data", JSON.stringify(data));
+          }
+        }
+        
+        // Обновляем UI
+        const containerTable = document.querySelector(`[data-container="${containerNo}"]`);
+        const packageInfoSelects = containerTable.querySelectorAll(".package-info-select");
+        packageInfoSelects.forEach((select) => {
+          select.value = value;
+        });
+        
+        const bulkSelect = containerTable.querySelector(".bulk-package-info-select");
+        if (bulkSelect) bulkSelect.value = "";
+        showToast(`Информация об упаковке изменена на ${value} для контейнера ${containerNo}`);
+      }
+
       // Save data to server
       async function saveDataToServer() {
         try {
@@ -1050,7 +1165,21 @@
             return;
           }
 
-          // Отправляем сырые данные из localStorage на сервер
+          // Отладочная информация - проверяем данные перед отправкой
+          const data = JSON.parse(savedData);
+          console.log("Данные перед отправкой на сервер:", data);
+          
+          // Проверяем значения "Информация об упаковке" во всех контейнерах
+          Object.keys(data.containers || {}).forEach(containerNo => {
+            console.log(`Контейнер ${containerNo}:`);
+            data.containers[containerNo].forEach((row, index) => {
+              const packageInfo = row["Информация об упаковке (0-БЕЗ, 1 С)"];
+              console.log(`  Строка ${index}: package_info = ${packageInfo}`);
+            });
+          });
+
+          // Отправляем данные из localStorage на сервер
+          // Изменения уже должны быть сохранены в localStorage через updatePackageInfo и updatePackageType
           const response = await fetch('/save', {
             method: 'POST',
             headers: {

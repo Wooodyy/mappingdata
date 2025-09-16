@@ -1,60 +1,82 @@
-# MappingData
+## MappingData
 
-MappingData is a lightweight web application that extracts and visualizes data from Excel and PDF files for customs declarations.
+Лёгкое веб‑приложение на FastAPI для извлечения и визуализации данных из Excel/PDF (таможенные декларации и инвойсы). Загружаете файл, выбираете отправителя — получаете структурированную таблицу и расчёты.
 
-## Demo
-Check the live version here: [data-mapping-tool-15n5.onrender.com](https://data-mapping-tool-15n5.onrender.com)
+### Демо
+Открыть: `https://data-mapping-tool-15n5.onrender.com`
 
-## Features
-- Upload Excel or PDF documents.
-- Process data using pre-configured algorithms.
-- View parsed data as a table on the frontend.
-- Easy extension: add new processors under `processors/`.
+### Возможности
+- **Загрузка** Excel/PDF через веб‑интерфейс.
+- **Обработка** данными алгоритмами для конкретных отправителей.
+- **Просмотр** результатов в виде таблицы + агрегаты/итоги.
+- **Расширяемость**: легко добавить нового отправителя и алгоритм сравнения.
 
-## Project Structure
+### Стек
+- **Backend**: FastAPI, Uvicorn
+- **Шаблоны**: Jinja2 (`templates/`)
+- **Docker**: запуск в режиме разработки через `docker-compose.yml`
+- **Деплой**: Render (`render.yaml`)
+
+### Структура проекта
+```
+mappingdata/
+├── main.py                 # Точка входа (uvicorn main:app)
+├── docker-compose.yml      # Docker dev‑запуск
+├── requirements.txt        # Зависимости Python
+├── render.yaml             # Конфигурация деплоя на Render
+├── src/
+│   ├── api.py              # FastAPI маршруты и HTML‑страницы
+│   ├── models.py           # Pydantic‑модели запросов/данных
+│   ├── services.py         # Логика обработки и сохранения данных
+│   ├── gemini_api.py       # Интеграция с Gemini (если используется)
+│   ├── processors/         # Алгоритмы парсинга по отправителям
+│   │   ├── __init__.py     # Регистрация PROCESSORS
+│   │   ├── xinjiang.py
+│   │   ├── mtl.py
+│   │   └── changan.py
+│   └── compare/            # Логика сравнения инвойс/декларация
+│       ├── __init__.py     # Доступ к COMPARE_HANDLERS
+│       └── test_handler.py # Реестр COMPARE_HANDLERS
+├── templates/              # HTML‑шаблоны (upload/table/compare)
+└── static/                 # Статические файлы
 ```
 
-mappingdata/
-├── api/               # API routes if any
-├── data/              # Sample or uploaded files
-├── processors/        # Logic for parsing files (Excel, PDF, etc.)
-├── templates/         # HTML templates for frontend rendering
-├── main.py            # FastAPI application entrypoint
-├── models.py          # Pydantic models or data structures
-├── requirements.txt   # Python dependencies
-└── render.yaml        # Deploy configuration for Render.com
+### Установка и запуск
 
-````
+Вариант A — Docker (рекомендуется, один старт‑командой):
+```bash
+docker-compose up --build
+```
+Приложение будет доступно на `http://127.0.0.1:8000`.
 
-## Tech Stack
-- **Backend**: FastAPI + Uvicorn  
-- **Frontend**: Jinja2 templates  
-- **Deployment**: Render with automatic Docker build via `render.yaml`  
+Вариант B — Локально (без Docker):
+```bash
+python -m venv .venv
+. .venv/Scripts/activate  # Windows PowerShell: .venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+Откройте `http://127.0.0.1:8000`.
 
-## Usage
+### Как пользоваться
+1. Откройте главную страницу (`/`).
+2. Выберите отправителя из списка (список формируется из `PROCESSORS` в `src/processors/__init__.py`).
+3. Загрузите файл (Excel/PDF) и дождитесь обработки.
+4. Перейдите на страницу таблицы (`/table`) для просмотра данных и итогов.
+5. Для сравнения инвойса и декларации используйте `/compare`.
 
-1. Clone the repo:
-    ```bash
-    git clone https://github.com/Wooodyy/mappingdata.git
-    cd mappingdata
-    ```
+### Как добавить нового отправителя (парсер)
+1. Создайте модуль в `src/processors/`, реализуйте функцию обработки: `bytes -> dict`.
+2. Зарегистрируйте её в `src/processors/__init__.py` в словаре `PROCESSORS`.
+3. Имя ключа в `PROCESSORS` появится в UI автоматически.
 
-2. Install dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
+### Как добавить обработчик сравнения
+1. Добавьте функцию в `src/compare/test_handler.py` и зарегистрируйте её в `COMPARE_HANDLERS`.
+2. Хэндлер станет доступен на странице `/compare` (список формируется из `COMPARE_HANDLERS`).
 
-3. Run the app:
-    ```bash
-    uvicorn main:app --reload
-    ```
+### Деплой на Render
+- Репозиторий собирается Docker‑ом автоматически. Конфигурация — `render.yaml`.
+- Переменные окружения и команду запуска можно указать в панели Render, команда по умолчанию: `uvicorn main:app --host 0.0.0.0 --port 8000`.
 
-4. Open your browser at `http://127.0.0.1:8000` and upload a file.
-
-## Contributing
-Want to add more processors (e.g., for different Excel formats or PDF layouts)?  
-Simply create a new module in `processors/`, register it in `processors/__init__.py`, and add its name to the upload UI picker.
-
-## License
-Licensed under the MIT License.
-
+### Лицензия
+MIT

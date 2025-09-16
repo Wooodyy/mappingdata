@@ -3,19 +3,7 @@
 """
 import json
 from typing import Dict, Any, List
-from pydantic import BaseModel
-
-
-class RawDataRequest(BaseModel):
-    """Модель для принятия сырых данных из localStorage"""
-    containers: Dict[str, List[Dict[str, Any]]]
-    sender: str
-    recipient: str
-    seller: str = None
-    buyer: str = None
-    truck: str = ""
-    calc: Dict[str, Any] = {}
-    totals: Dict[str, Any] = {}
+from src.models import RawDataRequest
 
 
 class DataHandler:
@@ -55,6 +43,10 @@ class DataHandler:
                 
                 # Обрабатываем товары в контейнере
                 for row in container_rows:
+                    # Отладочная информация - выводим значение поля "Информация об упаковке"
+                    package_info_raw = row.get("Информация об упаковке (0-БЕЗ, 1 С)", "НЕ_НАЙДЕНО")
+                    print(f"DEBUG: package_info_raw = {package_info_raw} (тип: {type(package_info_raw)})")
+                    
                     # Безопасное преобразование в числа с обработкой ошибок
                     def safe_float(value, default=0.0):
                         try:
@@ -72,11 +64,15 @@ class DataHandler:
                         except (ValueError, TypeError):
                             return default
                     
+                    # Вычисляем package_info
+                    package_info_value = safe_int(row.get("Информация об упаковке (0-БЕЗ, 1 С)", 0))
+                    print(f"DEBUG: package_info_value = {package_info_value} (тип: {type(package_info_value)})")
+                    
                     item = {
                         "code": row.get("Код ТН ВЭД", ""),
                         "goods_name": row.get("Коммерческое описание товара", ""),
                         "restriction_flag": 1,
-                        "package_info": 0,  # Согласно шаблону: 0 - без упаковки
+                        "package_info": package_info_value,  # Берем значение из данных пользователя
                         "places": safe_int(row.get("Количество грузовых мест", 0)),  # Целое число
                         "package_info_type": 0,
                         "package_type": row.get("Вид упаковки ", "PP"),

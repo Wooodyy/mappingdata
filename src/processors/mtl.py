@@ -1,7 +1,7 @@
 import pandas as pd
 import io
-from models import ExcelData, Totals, Calc
-from gemini_api import detect_currency, detect_recipient, detect_sender
+from src.models import ExcelData, Totals, Calc
+from src.gemini_api import detect_currency, detect_recipient, detect_sender
 
 def process_mtl(file_content: bytes) -> dict:
     """
