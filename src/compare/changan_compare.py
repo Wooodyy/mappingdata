@@ -54,11 +54,36 @@ def extract_xml_data_and_documents(xml_bytes: bytes) -> tuple[ExcelData, List[Do
                 if doc_kind or doc_name or doc_id or doc_date:
                     # Исключаем документы с кодами 02013, 11002, 09021
                     if doc_kind not in ["02013", "11002", "09021"]:
+                        # Проверяем документы с кодом 09034 на соответствие дате 31.05.2011
+                        has_error = False
+                        error_message = ""
+                        
+                        if doc_kind == "09034":
+                            # Проверяем различные форматы даты
+                            expected_date_formats = [
+                                "30.05.2011",
+                                "2011-05-30",
+                                "2011/05/30",
+                                "30/05/2011",
+                                "2011-05-30T00:00:00",
+                                "2011-05-30T00:00:00Z"
+                            ]
+                            
+                            # Нормализуем дату для сравнения
+                            normalized_date = doc_date.strip() if doc_date else ""
+                            
+                            # Проверяем соответствие ожидаемой дате
+                            if normalized_date not in expected_date_formats:
+                                has_error = True
+                                error_message = f"Ошибка: Документ с кодом 09034 должен иметь дату 31.05.2011, но получена дата: {normalized_date}"
+                        
                         doc = DocumentInfo(
                             DocKindCode=doc_kind,
                             DocName=doc_name,
                             DocId=doc_id,
-                            DocCreationDate=doc_date
+                            DocCreationDate=doc_date,
+                            has_error=has_error,
+                            error_message=error_message
                         )
                         # Проверяем на дубликаты перед добавлением
                         doc_exists = False
@@ -94,7 +119,7 @@ def extract_xml_data_and_documents(xml_bytes: bytes) -> tuple[ExcelData, List[Do
             record = {
                 "Код ТН ВЭД": int(commodity_code) if commodity_code and commodity_code.isdigit() else 0,
                 "Коммерческое описание товара": goods_description,
-                "Признак товара, свободного от применения запретов и ограничений (всегда 1)": 1 if goods_prohibition_free_code == "С" else 0,
+                "Признак товара, свободного от применения запретов и ограничений (всегда 1)": 1 if goods_prohibition_free_code == "C" else 0,
                 "Информация об упаковке (0-БЕЗ, 1 С)": 1,
                 "Количество грузовых мест": float(cargo_quantity) if cargo_quantity else 0,
                 "Вид информации об упаковке (всегда 0)": 0,

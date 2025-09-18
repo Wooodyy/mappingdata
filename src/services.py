@@ -45,7 +45,6 @@ class DataHandler:
                 for row in container_rows:
                     # Отладочная информация - выводим значение поля "Информация об упаковке"
                     package_info_raw = row.get("Информация об упаковке (0-БЕЗ, 1 С)", "НЕ_НАЙДЕНО")
-                    print(f"DEBUG: package_info_raw = {package_info_raw} (тип: {type(package_info_raw)})")
                     
                     # Безопасное преобразование в числа с обработкой ошибок
                     def safe_float(value, default=0.0):
@@ -66,7 +65,6 @@ class DataHandler:
                     
                     # Вычисляем package_info
                     package_info_value = safe_int(row.get("Информация об упаковке (0-БЕЗ, 1 С)", 0))
-                    print(f"DEBUG: package_info_value = {package_info_value} (тип: {type(package_info_value)})")
                     
                     item = {
                         "code": row.get("Код ТН ВЭД", ""),

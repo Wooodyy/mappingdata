@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 from typing import Dict, List, Any, Optional
-from datetime import date
 
 class Totals(BaseModel):
     total_quantity: float = 0
@@ -18,21 +17,20 @@ class ExcelData(BaseModel):
     calc: Calc
     sender: str = ""
     truck: str = ""
+    seller: str = ""
     recipient: str = ""
     buyer: str = ""
+    invoice: str = ""
+    date_invoice: str = ""
 
 class RawDataRequest(BaseModel):
     """Модель для принятия сырых данных из localStorage"""
     containers: Dict[str, List[Dict[str, Any]]]
     sender: str
     recipient: str
-    invoice: str
-    date_invoice: date  # формат: "25.02.2025"
     seller: str = None
     buyer: str = None
     truck: str = ""
-    calc: Dict[str, Any] = {}
-    totals: Dict[str, Any] = {}
 
 
 # ===== Модели для сравнения =====
@@ -42,6 +40,8 @@ class DocumentInfo(BaseModel):
     DocName: str = ""
     DocId: str = ""
     DocCreationDate: str = ""
+    has_error: bool = False
+    error_message: str = ""
 
 
 class CompareData(BaseModel):
@@ -49,8 +49,3 @@ class CompareData(BaseModel):
     xml_data: Optional[ExcelData] = None  # XML данные в формате ExcelData
     xml_documents: List[DocumentInfo] = []  # Документы из XML
     invoice_data: Optional[ExcelData] = None
-
-
-class CompareResult(BaseModel):
-    success: bool = True
-    data: CompareData

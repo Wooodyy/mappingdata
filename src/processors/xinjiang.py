@@ -6,7 +6,7 @@ from src.gemini_api import detect_currency
 import json
 
 def process_xinjiang(file_content: bytes) -> dict:
-    storage = ExcelData(containers={}, totals=Totals(), sender="", truck="", calc=Calc(), recipient="")
+    storage = ExcelData(containers={}, totals=Totals(), truck="", calc=Calc(), recipient="", sender="")
 
     column_mapping = {
         "Xinjiang Xindudu \nImport and Export Trading Co.,Ltd": "Наименование/модель",
