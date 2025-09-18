@@ -50,54 +50,241 @@
         white-space: nowrap;
         border: 0;
       }
-      .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-      .card-shadow { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
-      .upload-zone-hover:hover {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        border-color: #3b82f6;
-      }
+      
+      /* More professional and subdued color scheme */
+      .gradient-bg { background: linear-gradient(135deg, #475569 0%, #64748b 100%); }
+      .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
       .pulse-animation { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+      
+      /* Professional sidebar design with muted colors */
+      .sidebar-nav {
+        background: linear-gradient(135deg, #334155 0%, #475569 100%);
+        backdrop-filter: blur(20px);
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+      
+      .nav-item {
+        backdrop-filter: blur(10px);
+        transition: all 0.2s ease-in-out;
+      }
+      
+      .nav-item.active {
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      
+      .nav-item:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      
+      /* Smooth content transitions without jerky movement */
+      .content-container {
+        min-height: 500px;
+      }
+
+      .main-content {
+        min-height: auto;
+        height: fit-content;
+      }
+      
+      .mode-content {
+        display: none;
+        opacity: 0;
+        transition: opacity 0.25s ease-in-out;
+      }
+      
+      .mode-content.active {
+        display: block;
+        opacity: 1;
+      }
+      
+      /* Fade-in animation for smooth appearance */
+      .mode-content.active {
+        animation: fadeIn 0.25s ease-in-out;
+      }
+      
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      
+      /* Enhanced upload zone hover animations */
+      .upload-zone {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .upload-zone:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border-color: #3b82f6;
+        background-color: rgba(59, 130, 246, 0.05);
+      }
+      
+      .upload-zone:hover .upload-icon-container {
+        transform: scale(1.1);
+        background-color: #3b82f6;
+      }
+      
+      .upload-zone:hover .upload-icon-container img {
+        filter: brightness(0) invert(1);
+      }
+      
+      .upload-icon-container {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .upload-icon-container img {
+        transition: filter 0.3s ease;
+      }
+      
+      /* Drag and drop enhanced effects */
+      .upload-zone.drag-over {
+        border-color: #10b981;
+        background-color: rgba(16, 185, 129, 0.1);
+        transform: scale(1.02);
+      }
+      
+      .upload-zone.drag-over .upload-icon-container {
+        background-color: #10b981;
+        transform: scale(1.15);
+      }
+      
+      .upload-zone.drag-over .upload-icon-container img {
+        filter: brightness(0) invert(1);
+      }
+      
+      /* Enhanced file uploaded view */
+      .file-uploaded-view {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid #10b981;
+        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .file-uploaded-view::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: left 0.5s;
+      }
+      
+      .file-uploaded-view:hover::before {
+        left: 100%;
+      }
+      
+      .file-icon-container {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      }
+      
+      .file-info {
+        flex: 1;
+        min-width: 0;
+      }
+      
+      .file-name {
+        font-weight: 600;
+        color: #065f46;
+        margin-bottom: 2px;
+      }
+      
+      .file-size {
+        color: #047857;
+        font-size: 0.75rem;
+      }
+      
+      .remove-btn {
+        background: #fee2e2;
+        color: #dc2626;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(220, 38, 38, 0.1);
+      }
+      
+      .remove-btn:hover {
+        background: #fecaca;
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(220, 38, 38, 0.2);
+      }
+      
     </style>
   </head>
-  <body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 font-sans">
+  <body class="min-h-screen bg-gradient-to-br from-slate-100 via-gray-50 to-slate-200 font-sans">
     <div class="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      <main class="w-full max-w-2xl">
-        <div class="bg-white/95 backdrop-blur-sm rounded-2xl card-shadow overflow-hidden">
-          <div class="gradient-bg px-6 sm:px-8 py-6">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                </svg>
-              </div>
-              <div>
-                <h1 class="text-xl font-bold text-white">Загрузка файлов</h1>
-                <p class="text-white/80 text-sm">Выберите отправителя и загрузите документ</p>
-              </div>
+      <main class="w-full max-w-6xl">
+        <div class="flex gap-6">
+          <!-- Сайдбар навигации -->
+          <div class="sidebar-nav w-80 p-6 flex-shrink-0">
+            <div class="text-center mb-8">
+              <h1 class="text-2xl font-bold text-white mb-2">
+                Обработка данных
+              </h1>
+              <p class="text-white/80 text-sm">
+                Выберите режим работы
+              </p>
             </div>
+            
+            <nav class="space-y-3">
+              <button id="mode1Btn" class="nav-item active w-full text-left p-4 rounded-xl text-white font-medium flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-semibold">Импорт из Инвойса</div>
+                  <div class="text-white/70 text-sm">Обработка Excel файлов</div>
+                </div>
+              </button>
+              
+              <button id="mode2Btn" class="nav-item w-full text-left p-4 rounded-xl text-white font-medium flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-semibold">Проверка ТД</div>
+                  <div class="text-white/70 text-sm">Таможенная декларация</div>
+                </div>
+              </button>
+            </nav>
           </div>
-
-          <div class="p-6 sm:p-8">
-            <div class="mb-6 flex items-center justify-center">
-              <div class="inline-flex bg-gray-100 rounded-xl p-1">
-                <a href="/" id="mode1Btn" class="px-4 py-2 rounded-lg bg-white shadow text-gray-900 font-semibold">Импорт из Инвойса</a>
-                <a href="/compare" id="mode2Btn" class="px-4 py-2 rounded-lg text-gray-600">Сравнение ТД с Инвойсом</a>
-              </div>
-            </div>
-
-            <div id="mode1Panel">
-              <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
-              <div class="space-y-2">
-                <label for="senderSearch" class="block text-sm font-semibold text-gray-900">
-                  Отправитель
-                  <span class="text-red-500 ml-1">*</span>
-                </label>
+          
+          <!-- Основной контент -->
+          <div class="flex-1 bg-white/95 backdrop-blur-sm rounded-2xl card-shadow overflow-hidden">
+            <div class="main-content p-8"> <!-- Added main-content class for auto height -->
+              <!-- Режим 1: Импорт из Инвойса -->
+              <div id="mode1Panel" class="mode-content active">
+                   <div class="mb-6">
+                     <h2 class="text-2xl font-bold text-gray-900 mb-2">Импорт из Инвойса</h2>
+                     <p class="text-gray-600">Загрузите Excel файл для обработки данных</p>
+                   </div>
+                   
+                   <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
+                     <!-- Поле отправителя -->
+                     <div class="space-y-2">
+                      <label for="senderSearch" class="block text-sm font-semibold text-gray-900">
+                        Отправитель
+                        <span class="text-red-500 ml-1">*</span>
+                      </label>
 
                 <div class="relative autocomplete-wrap">
                   <div id="suggestion" class="suggestion-layer rounded-xl border border-transparent px-4 py-3 text-sm"></div>
-                  <input id="senderSearch" name="senderSearch" type="text" class="input-ghost w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200" placeholder="Начните вводить имя отправителя..." autocomplete="off" aria-autocomplete="both"/>
+                  <input id="senderSearch" name="senderSearch" type="text" class="input-ghost w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="Начните вводить имя отправителя..." autocomplete="off" aria-autocomplete="both"/>
 
-                  <button id="clearBtn" type="button" class="absolute right-3 top-3 w-6 h-6 text-gray-400 hover:text-gray-600 hidden rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors z-10" title="Очистить поле">
+                  <button id="clearBtn" type="button" class="absolute right-3 top-3 w-6 h-6 text-gray-400 hover:text-gray-600 hidden rounded-full hover:bg-gray-100 flex items-center justify-center z-10" title="Очистить поле">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
@@ -108,71 +295,34 @@
 
                 <input type="hidden" id="sender" name="sender" required />
 
-                <div class="flex items-center gap-2 text-xs text-gray-500">
-                  <svg
-                    class="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <span
-                    >Нажмите
-                    <kbd
-                      class="px-2 py-1 bg-gray-100 rounded-md border text-xs font-mono"
-                      >Tab</kbd
-                    >
-                    для принятия подсказки</span
-                  >
-                </div>
               </div>
 
               <div class="space-y-2">
-                <label class="block text-sm font-semibold text-gray-900">
-                  Файл документа
-                  <span class="text-red-500 ml-1">*</span>
-                </label>
                 <div id="uploadWrapper" class="relative">
-                  <label id="uploadZone" for="file" class="upload-zone-hover flex flex-col items-center justify-center gap-4 border-2 border-dashed border-gray-300 rounded-2xl p-8 cursor-pointer bg-gray-50/50 transition-all duration-300 hover:shadow-lg group" tabindex="0" aria-describedby="fileHint">
-                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 via-emerald-400 to-cyan-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-150">
-                      <svg id="uploadIcon" class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                        <polyline points="14,2 14,8 20,8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10,9 9,9 8,9"/>
-                      </svg>
+                   <label id="uploadZone" for="file" class="upload-zone flex flex-col items-center justify-center gap-3 border-2 border-dashed border-gray-300 rounded-2xl p-6 cursor-pointer bg-gray-50/50 h-40" tabindex="0">
+                     <div class="upload-icon-container w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center">
+                      <img id="uploadIcon" class="w-6 h-6" src="/assets/excel-icon.svg" alt="Excel icon">
                     </div>
 
                     <div class="text-center">
-                      <div id="uploadText" class="text-base font-semibold text-gray-700 mb-1">Перетащите файл сюда или нажмите для выбора</div>
-                      <div id="uploadSub" class="text-sm text-gray-500">Поддерживаются форматы .xlsx и .xls</div>
+                      <div id="uploadText" class="text-sm font-semibold text-gray-700">Файл документа (Excel) <span class="text-red-500">*</span></div>
                     </div>
                   </label>
 
-                  <div id="fileView" class="hidden relative border-2 border-green-200 rounded-2xl p-6 bg-gradient-to-r from-green-50 to-emerald-50">
-                    <div class="flex items-center justify-between gap-4">
-                      <div class="flex items-center gap-4 min-w-0">
-                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                            <polyline points="14,2 14,8 20,8"/>
-                          </svg>
+                  <div id="fileView" class="file-uploaded-view hidden relative rounded-2xl p-4 h-40 flex items-center">
+                    <div class="flex items-center justify-between gap-3 w-full">
+                      <div class="flex items-center gap-3 min-w-0">
+                        <div class="file-icon-container w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <img class="w-5 h-5 brightness-0 invert" src="/assets/excel-icon.svg" alt="Excel icon">
                         </div>
-                        <div class="min-w-0">
-                          <div id="selectedFileName" class="text-base font-semibold text-gray-900 truncate"></div>
-                          <div id="selectedFileSize" class="text-sm text-gray-600 mt-1"></div>
+                        <div class="file-info min-w-0">
+                          <div id="selectedFileName" class="file-name text-sm truncate"></div>
+                          <div id="selectedFileSize" class="file-size mt-1"></div>
                         </div>
                       </div>
 
-                      <button id="removeFileBtn" type="button" class="w-10 h-10 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-colors duration-200" aria-label="Удалить файл">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <button id="removeFileBtn" type="button" class="remove-btn w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" aria-label="Удалить файл">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                       </button>
@@ -182,151 +332,133 @@
 
                 <input id="file" name="file" type="file" accept=".xlsx,.xls" class="sr-only" required/>
 
-                <div id="fileHint" class="flex items-start gap-2 text-xs text-gray-500 bg-blue-50 rounded-lg p-3">
-                  <svg class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                  <span>Файл появится в зоне выше после выбора. Чтобы загрузить новый файл, сначала удалите текущий.</span>
-                </div>
               </div>
 
-              <div class="pt-0">
-                <button id="submitBtn" type="submit" class="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-4 rounded-xl disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl">
+              <div class="pt-0 mt-auto">
+                <button id="submitBtn" type="submit" class="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-semibold px-6 py-4 rounded-xl disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl">
                   <svg id="btnSpinner" class="w-5 h-5 hidden pulse-animation" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <circle cx="12" cy="12" r="10" stroke-width="3" stroke="currentColor"/>
                   </svg>
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 12l2 2 4-4"/>
-                  </svg>
-                  Обработать файл
-                </button>
-              </div>
-              </form>
-            </div>
-
-            <div id="mode2Panel" class="hidden">
-              <form id="compareForm" action="/compare" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
-                <div class="space-y-2">
-                  <label class="block text-sm font-semibold text-gray-900">
-                    Отправитель
-                    <span class="text-red-500 ml-1">*</span>
-                  </label>
-                  <div class="relative autocomplete-wrap">
-                    <div id="compareSuggestion" class="suggestion-layer rounded-xl border border-transparent px-4 py-3 text-sm"></div>
-                    <input id="compareSenderSearch" type="text" class="input-ghost w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200" placeholder="Начните вводить имя отправителя..." autocomplete="off" aria-autocomplete="both"/>
-                    <button id="compareClearBtn" type="button" class="absolute right-3 top-3 w-6 h-6 text-gray-400 hover:text-gray-600 hidden rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors z-10" title="Очистить поле">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                      </svg>
+                      Импортировать
                     </button>
-                    <div id="compareSenderDropdown" class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto hidden"></div>
-                  </div>
-                  <input type="hidden" id="compareSenderHidden" name="sender" required />
+                  </form>
                 </div>
 
-                <div class="space-y-2">
-                  <label class="block text-sm font-semibold text-gray-900">
-                    Инвойс (Excel)
-                    <span class="text-red-500 ml-1">*</span>
-                  </label>
-                  <div id="invoiceWrapper2" class="relative">
-                    <label id="invoiceZone2" for="invoiceFile" class="upload-zone-hover flex flex-col items-center justify-center gap-4 border-2 border-dashed border-gray-300 rounded-2xl p-8 cursor-pointer bg-gray-50/50 transition-all duration-300 hover:shadow-lg group" tabindex="0">
-                      <div class="w-16 h-16 bg-gradient-to-br from-green-500 via-emerald-400 to-cyan-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                          <polyline points="14,2 14,8 20,8"/>
-                          <line x1="16" y1="13" x2="8" y2="13"/>
-                          <line x1="16" y1="17" x2="8" y2="17"/>
-                          <polyline points="10,9 9,9 8,9"/>
-                        </svg>
-                      </div>
-                      <div class="text-center">
-                        <div class="text-base font-semibold text-gray-700 mb-1">Перетащите файл сюда или нажмите для выбора</div>
-                        <div class="text-sm text-gray-500">Поддерживаются форматы .xlsx и .xls</div>
-                      </div>
-                    </label>
-                    <div id="invoiceView2" class="hidden relative border-2 border-green-200 rounded-2xl p-6 bg-gradient-to-r from-green-50 to-emerald-50">
-                      <div class="flex items-center justify-between gap-4">
-                        <div class="flex items-center gap-4 min-w-0">
-                          <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                              <polyline points="14,2 14,8 20,8"/>
-                            </svg>
-                          </div>
-                          <div class="min-w-0">
-                            <div id="invoiceFileName2" class="text-base font-semibold text-gray-900 truncate"></div>
-                            <div id="invoiceFileSize2" class="text-sm text-gray-600 mt-1"></div>
-                          </div>
-                        </div>
-                        <button id="removeInvoiceBtn2" type="button" class="w-10 h-10 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-colors duration-200" aria-label="Удалить файл">
-                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              </div>
+              
+              <!-- Режим 2: Сравнение данных -->
+              <div id="mode2Panel" class="mode-content">
+                  <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Сравнение данных</h2>
+                    <p class="text-gray-600">Сравните инвойс с таможенной декларацией</p>
+                  </div>
+                  
+                  <form id="compareForm" action="/compare" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
+                    <!-- Поле отправителя -->
+                    <div class="space-y-2">
+                      <label class="block text-sm font-semibold text-gray-900">
+                        Отправитель
+                        <span class="text-red-500 ml-1">*</span>
+                      </label>
+                      <div class="relative autocomplete-wrap">
+                        <div id="compareSuggestion" class="suggestion-layer rounded-xl border border-transparent px-4 py-3 text-sm"></div>
+                        <input id="compareSenderSearch" type="text" class="input-ghost w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="Начните вводить имя отправителя..." autocomplete="off" aria-autocomplete="both"/>
+                        <button id="compareClearBtn" type="button" class="absolute right-3 top-3 w-6 h-6 text-gray-400 hover:text-gray-600 hidden rounded-full hover:bg-gray-100 flex items-center justify-center z-10" title="Очистить поле">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                           </svg>
                         </button>
+                        <div id="compareSenderDropdown" class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto hidden"></div>
                       </div>
+                      <input type="hidden" id="compareSenderHidden" name="sender" required />
                     </div>
-                  </div>
-                  <input id="invoiceFile" name="invoice" type="file" accept=".xlsx,.xls" class="sr-only" required />
-                </div>
 
-                <div class="space-y-2">
-                  <label class="block text-sm font-semibold text-gray-900">
-                    Таможенная декларация (XML)
-                    <span class="text-red-500 ml-1">*</span>
-                  </label>
-                  <div id="declWrapper2" class="relative">
-                    <label id="declZone2" for="declFile" class="upload-zone-hover flex flex-col items-center justify-center gap-4 border-2 border-dashed border-gray-300 rounded-2xl p-8 cursor-pointer bg-gray-50/50 transition-all duration-300 hover:shadow-lg group" tabindex="0">
-                      <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                          <polyline points="14,2 14,8 20,8"/>
-                        </svg>
-                      </div>
-                      <div class="text-center">
-                        <div class="text-base font-semibold text-gray-700 mb-1">Перетащите XML сюда или нажмите для выбора</div>
-                        <div class="text-sm text-gray-500">Поддерживается формат .xml</div>
-                      </div>
-                    </label>
-                    <div id="declView2" class="hidden relative border-2 border-green-200 rounded-2xl p-6 bg-gradient-to-r from-green-50 to-emerald-50">
-                      <div class="flex items-center justify-between gap-4">
-                        <div class="flex items-center gap-4 min-w-0">
-                          <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                              <polyline points="14,2 14,8 20,8"/>
-                            </svg>
-                          </div>
-                          <div class="min-w-0">
-                            <div id="declFileName2" class="text-base font-semibold text-gray-900 truncate"></div>
-                            <div id="declFileSize2" class="text-sm text-gray-600 mt-1"></div>
-                          </div>
+                    <!-- Файлы для сравнения -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <!-- Инвойс (левый столбец) -->
+                  <div class="space-y-2">
+                    <div id="invoiceWrapper2" class="relative">
+                      <label id="invoiceZone2" for="invoiceFile" class="upload-zone flex flex-col items-center justify-center gap-3 border-2 border-dashed border-gray-300 rounded-2xl p-6 cursor-pointer bg-gray-50/50 h-40" tabindex="0">
+                        <div class="upload-icon-container w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center">
+                          <img class="w-6 h-6" src="/assets/excel-icon.svg" alt="Excel icon">
                         </div>
-                        <button id="removeDeclBtn2" type="button" class="w-10 h-10 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-colors duration-200" aria-label="Удалить файл">
-                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="text-center">
+                          <div class="text-sm font-semibold text-gray-700">Инвойс (Excel) <span class="text-red-500">*</span></div>
+                        </div>
+                      </label>
+                      <div id="invoiceView2" class="file-uploaded-view hidden relative rounded-2xl p-4 h-40 flex items-center">
+                        <div class="flex items-center justify-between gap-3 w-full">
+                          <div class="flex items-center gap-3 min-w-0">
+                            <div class="file-icon-container w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
+                              <img class="w-5 h-5 brightness-0 invert" src="/assets/excel-icon.svg" alt="Excel icon">
+                            </div>
+                            <div class="file-info min-w-0">
+                              <div id="invoiceFileName2" class="file-name text-sm truncate"></div>
+                              <div id="invoiceFileSize2" class="file-size mt-1"></div>
+                            </div>
+                          </div>
+                        <button id="removeInvoiceBtn2" type="button" class="remove-btn w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" aria-label="Удалить файл">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                           </svg>
                         </button>
+                        </div>
                       </div>
                     </div>
+                    <input id="invoiceFile" name="invoice" type="file" accept=".xlsx,.xls" class="sr-only" required />
                   </div>
-                  <input id="declFile" name="declaration" type="file" accept=".xml" class="sr-only" required />
+
+                  <!-- Таможенная декларация (правый столбец) -->
+                  <div class="space-y-2">
+                    <div id="declWrapper2" class="relative">
+                      <label id="declZone2" for="declFile" class="upload-zone flex flex-col items-center justify-center gap-3 border-2 border-dashed border-gray-300 rounded-2xl p-6 cursor-pointer bg-gray-50/50 h-40" tabindex="0">
+                        <div class="upload-icon-container w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center">
+                          <img class="w-6 h-6" src="/assets/xml-icon.svg" alt="XML icon">
+                        </div>
+                        <div class="text-center">
+                          <div class="text-sm font-semibold text-gray-700">Таможенная декларация (XML) <span class="text-red-500">*</span></div>
+                        </div>
+                      </label>
+                      <div id="declView2" class="file-uploaded-view hidden relative rounded-2xl p-4 h-40 flex items-center">
+                        <div class="flex items-center justify-between gap-3 w-full">
+                          <div class="flex items-center gap-3 min-w-0">
+                            <div class="file-icon-container w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
+                              <img class="w-5 h-5 brightness-0 invert" src="/assets/xml-icon.svg" alt="XML icon">
+                            </div>
+                            <div class="file-info min-w-0">
+                              <div id="declFileName2" class="file-name text-sm truncate"></div>
+                              <div id="declFileSize2" class="file-size mt-1"></div>
+                            </div>
+                          </div>
+                          <button id="removeDeclBtn2" type="button" class="remove-btn w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" aria-label="Удалить файл">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <input id="declFile" name="declaration" type="file" accept=".xml" class="sr-only" required />
+                  </div>
                 </div>
 
-                <div class="pt-0">
-                  <button id="compareSubmit" type="submit" class="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-4 rounded-xl disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl">
-                    <svg id="compareSpinner" class="w-5 h-5 hidden pulse-animation" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <circle cx="12" cy="12" r="10" stroke-width="3" stroke="currentColor"/>
-                    </svg>
-                    Показать имена файлов
-                  </button>
+                    <div class="pt-0">
+                      <button id="compareSubmit" type="submit" class="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-semibold px-6 py-4 rounded-xl disabled:opacity-60 disabled:cursor-not-allowed shadow-lg hover:shadow-xl">
+                        <svg id="compareSpinner" class="w-5 h-5 hidden pulse-animation" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <circle cx="12" cy="12" r="10" stroke-width="3" stroke="currentColor"/>
+                        </svg>
+                        Проверить
+                      </button>
+                    </div>
+                    
+                    <div id="compareResult" class="hidden mt-4 text-sm text-gray-800 bg-blue-50 border border-blue-200 rounded-xl p-4"></div>
+                  </form>
                 </div>
-              </form>
-
-              <div id="compareResult" class="hidden mt-4 text-sm text-gray-800 bg-blue-50 border border-blue-200 rounded-xl p-4"></div>
+              </div>
             </div>
           </div>
         </div>
+      </main>
 
         <div id="notification" class="fixed right-6 top-6 hidden z-50">
           <div id="notificationInner" class="px-6 py-4 rounded-xl shadow-2xl text-white font-semibold backdrop-blur-sm"></div>
@@ -486,18 +618,18 @@
       function clearSelectedDecl2() { try { declFile2.value = ""; } catch (e) { const newInput = declFile2.cloneNode(); declFile2.parentNode.replaceChild(newInput, declFile2); location.reload(); } declView2.classList.add("hidden"); declZone2.classList.remove("hidden"); declZone2.removeAttribute("aria-disabled"); }
       if (invoiceFile2) { invoiceFile2.addEventListener("change", (e) => { const f = e.target.files[0]; if (!f) return; if (!VALID_RE.test(f.name)) { showNotification("Инвойс должен быть Excel (.xlsx/.xls)", "error"); invoiceFile2.value = ""; return; } showSelectedFile2(f); }); }
       if (invoiceZone2) {
-        invoiceZone2.addEventListener("dragover", (e) => { e.preventDefault(); if (!invoiceView2.classList.contains("hidden")) { invoiceZone2.classList.add("opacity-60"); return; } invoiceZone2.classList.add("ring-2", "ring-blue-200"); });
-        invoiceZone2.addEventListener("dragleave", () => { invoiceZone2.classList.remove("ring-2", "ring-blue-200", "opacity-60"); });
-        invoiceZone2.addEventListener("drop", (e) => { e.preventDefault(); invoiceZone2.classList.remove("ring-2", "ring-blue-200", "opacity-60"); if (!invoiceView2.classList.contains("hidden")) { showNotification("Сначала удалите текущий файл", "error"); return; } const f = e.dataTransfer?.files?.[0]; if (f && VALID_RE.test(f.name)) { try { const dt = new DataTransfer(); dt.items.add(f); invoiceFile2.files = dt.files; } catch {} showSelectedFile2(f); } else { showNotification("Пожалуйста, выберите Excel (.xlsx/.xls)", "error"); } });
+        invoiceZone2.addEventListener("dragover", (e) => { e.preventDefault(); if (!invoiceView2.classList.contains("hidden")) { invoiceZone2.classList.add("opacity-60"); return; } invoiceZone2.classList.add("drag-over"); });
+        invoiceZone2.addEventListener("dragleave", () => { invoiceZone2.classList.remove("drag-over", "opacity-60"); });
+        invoiceZone2.addEventListener("drop", (e) => { e.preventDefault(); invoiceZone2.classList.remove("drag-over", "opacity-60"); if (!invoiceView2.classList.contains("hidden")) { showNotification("Сначала удалите текущий файл", "error"); return; } const f = e.dataTransfer?.files?.[0]; if (f && VALID_RE.test(f.name)) { try { const dt = new DataTransfer(); dt.items.add(f); invoiceFile2.files = dt.files; } catch {} showSelectedFile2(f); } else { showNotification("Пожалуйста, выберите Excel (.xlsx/.xls)", "error"); } });
         invoiceZone2.addEventListener("click", (e) => { if (!invoiceView2.classList.contains("hidden")) { e.preventDefault(); showNotification("Удалите текущий файл", "error"); } });
         invoiceZone2.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && invoiceView2.classList.contains("hidden")) { invoiceFile2.click(); } });
       }
       if (removeInvoiceBtn2) removeInvoiceBtn2.addEventListener("click", clearSelectedFile2);
       if (declFile2) { declFile2.addEventListener("change", (e) => { const f = e.target.files[0]; if (!f) return; if (!/\.xml$/i.test(f.name)) { showNotification("Декларация должна быть XML", "error"); declFile2.value = ""; return; } showSelectedDecl2(f); }); }
       if (declZone2) {
-        declZone2.addEventListener("dragover", (e) => { e.preventDefault(); if (!declView2.classList.contains("hidden")) { declZone2.classList.add("opacity-60"); return; } declZone2.classList.add("ring-2", "ring-blue-200"); });
-        declZone2.addEventListener("dragleave", () => { declZone2.classList.remove("ring-2", "ring-blue-200", "opacity-60"); });
-        declZone2.addEventListener("drop", (e) => { e.preventDefault(); declZone2.classList.remove("ring-2", "ring-blue-200", "opacity-60"); if (!declView2.classList.contains("hidden")) { showNotification("Сначала удалите текущий файл", "error"); return; } const f = e.dataTransfer?.files?.[0]; if (f && /\.xml$/i.test(f.name)) { try { const dt = new DataTransfer(); dt.items.add(f); declFile2.files = dt.files; } catch {} showSelectedDecl2(f); } else { showNotification("Пожалуйста, выберите XML", "error"); } });
+        declZone2.addEventListener("dragover", (e) => { e.preventDefault(); if (!declView2.classList.contains("hidden")) { declZone2.classList.add("opacity-60"); return; } declZone2.classList.add("drag-over"); });
+        declZone2.addEventListener("dragleave", () => { declZone2.classList.remove("drag-over", "opacity-60"); });
+        declZone2.addEventListener("drop", (e) => { e.preventDefault(); declZone2.classList.remove("drag-over", "opacity-60"); if (!declView2.classList.contains("hidden")) { showNotification("Сначала удалите текущий файл", "error"); return; } const f = e.dataTransfer?.files?.[0]; if (f && /\.xml$/i.test(f.name)) { try { const dt = new DataTransfer(); dt.items.add(f); declFile2.files = dt.files; } catch {} showSelectedDecl2(f); } else { showNotification("Пожалуйста, выберите XML", "error"); } });
         declZone2.addEventListener("click", (e) => { if (!declView2.classList.contains("hidden")) { e.preventDefault(); showNotification("Удалите текущий файл", "error"); } });
         declZone2.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && declView2.classList.contains("hidden")) { declFile2.click(); } });
       }
@@ -519,23 +651,25 @@
       }
 
       function setActiveMode(mode) {
-        const activeBtnClasses = ["bg-white", "shadow", "text-gray-900", "font-semibold"]; 
-        const inactiveBtnClasses = ["bg-transparent", "text-gray-600", "font-normal", "shadow-none"]; 
-
+        const panels = document.querySelectorAll('.mode-content');
+        panels.forEach(panel => {
+          panel.classList.remove('active');
+        });
+        
+        // Обновляем кнопки навигации
+        const buttons = document.querySelectorAll('.nav-item');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
         if (mode === 1) {
-          mode1Panel.classList.remove("hidden");
-          mode2Panel.classList.add("hidden");
-          mode1Btn.classList.add(...activeBtnClasses);
-          mode1Btn.classList.remove(...inactiveBtnClasses);
-          mode2Btn.classList.remove(...activeBtnClasses);
-          mode2Btn.classList.add(...inactiveBtnClasses);
+          mode1Btn.classList.add("active");
+          if (mode1Panel) {
+            mode1Panel.classList.add('active');
+          }
         } else {
-          mode1Panel.classList.add("hidden");
-          mode2Panel.classList.remove("hidden");
-          mode2Btn.classList.add(...activeBtnClasses);
-          mode2Btn.classList.remove(...inactiveBtnClasses);
-          mode1Btn.classList.remove(...activeBtnClasses);
-          mode1Btn.classList.add(...inactiveBtnClasses);
+          mode2Btn.classList.add("active");
+          if (mode2Panel) {
+            mode2Panel.classList.add('active');
+          }
         }
       }
 
@@ -581,7 +715,11 @@
             try {
               localStorage.setItem(
                 "mapato_compare_result",
-                JSON.stringify({ invoice_file: j.data.invoice_file || "", declaration_file: j.data.declaration_file || "" })
+                JSON.stringify({
+                  xml_data: j.data.xml_data || null,
+                  xml_documents: j.data.xml_documents || [],
+                  invoice_data: j.data.invoice_data || null
+                })
               );
             } catch {}
             location.href = "/compare";
@@ -797,6 +935,17 @@
         });
       }
 
+      // Принудительная инициализация режима 1 при загрузке
+      document.addEventListener('DOMContentLoaded', function() {
+        // Ensure mode 1 is active by default
+        if (mode1Panel && mode2Panel) {
+          mode2Panel.classList.remove('active');
+          mode1Panel.classList.add('active');
+          mode1Btn.classList.add('active');
+          mode2Btn.classList.remove('active');
+        }
+      });
+
       if (compareForm) {
         compareForm.addEventListener("submit", submitCompareForm);
       }
@@ -1005,15 +1154,15 @@
           uploadZone.classList.add("opacity-60");
           return;
         }
-        uploadZone.classList.add("ring-2", "ring-blue-200");
+        uploadZone.classList.add("drag-over");
       });
       uploadZone.addEventListener("dragleave", () => {
-        uploadZone.classList.remove("ring-2", "ring-blue-200", "opacity-60");
+        uploadZone.classList.remove("drag-over", "opacity-60");
       });
 
       uploadZone.addEventListener("drop", (e) => {
         e.preventDefault();
-        uploadZone.classList.remove("ring-2", "ring-blue-200", "opacity-60");
+        uploadZone.classList.remove("drag-over", "opacity-60");
         if (!fileView.classList.contains("hidden")) {
           showNotification(
             "Сначала удалите текущий файл, затем загрузите новый",

@@ -716,13 +716,6 @@
           // Используем сравнение с допустимой погрешностью
           const isMatch = isEqualWithTolerance(totalValue, calcValue);
           
-          // Отладочная информация
-          console.log(`Сравнение ${comp.name}:`, {
-            totalValue: totalValue,
-            calcValue: calcValue,
-            difference: Math.abs(totalValue - calcValue),
-            isMatch: isMatch
-          });
 
           // Получаем элементы для обновления стилей
           const totalElement = document.getElementById(`total-${comp.totalKey}`);
@@ -941,20 +934,13 @@
 
 
       function updatePackageType(containerNo, rowIndex, value) {
-        console.log("updatePackageType вызвана с параметрами:", {containerNo, rowIndex, value, type: typeof rowIndex});
-        
         // Преобразуем rowIndex в число, если это строка
         const numericRowIndex = parseInt(rowIndex, 10);
-        console.log("Преобразованный rowIndex:", numericRowIndex);
         
         // Обновляем данные в localStorage
         const savedData = localStorage.getItem("mapato_data");
         if (savedData) {
           const data = JSON.parse(savedData);
-          console.log("Данные из localStorage:", data);
-          console.log("Контейнеры:", data.containers);
-          console.log("Конкретный контейнер:", data.containers?.[containerNo]);
-          console.log("Строка для обновления:", data.containers?.[containerNo]?.[numericRowIndex]);
           
           if (data.containers && data.containers[containerNo] && data.containers[containerNo][numericRowIndex]) {
             data.containers[containerNo][numericRowIndex]["Вид упаковки "] = value;
@@ -964,22 +950,10 @@
             updateTotalsAfterPackageChange(data);
             
             showToast(`Вид упаковки изменен на ${value} для товара в контейнере ${containerNo}`);
-            console.log("Обновление успешно выполнено");
           } else {
-            console.error("Не удалось найти данные для обновления:", {containerNo, rowIndex: numericRowIndex, value});
-            console.error("Проверка условий:", {
-              hasContainers: !!data.containers,
-              hasContainer: !!data.containers?.[containerNo],
-              hasRow: !!data.containers?.[containerNo]?.[numericRowIndex],
-              containerKeys: data.containers ? Object.keys(data.containers) : "нет контейнеров",
-              containerRows: data.containers?.[containerNo] ? data.containers[containerNo].length : "нет строк",
-              originalRowIndex: rowIndex,
-              numericRowIndex: numericRowIndex
-            });
             showToast("Ошибка при обновлении вида упаковки", "error");
           }
         } else {
-          console.error("Нет данных в localStorage");
           showToast("Нет данных для обновления", "error");
         }
       }
@@ -1082,11 +1056,8 @@
       }
 
       function updatePackageInfo(containerNo, rowIndex, value) {
-        console.log("updatePackageInfo вызвана с параметрами:", {containerNo, rowIndex, value, type: typeof rowIndex});
-        
         // Преобразуем rowIndex в число, если это строка
         const numericRowIndex = parseInt(rowIndex, 10);
-        console.log("Преобразованный rowIndex:", numericRowIndex);
         
         // Преобразуем value в число
         const numericValue = parseInt(value, 10);
@@ -1095,32 +1066,16 @@
         const savedData = localStorage.getItem("mapato_data");
         if (savedData) {
           const data = JSON.parse(savedData);
-          console.log("Данные из localStorage:", data);
-          console.log("Контейнеры:", data.containers);
-          console.log("Конкретный контейнер:", data.containers?.[containerNo]);
-          console.log("Строка для обновления:", data.containers?.[containerNo]?.[numericRowIndex]);
           
           if (data.containers && data.containers[containerNo] && data.containers[containerNo][numericRowIndex]) {
-            // Проверяем текущее значение перед изменением
-            const currentValue = data.containers[containerNo][numericRowIndex]["Информация об упаковке (0-БЕЗ, 1 С)"];
-            console.log("Текущее значение:", currentValue, "Новое значение:", numericValue);
-            
             data.containers[containerNo][numericRowIndex]["Информация об упаковке (0-БЕЗ, 1 С)"] = numericValue;
             localStorage.setItem("mapato_data", JSON.stringify(data));
             
-            // Проверяем, что значение действительно сохранилось
-            const savedData = JSON.parse(localStorage.getItem("mapato_data"));
-            const savedValue = savedData.containers[containerNo][numericRowIndex]["Информация об упаковке (0-БЕЗ, 1 С)"];
-            console.log("Сохраненное значение:", savedValue);
-            
             showToast(`Информация об упаковке изменена на ${value} для товара в контейнере ${containerNo}`);
-            console.log("Обновление успешно выполнено");
           } else {
-            console.error("Не удалось найти данные для обновления:", {containerNo, rowIndex: numericRowIndex, value});
             showToast("Ошибка при обновлении информации об упаковке", "error");
           }
         } else {
-          console.error("Нет данных в localStorage");
           showToast("Нет данных для обновления", "error");
         }
       }
@@ -1165,18 +1120,6 @@
             return;
           }
 
-          // Отладочная информация - проверяем данные перед отправкой
-          const data = JSON.parse(savedData);
-          console.log("Данные перед отправкой на сервер:", data);
-          
-          // Проверяем значения "Информация об упаковке" во всех контейнерах
-          Object.keys(data.containers || {}).forEach(containerNo => {
-            console.log(`Контейнер ${containerNo}:`);
-            data.containers[containerNo].forEach((row, index) => {
-              const packageInfo = row["Информация об упаковке (0-БЕЗ, 1 С)"];
-              console.log(`  Строка ${index}: package_info = ${packageInfo}`);
-            });
-          });
 
           // Отправляем данные из localStorage на сервер
           // Изменения уже должны быть сохранены в localStorage через updatePackageInfo и updatePackageType

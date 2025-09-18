@@ -15,6 +15,11 @@ static_dir = Path("static")
 static_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# Настройка папки assets для иконок
+assets_dir = Path("assets")
+assets_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/assets", StaticFiles(directory="assets"), name="assets")
+
 # Настройка шаблонов
 templates = Jinja2Templates(directory="templates")
 

@@ -62,14 +62,18 @@ def process_xinjiang(file_content: bytes) -> dict:
         storage.recipient = recipient
 
         # определение валюты по документу
-        # Отправляем весь Excel в ИИ для анализа
-        excel_content_for_ai = ""
-        for sheet_name, df in sheets.items():
-            excel_content_for_ai += f"Лист: {sheet_name}\n"
-            excel_content_for_ai += df.to_string() + "\n\n"
+        # ВРЕМЕННО: используем статическую валюту для отладки
+        try:
+            # Отправляем весь Excel в ИИ для анализа
+            excel_content_for_ai = ""
+            for sheet_name, df in sheets.items():
+                excel_content_for_ai += f"Лист: {sheet_name}\n"
+                excel_content_for_ai += df.to_string() + "\n\n"
 
-        # Отправляем в ИИ для получения валюты
-        currency = detect_currency(excel_content_for_ai)
+            # Отправляем в ИИ для получения валюты
+            currency = detect_currency(excel_content_for_ai)
+        except Exception as e:
+            currency = "USD"
 
         
         # Найдем запись, начинающуюся с 'Truck:№ ' до конца строки
@@ -163,5 +167,5 @@ def process_xinjiang(file_content: bytes) -> dict:
     except Exception as e:
         return {"error": str(e)}
 
-    # Возвращаем результат и найденный текст 'FROM:'
+    # Возвращаем результат
     return {"success": True, "storage": storage}

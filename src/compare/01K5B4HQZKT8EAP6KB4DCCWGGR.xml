@@ -1,0 +1,701 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><ns5:TransitDeclaration xmlns="urn:EEC:M:SimpleDataObjects:v0.4.14" xmlns:ns5="urn:EEC:R:048:TransitDeclaration:v1.0.0" xmlns:ns2="urn:EEC:M:CA:SimpleDataObjects:v1.8.1" xmlns:ns4="urn:EEC:M:ComplexDataObjects:v0.4.14" xmlns:ns3="urn:EEC:M:CA:ComplexDataObjects:v1.8.1">
+    <EDocCode>R.048</EDocCode>
+    <ns2:DeclarationKindCode>ТТ</ns2:DeclarationKindCode>
+    <ns2:DeclarationFeatureCode codeListId="2007"/>
+    <ns2:TransitProcedureCode codeListId="2019">ИМ</ns2:TransitProcedureCode>
+    <ns2:EDocIndicatorCode>ЭД</ns2:EDocIndicatorCode>
+    <ns2:GoodsQuantity>0</ns2:GoodsQuantity>
+    <ns2:CargoQuantity>0</ns2:CargoQuantity>
+    <ns2:TotalAmount currencyCode="USD" currencyCodeListId="2022">21578.03</ns2:TotalAmount>
+    <ns2:ContainerIndicator>true</ns2:ContainerIndicator>
+    <ns3:TransportMeansItemDetails>
+        <ObjectOrdinal>1</ObjectOrdinal>
+        <UnifiedTransportModeCode codeListId="2004">20</UnifiedTransportModeCode>
+        <ns2:RegistrationNationalityCode codeListId="2021"></ns2:RegistrationNationalityCode>
+        <TransportMeansRegId>CRTU1208468</TransportMeansRegId>
+        <ns2:TransportTypeCode codeListId="2024">901</ns2:TransportTypeCode>
+    </ns3:TransportMeansItemDetails>
+    <ns3:DeclarantDetails>
+        <SubjectName>Товарищество с ограниченной ответственностью "Международная логистика (CRCT) Казахстан"</SubjectName>
+        <SubjectBriefName>ТОО "Международная логистика (CRCT) Казахстан"</SubjectBriefName>
+        <TaxpayerId>160440012089</TaxpayerId>
+        <ns4:SubjectAddressDetails>
+            <AddressKindCode>1</AddressKindCode>
+            <UnifiedCountryCode codeListId="2021">KZ</UnifiedCountryCode>
+            <RegionName>город Алматы</RegionName>
+            <DistrictName>Медеуский район</DistrictName>
+            <CityName>-</CityName>
+            <SettlementName>-</SettlementName>
+            <StreetName>улица Гоголя</StreetName>
+            <BuildingNumberId>39</BuildingNumberId>
+            <RoomNumberId>оф. 1003</RoomNumberId>
+        </ns4:SubjectAddressDetails>
+    </ns3:DeclarantDetails>
+    <ns3:TDGoodsShipmentDetails>
+        <ObjectOrdinal>1</ObjectOrdinal>
+        <ns3:TransportDocumentDetails>
+            <DocKindCode codeListId="2009"/>
+        </ns3:TransportDocumentDetails>
+        <ns2:GoodsQuantity>0</ns2:GoodsQuantity>
+        <ns2:CargoQuantity>7</ns2:CargoQuantity>
+        <ns2:DepartureCountryCode codeListId="2021">CN</ns2:DepartureCountryCode>
+        <ns2:DestinationCountryCode codeListId="2021">KZ</ns2:DestinationCountryCode>
+        <ns2:TotalGrossMassMeasure measurementUnitCode="166" measurementUnitCodeListId="2064">26551.6</ns2:TotalGrossMassMeasure>
+        <ns2:TotalAmount currencyCode="USD" currencyCodeListId="2022">21578.03</ns2:TotalAmount>
+        <ns3:ConsignorDetails>
+            <SubjectName>YIWU DIER TRADING CO LIMITED</SubjectName>
+            <ns4:SubjectAddressDetails>
+                <AddressKindCode>1</AddressKindCode>
+                <UnifiedCountryCode codeListId="2021">CN</UnifiedCountryCode>
+                <CityName>YIWU, ZHEJIANG</CityName>
+                <StreetName>RM 712 BLDG A, CHOUYIN BLDG, FUTIAN STREET.</StreetName>
+            </ns4:SubjectAddressDetails>
+        </ns3:ConsignorDetails>
+        <ns3:ConsigneeDetails>
+            <SubjectName>Товарищество с ограниченной ответственностью "Семрон Строй Снаб"</SubjectName>
+            <SubjectBriefName>ТОО "Семрон Строй Снаб"</SubjectBriefName>
+            <TaxpayerId>191140012353</TaxpayerId>
+            <ns4:SubjectAddressDetails>
+                <AddressKindCode>1</AddressKindCode>
+                <UnifiedCountryCode codeListId="2021">KZ</UnifiedCountryCode>
+                <RegionName>город Алматы</RegionName>
+                <DistrictName>Алатауский район</DistrictName>
+                <CityName></CityName>
+                <SettlementName></SettlementName>
+                <StreetName>улица Отрарская</StreetName>
+                <BuildingNumberId>58</BuildingNumberId>
+                <RoomNumberId></RoomNumberId>
+            </ns4:SubjectAddressDetails>
+        </ns3:ConsigneeDetails>
+        <ns3:TransitDestinationDetails>
+            <ns4:CustomsOfficeDetails>
+                <CustomsOfficeCode>39855302</CustomsOfficeCode>
+                <CustomsOfficeName>ТАМОЖЕННЫЙ ПОСТ «АЛМАТЫ – ЦЕНТР ТАМОЖЕННОГО ОФОРМЛЕНИЯ»</CustomsOfficeName>
+            </ns4:CustomsOfficeDetails>
+            <ns2:RailwayStationCode>70000</ns2:RailwayStationCode>
+        </ns3:TransitDestinationDetails>
+        <ns3:TransitGoodsItemDetails>
+            <ns2:ConsignmentItemOrdinal>1</ns2:ConsignmentItemOrdinal>
+            <CommodityCode>731814</CommodityCode>
+            <ns2:GoodsDescriptionText>Шуруп, размер 3.5 * 40</ns2:GoodsDescriptionText>
+            <UnifiedGrossMassMeasure measurementUnitCode="166" measurementUnitCodeListId="2064">4674</UnifiedGrossMassMeasure>
+            <ns3:GoodsMeasureDetails>
+                <ns2:GoodsMeasure measurementUnitCodeListId="2064"/>
+            </ns3:GoodsMeasureDetails>
+            <ns2:GoodsProhibitionFreeCode>C</ns2:GoodsProhibitionFreeCode>
+            <ns3:CargoPackagePalletDetails>
+                <ns2:PackageAvailabilityCode>1</ns2:PackageAvailabilityCode>
+                <ns2:CargoQuantity>285</ns2:CargoQuantity>
+                <ns3:PackagePalletDetails>
+                    <PackageKindCode codeListId="2013">BX</PackageKindCode>
+                    <PackageQuantity>285</PackageQuantity>
+                </ns3:PackagePalletDetails>
+            </ns3:CargoPackagePalletDetails>
+            <ns3:ContainerListDetails>
+                <ns3:ContainerDetails>
+                    <ns2:ContainerId>CRTU1208468</ns2:ContainerId>
+                </ns3:ContainerDetails>
+            </ns3:ContainerListDetails>
+            <ns2:CAValueAmount currencyCode="USD" currencyCodeListId="2022">3798.48</ns2:CAValueAmount>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04021</DocKindCode>
+                <DocName>Инвойс </DocName>
+                <DocId>CRTU1208468</DocId>
+                <DocCreationDate>2025-08-27</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09021</DocKindCode>
+                <DocName>СНИМОК  ИДК</DocName>
+                <DocId>СНИМОК  ИДК</DocId>
+                <DocCreationDate>2025-09-16</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09034</DocKindCode>
+                <DocName>ПРИКАЗ О ВКЛЮЧЕНИИ В РЕЕСТР ТОМОЖНЫХ ПРЕДСТАВИТЕЛЕЙ</DocName>
+                <DocId>396</DocId>
+                <DocCreationDate>2011-05-31</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">11002</DocKindCode>
+                <DocName>ДОГОВОР  С ТАМОЖЕННЫМ ПРЕДСТАВИТЕЛЕМ</DocName>
+                <DocId>396/1089</DocId>
+                <DocCreationDate>2020-11-01</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04131</DocKindCode>
+                <DocName>Упаковочный  лист </DocName>
+                <DocId>CRTU1208468</DocId>
+                <DocCreationDate>2025-08-27</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">02013</DocKindCode>
+                <DocName>железнодорожная накладная    </DocName>
+                <DocId>36376575</DocId>
+                <DocCreationDate>2025-09-10</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+        </ns3:TransitGoodsItemDetails>
+        <ns3:TransitGoodsItemDetails>
+            <ns2:ConsignmentItemOrdinal>2</ns2:ConsignmentItemOrdinal>
+            <CommodityCode>731814</CommodityCode>
+            <ns2:GoodsDescriptionText>Шуруп, размер 3.5х50</ns2:GoodsDescriptionText>
+            <UnifiedGrossMassMeasure measurementUnitCode="166" measurementUnitCodeListId="2064">1640</UnifiedGrossMassMeasure>
+            <ns3:GoodsMeasureDetails>
+                <ns2:GoodsMeasure measurementUnitCodeListId="2064"/>
+            </ns3:GoodsMeasureDetails>
+            <ns2:GoodsProhibitionFreeCode>C</ns2:GoodsProhibitionFreeCode>
+            <ns3:CargoPackagePalletDetails>
+                <ns2:PackageAvailabilityCode>1</ns2:PackageAvailabilityCode>
+                <ns2:CargoQuantity>100</ns2:CargoQuantity>
+                <ns3:PackagePalletDetails>
+                    <PackageKindCode codeListId="2013">BX</PackageKindCode>
+                    <PackageQuantity>100</PackageQuantity>
+                </ns3:PackagePalletDetails>
+            </ns3:CargoPackagePalletDetails>
+            <ns3:ContainerListDetails>
+                <ns3:ContainerDetails>
+                    <ns2:ContainerId>CRTU1208468</ns2:ContainerId>
+                </ns3:ContainerDetails>
+            </ns3:ContainerListDetails>
+            <ns2:CAValueAmount currencyCode="USD" currencyCodeListId="2022">1332.8</ns2:CAValueAmount>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04021</DocKindCode>
+                <DocName>Инвойс </DocName>
+                <DocId>CRTU1208468</DocId>
+                <DocCreationDate>2025-08-27</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09021</DocKindCode>
+                <DocName>СНИМОК  ИДК</DocName>
+                <DocId>СНИМОК  ИДК</DocId>
+                <DocCreationDate>2025-09-16</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09034</DocKindCode>
+                <DocName>ПРИКАЗ О ВКЛЮЧЕНИИ В РЕЕСТР ТОМОЖНЫХ ПРЕДСТАВИТЕЛЕЙ</DocName>
+                <DocId>396</DocId>
+                <DocCreationDate>2011-05-31</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">11002</DocKindCode>
+                <DocName>ДОГОВОР  С ТАМОЖЕННЫМ ПРЕДСТАВИТЕЛЕМ</DocName>
+                <DocId>396/1089</DocId>
+                <DocCreationDate>2020-11-01</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04131</DocKindCode>
+                <DocName>Упаковочный  лист </DocName>
+                <DocId>CRTU1208468</DocId>
+                <DocCreationDate>2025-08-27</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">02013</DocKindCode>
+                <DocName>железнодорожная накладная    </DocName>
+                <DocId>36376575</DocId>
+                <DocCreationDate>2025-09-10</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+        </ns3:TransitGoodsItemDetails>
+        <ns3:TransitGoodsItemDetails>
+            <ns2:ConsignmentItemOrdinal>3</ns2:ConsignmentItemOrdinal>
+            <CommodityCode>731814</CommodityCode>
+            <ns2:GoodsDescriptionText>Шуруп, размер 3.5х25</ns2:GoodsDescriptionText>
+            <UnifiedGrossMassMeasure measurementUnitCode="166" measurementUnitCodeListId="2064">1640</UnifiedGrossMassMeasure>
+            <ns3:GoodsMeasureDetails>
+                <ns2:GoodsMeasure measurementUnitCodeListId="2064"/>
+            </ns3:GoodsMeasureDetails>
+            <ns2:GoodsProhibitionFreeCode>C</ns2:GoodsProhibitionFreeCode>
+            <ns3:CargoPackagePalletDetails>
+                <ns2:PackageAvailabilityCode>1</ns2:PackageAvailabilityCode>
+                <ns2:CargoQuantity>100</ns2:CargoQuantity>
+                <ns3:PackagePalletDetails>
+                    <PackageKindCode codeListId="2013">BX</PackageKindCode>
+                    <PackageQuantity>100</PackageQuantity>
+                </ns3:PackagePalletDetails>
+            </ns3:CargoPackagePalletDetails>
+            <ns3:ContainerListDetails>
+                <ns3:ContainerDetails>
+                    <ns2:ContainerId>CRTU1208468</ns2:ContainerId>
+                </ns3:ContainerDetails>
+            </ns3:ContainerListDetails>
+            <ns2:CAValueAmount currencyCode="USD" currencyCodeListId="2022">1332.8</ns2:CAValueAmount>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04021</DocKindCode>
+                <DocName>Инвойс </DocName>
+                <DocId>CRTU1208468</DocId>
+                <DocCreationDate>2025-08-27</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09021</DocKindCode>
+                <DocName>СНИМОК  ИДК</DocName>
+                <DocId>СНИМОК  ИДК</DocId>
+                <DocCreationDate>2025-09-16</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09034</DocKindCode>
+                <DocName>ПРИКАЗ О ВКЛЮЧЕНИИ В РЕЕСТР ТОМОЖНЫХ ПРЕДСТАВИТЕЛЕЙ</DocName>
+                <DocId>396</DocId>
+                <DocCreationDate>2011-05-31</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">11002</DocKindCode>
+                <DocName>ДОГОВОР  С ТАМОЖЕННЫМ ПРЕДСТАВИТЕЛЕМ</DocName>
+                <DocId>396/1089</DocId>
+                <DocCreationDate>2020-11-01</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04131</DocKindCode>
+                <DocName>Упаковочный  лист </DocName>
+                <DocId>CRTU1208468</DocId>
+                <DocCreationDate>2025-08-27</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">02013</DocKindCode>
+                <DocName>железнодорожная накладная    </DocName>
+                <DocId>36376575</DocId>
+                <DocCreationDate>2025-09-10</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+        </ns3:TransitGoodsItemDetails>
+        <ns3:TransitGoodsItemDetails>
+            <ns2:ConsignmentItemOrdinal>4</ns2:ConsignmentItemOrdinal>
+            <CommodityCode>731814</CommodityCode>
+            <ns2:GoodsDescriptionText>Шуруп, размер 4.2*13</ns2:GoodsDescriptionText>
+            <UnifiedGrossMassMeasure measurementUnitCode="166" measurementUnitCodeListId="2064">3296.4</UnifiedGrossMassMeasure>
+            <ns3:GoodsMeasureDetails>
+                <ns2:GoodsMeasure measurementUnitCodeListId="2064"/>
+            </ns3:GoodsMeasureDetails>
+            <ns2:GoodsProhibitionFreeCode>C</ns2:GoodsProhibitionFreeCode>
+            <ns3:CargoPackagePalletDetails>
+                <ns2:PackageAvailabilityCode>1</ns2:PackageAvailabilityCode>
+                <ns2:CargoQuantity>201</ns2:CargoQuantity>
+                <ns3:PackagePalletDetails>
+                    <PackageKindCode codeListId="2013">BX</PackageKindCode>
+                    <PackageQuantity>201</PackageQuantity>
+                </ns3:PackagePalletDetails>
+            </ns3:CargoPackagePalletDetails>
+            <ns3:ContainerListDetails>
+                <ns3:ContainerDetails>
+                    <ns2:ContainerId>CRTU1208468</ns2:ContainerId>
+                </ns3:ContainerDetails>
+            </ns3:ContainerListDetails>
+            <ns2:CAValueAmount currencyCode="USD" currencyCodeListId="2022">2678.92</ns2:CAValueAmount>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04021</DocKindCode>
+                <DocName>Инвойс </DocName>
+                <DocId>CRTU1208468</DocId>
+                <DocCreationDate>2025-08-27</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09021</DocKindCode>
+                <DocName>СНИМОК  ИДК</DocName>
+                <DocId>СНИМОК  ИДК</DocId>
+                <DocCreationDate>2025-09-16</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09034</DocKindCode>
+                <DocName>ПРИКАЗ О ВКЛЮЧЕНИИ В РЕЕСТР ТОМОЖНЫХ ПРЕДСТАВИТЕЛЕЙ</DocName>
+                <DocId>396</DocId>
+                <DocCreationDate>2011-05-31</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">11002</DocKindCode>
+                <DocName>ДОГОВОР  С ТАМОЖЕННЫМ ПРЕДСТАВИТЕЛЕМ</DocName>
+                <DocId>396/1089</DocId>
+                <DocCreationDate>2020-11-01</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04131</DocKindCode>
+                <DocName>Упаковочный  лист </DocName>
+                <DocId>CRTU1208468</DocId>
+                <DocCreationDate>2025-08-27</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">02013</DocKindCode>
+                <DocName>железнодорожная накладная    </DocName>
+                <DocId>36376575</DocId>
+                <DocCreationDate>2025-09-10</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+        </ns3:TransitGoodsItemDetails>
+        <ns3:TransitGoodsItemDetails>
+            <ns2:ConsignmentItemOrdinal>5</ns2:ConsignmentItemOrdinal>
+            <CommodityCode>731814</CommodityCode>
+            <ns2:GoodsDescriptionText>Шуруп, размер 4.2*19</ns2:GoodsDescriptionText>
+            <UnifiedGrossMassMeasure measurementUnitCode="166" measurementUnitCodeListId="2064">2755.2</UnifiedGrossMassMeasure>
+            <ns3:GoodsMeasureDetails>
+                <ns2:GoodsMeasure measurementUnitCodeListId="2064"/>
+            </ns3:GoodsMeasureDetails>
+            <ns2:GoodsProhibitionFreeCode>C</ns2:GoodsProhibitionFreeCode>
+            <ns3:CargoPackagePalletDetails>
+                <ns2:PackageAvailabilityCode>1</ns2:PackageAvailabilityCode>
+                <ns2:CargoQuantity>168</ns2:CargoQuantity>
+                <ns3:PackagePalletDetails>
+                    <PackageKindCode codeListId="2013">BX</PackageKindCode>
+                    <PackageQuantity>168</PackageQuantity>
+                </ns3:PackagePalletDetails>
+            </ns3:CargoPackagePalletDetails>
+            <ns3:ContainerListDetails>
+                <ns3:ContainerDetails>
+                    <ns2:ContainerId>CRTU1208468</ns2:ContainerId>
+                </ns3:ContainerDetails>
+            </ns3:ContainerListDetails>
+            <ns2:CAValueAmount currencyCode="USD" currencyCodeListId="2022">2239.12</ns2:CAValueAmount>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04021</DocKindCode>
+                <DocName>Инвойс </DocName>
+                <DocId>CRTU1208468</DocId>
+                <DocCreationDate>2025-08-27</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09021</DocKindCode>
+                <DocName>СНИМОК  ИДК</DocName>
+                <DocId>СНИМОК  ИДК</DocId>
+                <DocCreationDate>2025-09-16</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09034</DocKindCode>
+                <DocName>ПРИКАЗ О ВКЛЮЧЕНИИ В РЕЕСТР ТОМОЖНЫХ ПРЕДСТАВИТЕЛЕЙ</DocName>
+                <DocId>396</DocId>
+                <DocCreationDate>2011-05-31</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">11002</DocKindCode>
+                <DocName>ДОГОВОР  С ТАМОЖЕННЫМ ПРЕДСТАВИТЕЛЕМ</DocName>
+                <DocId>396/1089</DocId>
+                <DocCreationDate>2020-11-01</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04131</DocKindCode>
+                <DocName>Упаковочный  лист </DocName>
+                <DocId>CRTU1208468</DocId>
+                <DocCreationDate>2025-08-27</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">02013</DocKindCode>
+                <DocName>железнодорожная накладная    </DocName>
+                <DocId>36376575</DocId>
+                <DocCreationDate>2025-09-10</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+        </ns3:TransitGoodsItemDetails>
+        <ns3:TransitGoodsItemDetails>
+            <ns2:ConsignmentItemOrdinal>6</ns2:ConsignmentItemOrdinal>
+            <CommodityCode>731814</CommodityCode>
+            <ns2:GoodsDescriptionText>Шуруп, размер 3.5*30</ns2:GoodsDescriptionText>
+            <UnifiedGrossMassMeasure measurementUnitCode="166" measurementUnitCodeListId="2064">4231.2</UnifiedGrossMassMeasure>
+            <ns3:GoodsMeasureDetails>
+                <ns2:GoodsMeasure measurementUnitCodeListId="2064"/>
+            </ns3:GoodsMeasureDetails>
+            <ns2:GoodsProhibitionFreeCode>C</ns2:GoodsProhibitionFreeCode>
+            <ns3:CargoPackagePalletDetails>
+                <ns2:PackageAvailabilityCode>1</ns2:PackageAvailabilityCode>
+                <ns2:CargoQuantity>258</ns2:CargoQuantity>
+                <ns3:PackagePalletDetails>
+                    <PackageKindCode codeListId="2013">BX</PackageKindCode>
+                    <PackageQuantity>258</PackageQuantity>
+                </ns3:PackagePalletDetails>
+            </ns3:CargoPackagePalletDetails>
+            <ns3:ContainerListDetails>
+                <ns3:ContainerDetails>
+                    <ns2:ContainerId>CRTU1208468</ns2:ContainerId>
+                </ns3:ContainerDetails>
+            </ns3:ContainerListDetails>
+            <ns2:CAValueAmount currencyCode="USD" currencyCodeListId="2022">3438.62</ns2:CAValueAmount>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04021</DocKindCode>
+                <DocName>Инвойс </DocName>
+                <DocId>CRTU1208468</DocId>
+                <DocCreationDate>2025-08-27</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09021</DocKindCode>
+                <DocName>СНИМОК  ИДК</DocName>
+                <DocId>СНИМОК  ИДК</DocId>
+                <DocCreationDate>2025-09-16</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09034</DocKindCode>
+                <DocName>ПРИКАЗ О ВКЛЮЧЕНИИ В РЕЕСТР ТОМОЖНЫХ ПРЕДСТАВИТЕЛЕЙ</DocName>
+                <DocId>396</DocId>
+                <DocCreationDate>2011-05-31</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">11002</DocKindCode>
+                <DocName>ДОГОВОР  С ТАМОЖЕННЫМ ПРЕДСТАВИТЕЛЕМ</DocName>
+                <DocId>396/1089</DocId>
+                <DocCreationDate>2020-11-01</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04131</DocKindCode>
+                <DocName>Упаковочный  лист </DocName>
+                <DocId>CRTU1208468</DocId>
+                <DocCreationDate>2025-08-27</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">02013</DocKindCode>
+                <DocName>железнодорожная накладная    </DocName>
+                <DocId>36376575</DocId>
+                <DocCreationDate>2025-09-10</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+        </ns3:TransitGoodsItemDetails>
+        <ns3:TransitGoodsItemDetails>
+            <ns2:ConsignmentItemOrdinal>7</ns2:ConsignmentItemOrdinal>
+            <CommodityCode>731814</CommodityCode>
+            <ns2:GoodsDescriptionText>Шуруп, размер 4.2*16</ns2:GoodsDescriptionText>
+            <UnifiedGrossMassMeasure measurementUnitCode="166" measurementUnitCodeListId="2064">8314.8</UnifiedGrossMassMeasure>
+            <ns3:GoodsMeasureDetails>
+                <ns2:GoodsMeasure measurementUnitCodeListId="2064"/>
+            </ns3:GoodsMeasureDetails>
+            <ns2:GoodsProhibitionFreeCode>C</ns2:GoodsProhibitionFreeCode>
+            <ns3:CargoPackagePalletDetails>
+                <ns2:PackageAvailabilityCode>1</ns2:PackageAvailabilityCode>
+                <ns2:CargoQuantity>507</ns2:CargoQuantity>
+                <ns3:PackagePalletDetails>
+                    <PackageKindCode codeListId="2013">BX</PackageKindCode>
+                    <PackageQuantity>507</PackageQuantity>
+                </ns3:PackagePalletDetails>
+            </ns3:CargoPackagePalletDetails>
+            <ns3:ContainerListDetails>
+                <ns3:ContainerDetails>
+                    <ns2:ContainerId>CRTU1208468</ns2:ContainerId>
+                </ns3:ContainerDetails>
+            </ns3:ContainerListDetails>
+            <ns2:CAValueAmount currencyCode="USD" currencyCodeListId="2022">6757.29</ns2:CAValueAmount>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04021</DocKindCode>
+                <DocName>Инвойс </DocName>
+                <DocId>CRTU1208468</DocId>
+                <DocCreationDate>2025-08-27</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09021</DocKindCode>
+                <DocName>СНИМОК  ИДК</DocName>
+                <DocId>СНИМОК  ИДК</DocId>
+                <DocCreationDate>2025-09-16</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09034</DocKindCode>
+                <DocName>ПРИКАЗ О ВКЛЮЧЕНИИ В РЕЕСТР ТОМОЖНЫХ ПРЕДСТАВИТЕЛЕЙ</DocName>
+                <DocId>396</DocId>
+                <DocCreationDate>2011-05-31</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">11002</DocKindCode>
+                <DocName>ДОГОВОР  С ТАМОЖЕННЫМ ПРЕДСТАВИТЕЛЕМ</DocName>
+                <DocId>396/1089</DocId>
+                <DocCreationDate>2020-11-01</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04131</DocKindCode>
+                <DocName>Упаковочный  лист </DocName>
+                <DocId>CRTU1208468</DocId>
+                <DocCreationDate>2025-08-27</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">02013</DocKindCode>
+                <DocName>железнодорожная накладная    </DocName>
+                <DocId>36376575</DocId>
+                <DocCreationDate>2025-09-10</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+        </ns3:TransitGoodsItemDetails>
+    </ns3:TDGoodsShipmentDetails>
+    <ns3:CustomsIdentificationDetails>
+        <ns2:CustomsIdentificationMethodCode>01</ns2:CustomsIdentificationMethodCode>
+        <ns2:CustomsIdentificationMeansKindCode>01</ns2:CustomsIdentificationMeansKindCode>
+        <ns2:SealQuantity>1</ns2:SealQuantity>
+        <ns3:CustomsIdentificationMeansIdDetails>
+            <ns2:CustomsIdentificationMeansId>000724</ns2:CustomsIdentificationMeansId>
+        </ns3:CustomsIdentificationMeansIdDetails>
+    </ns3:CustomsIdentificationDetails>
+    <ns3:CarrierDetails>
+        <SubjectName>Товарищество с ограниченной ответственностью «КТЖ-Грузовые перевозки»</SubjectName>
+        <SubjectBriefName>ТОО «КТЖ-Грузовые перевозки»</SubjectBriefName>
+        <TaxpayerId>031040001799</TaxpayerId>
+        <ns4:SubjectAddressDetails>
+            <AddressKindCode>1</AddressKindCode>
+            <UnifiedCountryCode codeListId="2021">KZ</UnifiedCountryCode>
+            <DistrictName>Есиль</DistrictName>
+            <CityName>Астана</CityName>
+            <StreetName>Конаев</StreetName>
+            <BuildingNumberId>6</BuildingNumberId>
+        </ns4:SubjectAddressDetails>
+    </ns3:CarrierDetails>
+    <ns3:TransitGuaranteeDetails>
+        <ns2:GuaranteePresentCode>2</ns2:GuaranteePresentCode>
+        <ns2:NoGuaranteeCauseCode codeListId="2068">104</ns2:NoGuaranteeCauseCode>
+        <ns3:TransitGuaranteeDocDetails>
+            <DocKindCode codeListId="2009">02013</DocKindCode>
+            <DocId>36376575</DocId>
+            <DocCreationDate>2025-09-10</DocCreationDate>
+            <ns2:GuaranteeAmount currencyCodeListId="2022"/>
+            <ns2:PaymentGuaranteeMethodCode codeListId="2018"/>
+        </ns3:TransitGuaranteeDocDetails>
+    </ns3:TransitGuaranteeDetails>
+    <ns3:SignatoryRepresentativeDetails/>
+    <EventDate>2025-09-17</EventDate>
+    <ns3:SignatoryPersonV2Details/>
+</ns5:TransitDeclaration>

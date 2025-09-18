@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from datetime import date
 
 class Totals(BaseModel):
@@ -33,3 +33,24 @@ class RawDataRequest(BaseModel):
     truck: str = ""
     calc: Dict[str, Any] = {}
     totals: Dict[str, Any] = {}
+
+
+# ===== Модели для сравнения =====
+class DocumentInfo(BaseModel):
+    """Информация о документе."""
+    DocKindCode: str = ""
+    DocName: str = ""
+    DocId: str = ""
+    DocCreationDate: str = ""
+
+
+class CompareData(BaseModel):
+    """Данные ответа для страницы сравнения."""
+    xml_data: Optional[ExcelData] = None  # XML данные в формате ExcelData
+    xml_documents: List[DocumentInfo] = []  # Документы из XML
+    invoice_data: Optional[ExcelData] = None
+
+
+class CompareResult(BaseModel):
+    success: bool = True
+    data: CompareData
