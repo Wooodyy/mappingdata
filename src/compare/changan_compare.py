@@ -2,6 +2,7 @@ from typing import Dict, List
 import xml.etree.ElementTree as ET
 from src.models import ExcelData, Totals, Calc, DocumentInfo
 from src.processors.changan import process_changan
+from src.gemini_api import sort_containers_data
 
 
 def extract_xml_data_and_documents(xml_bytes: bytes) -> tuple[ExcelData, List[DocumentInfo]]:
@@ -53,7 +54,7 @@ def extract_xml_data_and_documents(xml_bytes: bytes) -> tuple[ExcelData, List[Do
                 # Добавляем документ если есть данные и код не в списке исключений
                 if doc_kind or doc_name or doc_id or doc_date:
                     # Исключаем документы с кодами 02013, 11002, 09021
-                    if doc_kind not in ["02013", "11002", "09021"]:
+                    if doc_kind not in [""]:
                         # Проверяем документы с кодом 09034 на соответствие дате 31.05.2011
                         has_error = False
                         error_message = ""
@@ -192,5 +193,22 @@ def changan_compare_handler(invoice_bytes: bytes, decl_bytes: bytes, invoice_nam
             "containers": invoice_data.containers,
             "calc": invoice_data.calc.dict()
         }
+        print(result_data)
+        # Отправляем данные контейнеров в Gemini API для сортировки
+        try:
+            sorted_data = sort_containers_data(
+                invoice_containers=invoice_data.containers,
+                xml_containers=xml_data.containers
+            )
+            
+            if sorted_data:
+                # Заменяем данные на отсортированные
+                result_data["data"]["invoice_data"]["containers"] = sorted_data["sorted_invoice_containers"]
+                result_data["data"]["xml_data"]["containers"] = sorted_data["sorted_xml_containers"]
+                result_data["data"]["gemini_analysis"] = "Данные успешно отсортированы"
+            else:
+                result_data["data"]["gemini_analysis"] = "Ошибка: Не удалось отсортировать данные"
+        except Exception as e:
+            result_data["data"]["gemini_analysis"] = f"Ошибка при сортировке через Gemini: {str(e)}"
     
     return result_data
