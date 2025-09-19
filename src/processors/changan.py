@@ -79,7 +79,6 @@ def process_changan(file_content: bytes) -> dict:
         truck = "Не опознан"  # значение по умолчанию
         truck_value = sheets[list(sheets.keys())[0]].iloc[9]["Unnamed: 2"]
         storage.truck = truck_value
-        print(truck_value)
         
         # Обрабатываем строки данных (кроме последней, если она итоги)
         data_rows = df  # df уже обрезан выше

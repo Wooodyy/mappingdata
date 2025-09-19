@@ -27,6 +27,23 @@
           Загрузить новый файл
         </button>
       </div>
+      
+      <!-- Блок с дополнительной информацией об инвойсе -->
+      <div id="invoiceInfoContainer" class="hidden">
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+          <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3">
+            <h2 class="text-base font-medium text-white flex items-center">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              Общая информация
+            </h2>
+          </div>
+          <div class="p-4">
+            <div id="invoiceInfoContent"></div>
+          </div>
+        </div>
+      </div>
       <div id="tableContainer"></div>
       <div id="emptyState" class="hidden">
         <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
@@ -140,19 +157,30 @@
               const value = (row[header] ?? '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
               const width = globalColumnWidths[header] || '7%';
               
-              // Проверяем, есть ли различия с данными для сравнения
-              let isDifferent = false;
+              // Проверяем состояние сравнения: 0 - равны (зеленый), 1 - неравны (красный), 2 - нет строки (фиолетовый)
+              let comparisonState = 0; // по умолчанию равны (зеленый)
               if (comparisonRows.length > i) {
                 const comparisonRow = comparisonRows[i];
-                isDifferent = !compareValues(row[header], comparisonRow[header], header);
+                comparisonState = compareValues(row[header], comparisonRow[header], header) ? 0 : 1; // 0 - равны, 1 - неравны
+              } else {
+                comparisonState = 2; // нет строки для сравнения (фиолетовый)
               }
               
               if (header === 'Коммерческое описание товара') {
+                let cellClass = '';
+                if (comparisonState === 0) {
+                  cellClass = 'bg-green-100 border border-green-300 rounded p-1'; // равны - зеленый
+                } else if (comparisonState === 1) {
+                  cellClass = 'bg-red-100 border border-red-300 rounded p-1'; // неравны - красный
+                } else {
+                  cellClass = 'bg-purple-100 border border-purple-300 rounded p-1'; // нет строки - фиолетовый
+                }
+                
                 return `<td class="px-2 py-1 text-sm text-slate-900 min-w-0 border-r border-slate-200" style="width: ${width}; min-width: ${width}; max-width: ${width};">
-                  <div class="${isDifferent ? 'bg-red-100 border border-red-300 rounded p-1' : 'bg-green-100 border border-green-300 rounded p-1'}">
+                  <div class="${cellClass}">
                     <div 
                       class="cursor-pointer overflow-hidden text-ellipsis p-0 m-0"
-                      style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; line-height: 1.2em; max-height: 3.6em;"
+                      style="display: -webkit-box; -webkit-line-clamp: none; -webkit-box-orient: vertical; line-height: 1.2em; "
                       onclick="toggleTextExpansion(this)"
                       title="Нажмите для развертывания/свертывания"
                     >
@@ -161,8 +189,17 @@
                   </div>
                 </td>`;
               } else {
+                let cellClass = '';
+                if (comparisonState === 0) {
+                  cellClass = 'bg-green-100 border border-green-300 rounded p-1'; // равны - зеленый
+                } else if (comparisonState === 1) {
+                  cellClass = 'bg-red-100 border border-red-300 rounded p-1'; // неравны - красный
+                } else {
+                  cellClass = 'bg-purple-100 border border-purple-300 rounded p-1'; // нет строки - фиолетовый
+                }
+                
                 return `<td class="px-2 py-1 text-sm text-slate-900 min-w-0 border-r border-slate-200" style="width: ${width}; min-width: ${width}; max-width: ${width};">
-                  <div class="${isDifferent ? 'bg-red-100 border border-red-300 rounded p-1' : 'bg-green-100 border border-green-300 rounded p-1'}">
+                  <div class="${cellClass}">
                     <span class="p-0 m-0">${value}</span>
                   </div>
                 </td>`;
@@ -203,17 +240,25 @@
               if (totals.hasOwnProperty(header)) {
                 const value = totals[header].toFixed(2);
                 const comparisonValue = comparisonTotals.hasOwnProperty(header) ? comparisonTotals[header].toFixed(2) : '';
-                const isDifferent = comparisonValue && !compareValues(value, comparisonValue, header);
                 
-                return `<td class="px-2 py-2 text-sm text-slate-800 whitespace-nowrap border-r border-slate-200" style="width: ${width}; min-width: ${width}; max-width: ${width};">
-                  <div class="${isDifferent ? 'bg-red-100 border border-red-300 rounded p-1' : 'bg-green-100 border border-green-300 rounded p-1'}">
+                let cellClass = '';
+                if (!comparisonValue) {
+                  cellClass = 'bg-purple-100 border border-purple-300 rounded p-1'; // нет данных для сравнения - фиолетовый
+                } else if (compareValues(value, comparisonValue, header)) {
+                  cellClass = 'bg-green-100 border border-green-300 rounded p-1'; // равны - зеленый
+                } else {
+                  cellClass = 'bg-red-100 border border-red-300 rounded p-1'; // неравны - красный
+                }
+                
+                return `<td class="px-2 py-2 bg-slate-300 text-sm text-slate-800 whitespace-nowrap border-r border-slate-200" style="width: ${width}; min-width: ${width}; max-width: ${width};">
+                  <div class="${cellClass}">
                     <span>${value}</span>
                   </div>
                 </td>`;
               } else if (header === 'Код ТН ВЭД') {
-                return `<td class="px-2 py-2 text-sm text-slate-800 whitespace-nowrap font-semibold border-r border-slate-200" style="width: ${width}; min-width: ${width}; max-width: ${width};">ИТОГО:</td>`;
+                return `<td class="px-2 py-2 bg-slate-300 text-sm text-slate-800 whitespace-nowrap font-semibold border-r border-slate-200" style="width: ${width}; min-width: ${width}; max-width: ${width};">ИТОГО:</td>`;
               } else {
-                return `<td class="px-2 py-2 text-sm text-slate-500 whitespace-nowrap border-r border-slate-200" style="width: ${width}; min-width: ${width}; max-width: ${width};">—</td>`;
+                return `<td class="px-2 py-2 bg-slate-300 text-sm text-slate-500 whitespace-nowrap border-r border-slate-200" style="width: ${width}; min-width: ${width}; max-width: ${width};"></td>`;
               }
             }).join('')}
           </tr>
@@ -251,6 +296,12 @@
           globalHeaders = [];
           globalColumnWidths = {};
           
+          // Скрываем блок с информацией об инвойсе
+          const invoiceInfoContainer = document.getElementById("invoiceInfoContainer");
+          if (invoiceInfoContainer) {
+            invoiceInfoContainer.classList.add("hidden");
+          }
+          
           const raw = localStorage.getItem("mapato_compare_result");
           const container = document.getElementById("tableContainer");
           const empty = document.getElementById("emptyState");
@@ -271,6 +322,175 @@
             // Передаем данные инвойса для сравнения, если они есть
             const compareWith = (data && data.invoice_data && data.invoice_data.containers && Object.keys(data.invoice_data.containers).length > 0) ? data.invoice_data : null;
             tableHtml += createTableHtml(data.xml_data, "Данные из ТД", "from-slate-600 to-slate-700", xmlIconPath, compareWith);
+          }
+
+          // Отображаем дополнительную информацию об инвойсе
+          if (data && data.invoice_data) {
+            const invoiceInfoContainer = document.getElementById("invoiceInfoContainer");
+            const invoiceInfoContent = document.getElementById("invoiceInfoContent");
+            
+            if (invoiceInfoContainer && invoiceInfoContent) {
+              const invoiceInfo = data.invoice_data;
+              let infoHtml = '';
+              
+              // Секция данных из инвойса
+              infoHtml += `
+                <div class="mb-6">
+                  <div class="flex items-center mb-4">
+                    <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                      <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                      </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-800">Данные из инвойса</h3>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              `;
+              
+              // Отображаем доступные поля из инвойса
+              const fields = [
+                { key: 'sender', label: 'Отправитель', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
+                { key: 'recipient', label: 'Получатель', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
+                { key: 'buyer', label: 'Покупатель', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
+                { key: 'seller', label: 'Продавец', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' }
+              ];
+              
+              fields.forEach(field => {
+                const value = invoiceInfo[field.key] || 'Нет данных либо не обработан';
+                const displayValue = value.toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                
+                infoHtml += `
+                  <div class="bg-green-50 rounded-lg p-4 border border-green-200 hover:shadow-sm transition-shadow">
+                    <div class="flex items-center mb-3">
+                      <svg class="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${field.icon}"/>
+                      </svg>
+                      <span class="text-sm font-semibold text-green-800">${field.label}</span>
+                    </div>
+                    <div class="text-sm text-green-900 break-words leading-relaxed">${displayValue}</div>
+                  </div>
+                `;
+              });
+              
+              infoHtml += `
+                  </div>
+                </div>
+              `;
+              
+              // Секция данных из XML
+              if (data.xml_data && (data.xml_data.sender_name || data.xml_data.sender_address || data.xml_data.recipient_name || data.xml_data.recipient_address)) {
+                const xmlData = data.xml_data;
+                infoHtml += `
+                  <div class="mb-6">
+                    <div class="flex items-center mb-4">
+                      <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                      </div>
+                      <h3 class="text-lg font-semibold text-slate-800">Данные из ТД (XML)</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                `;
+                
+                // Блок отправителя
+                if (xmlData.sender_name || xmlData.sender_address) {
+                  // Проверяем результаты проверки орфографии
+                  const spellingCheck = data.spelling_check || {};
+                  
+                  // Более надежная проверка булевых значений
+                  const senderNameCorrect = spellingCheck.sender_name_correct === true || spellingCheck.sender_name_correct === "true";
+                  const senderAddressCorrect = spellingCheck.sender_address_correct === true || spellingCheck.sender_address_correct === "true";
+                  
+                  infoHtml += `
+                    <div class="bg-blue-50 rounded-lg p-4 border border-blue-200 hover:shadow-sm transition-shadow">
+                      <div class="flex items-center mb-3">
+                        <svg class="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        <span class="text-sm font-semibold text-blue-800">Отправитель</span>
+                      </div>
+                      <div class="space-y-2">
+                        <div>
+                          <div class="text-xs font-medium text-blue-700 mb-1">Название (${senderNameCorrect ? 'OK' : 'ERROR'})</div>
+                          <div class="${senderNameCorrect ? 'bg-green-100 border border-green-300 rounded p-1' : 'bg-red-100 border border-red-300 rounded p-1'}">
+                            <div class="text-sm text-blue-900 break-words leading-relaxed font-medium">${xmlData.sender_name || 'Нет данных либо не обработан'}</div>
+                          </div>
+                        </div>
+                        <div>
+                          <div class="text-xs font-medium text-blue-700 mb-1">Адрес (${senderAddressCorrect ? 'OK' : 'ERROR'})</div>
+                          <div class="${senderAddressCorrect ? 'bg-green-100 border border-green-300 rounded p-1' : 'bg-red-100 border border-red-300 rounded p-1'}">
+                            <div class="text-sm text-blue-900 break-words leading-relaxed font-medium">${xmlData.sender_address || 'Нет данных либо не обработан'}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }
+                
+                // Блок получателя
+                if (xmlData.recipient_name || xmlData.recipient_address) {
+                  // Проверяем результаты проверки орфографии
+                  const spellingCheck = data.spelling_check || {};
+                  
+                  // Более надежная проверка булевых значений
+                  const recipientNameCorrect = spellingCheck.recipient_name_correct === true || spellingCheck.recipient_name_correct === "true";
+                  const recipientAddressCorrect = spellingCheck.recipient_address_correct === true || spellingCheck.recipient_address_correct === "true";
+                  
+                  infoHtml += `
+                    <div class="bg-blue-50 rounded-lg p-4 border border-blue-200 hover:shadow-sm transition-shadow">
+                      <div class="flex items-center mb-3">
+                        <svg class="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        <span class="text-sm font-semibold text-blue-800">Получатель</span>
+                      </div>
+                      <div class="space-y-2">
+                        <div>
+                          <div class="text-xs font-medium text-blue-700 mb-1">Название (${recipientNameCorrect ? 'OK' : 'ERROR'})</div>
+                          <div class="${recipientNameCorrect ? 'bg-green-100 border border-green-300 rounded p-1' : 'bg-red-100 border border-red-300 rounded p-1'}">
+                            <div class="text-sm text-blue-900 break-words leading-relaxed font-medium">${xmlData.recipient_name || 'Нет данных либо не обработан'}</div>
+                          </div>
+                        </div>
+                        <div>
+                          <div class="text-xs font-medium text-blue-700 mb-1">Адрес (${recipientAddressCorrect ? 'OK' : 'ERROR'})</div>
+                          <div class="${recipientAddressCorrect ? 'bg-green-100 border border-green-300 rounded p-1' : 'bg-red-100 border border-red-300 rounded p-1'}">
+                            <div class="text-sm text-blue-900 break-words leading-relaxed font-medium">${xmlData.recipient_address || 'Нет данных либо не обработан'}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }
+                
+                infoHtml += `
+                    </div>
+                  </div>
+                `;
+              }
+              
+              // Добавляем информацию об анализе Gemini, если доступна
+              if (data.gemini_analysis) {
+                infoHtml += `
+                  <div class="mb-6">
+                    <div class="flex items-center mb-4">
+                      <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                        </svg>
+                      </div>
+                      <h3 class="text-lg font-semibold text-slate-800">Комментарии</h3>
+                    </div>
+                    <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                      <div class="text-sm text-purple-900 leading-relaxed">${data.gemini_analysis}</div>
+                    </div>
+                  </div>
+                `;
+              }
+              
+              invoiceInfoContent.innerHTML = infoHtml;
+              invoiceInfoContainer.classList.remove("hidden");
+            }
           }
 
           // Таблица данных инвойса
@@ -407,13 +627,11 @@
         
         if (isExpanded) {
           // Свернуть текст
-          element.style.webkitLineClamp = '3';
-          element.style.maxHeight = '3.6em';
+          element.style.webkitLineClamp = '1';
           element.title = 'Нажмите для развертывания/свертывания';
         } else {
           // Развернуть текст
           element.style.webkitLineClamp = 'none';
-          element.style.maxHeight = 'none';
           element.title = 'Нажмите для развертывания/свертывания';
         }
       }

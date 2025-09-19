@@ -1,8 +1,8 @@
 from typing import Dict, List
 import xml.etree.ElementTree as ET
 from src.models import ExcelData, Totals, Calc, DocumentInfo
-from src.processors.changan import process_changan
-from src.gemini_api import sort_containers_data, check_spelling_errors
+from src.processors.astana import process_astana
+from src.gemini_api import sort_containers_data
 
 
 def extract_xml_data_and_documents(xml_bytes: bytes) -> tuple[ExcelData, List[DocumentInfo]]:
@@ -210,20 +210,32 @@ def extract_xml_data_and_documents(xml_bytes: bytes) -> tuple[ExcelData, List[Do
         return ExcelData(containers={}, totals=Totals(), calc=Calc(), sender="", truck="", recipient="", buyer="", sender_name="", sender_address="", recipient_name="", recipient_address=""), []
 
 
-def changan_compare_handler(invoice_bytes: bytes, decl_bytes: bytes, invoice_name: str, decl_name: str) -> Dict:
-    """Обработчик сравнения: извлекает данные из XML и обрабатывает инвойс через changan алгоритм."""
+def astana_compare_handler(invoice_bytes: bytes, decl_bytes: bytes, invoice_name: str, decl_name: str) -> Dict:
+    """Обработчик сравнения для Astana: извлекает данные из XML и обрабатывает инвойс через astana алгоритм."""
     # Обрабатываем XML декларацию
     xml_data, xml_documents = extract_xml_data_and_documents(decl_bytes)
     
-    # Обрабатываем инвойс через алгоритм changan
+    
+    # Получаем номер первого контейнера из XML данных
+    first_container_number = None
+    if xml_data.containers:
+        first_container_number = next(iter(xml_data.containers.keys()))
+    
+    
+    # Обрабатываем инвойс через алгоритм astana
     try:
-        invoice_result = process_changan(invoice_bytes)
+        invoice_result = process_astana(invoice_bytes, first_container_number)
         invoice_data = None
         if invoice_result.get("success") and "storage" in invoice_result:
+            # Удаляем все контейнеры кроме первого из инвойса
             invoice_data = invoice_result["storage"]
+            
+
     except Exception as e:
         invoice_result = {"error": str(e)}
         invoice_data = None
+    
+    
     # Создаем результат согласно требуемой структуре
     result_data = {
         "success": True,
@@ -240,10 +252,12 @@ def changan_compare_handler(invoice_bytes: bytes, decl_bytes: bytes, invoice_nam
             "invoice_data": None
         }
     }
-    print(xml_data.sender_name)
-    print(xml_data.sender_address)
-    print(xml_data.recipient_name)
-    print(xml_data.recipient_address)
+    
+    print(f"XML отправитель: {xml_data.sender_name}")
+    print(f"XML адрес отправителя: {xml_data.sender_address}")
+    print(f"XML получатель: {xml_data.recipient_name}")
+    print(f"XML адрес получателя: {xml_data.recipient_address}")
+    
     # Добавляем данные инвойса, если они есть
     if invoice_data:
         result_data["data"]["invoice_data"] = {
@@ -281,56 +295,5 @@ def changan_compare_handler(invoice_bytes: bytes, decl_bytes: bytes, invoice_nam
         except Exception as e:
             result_data["data"]["gemini_analysis"] = f"Ошибка при сортировке через Gemini: {str(e)}"
         
-        # Проверяем орфографические ошибки в данных отправителя и получателя
-        
-        try:
-            spelling_check = check_spelling_errors(
-                invoice_sender=invoice_data.sender,
-                invoice_recipient=invoice_data.recipient,
-                xml_sender_name=xml_data.sender_name,
-                xml_sender_address=xml_data.sender_address,
-                xml_recipient_name=xml_data.recipient_name,
-                xml_recipient_address=xml_data.recipient_address
-            )
-            print(spelling_check)
-            # Добавляем результаты проверки орфографии в результат
-            result_data["data"]["spelling_check"] = spelling_check
-            # Формируем сообщение о результатах проверки
-            spelling_messages = []
-            if not spelling_check["sender_name_correct"]:
-                spelling_messages.append("Орфографические ошибки в названии отправителя")
-            if not spelling_check["sender_address_correct"]:
-                spelling_messages.append("Орфографические ошибки в адресе отправителя")
-            if not spelling_check["recipient_name_correct"]:
-                spelling_messages.append("Орфографические ошибки в названии получателя")
-            if not spelling_check["recipient_address_correct"]:
-                spelling_messages.append("Орфографические ошибки в адресе получателя")
-            
-            if spelling_messages:
-                spelling_summary = "Обнаружены орфографические ошибки: " + "; ".join(spelling_messages)
-            else:
-                spelling_summary = "Орфографических ошибок не обнаружено"
-            
-            # Устанавливаем только информацию об орфографических ошибках
-            result_data["data"]["gemini_analysis"] = spelling_summary
-                
-        except Exception as e:
-            
-            result_data["data"]["spelling_check"] = {
-                "sender_name_correct": True,
-                "sender_address_correct": True,
-                "recipient_name_correct": True,
-                "recipient_address_correct": True
-            }
-            result_data["data"]["gemini_analysis"] = f"Ошибка при проверке орфографии: {str(e)}"
-    else:
-        # Если нет invoice_data, но есть XML данные, все равно добавляем пустую проверку орфографии
-        print("No invoice_data, adding default spelling check")
-        result_data["data"]["spelling_check"] = {
-            "sender_name_correct": True,
-            "sender_address_correct": True,
-            "recipient_name_correct": True,
-            "recipient_address_correct": True
-        }
     
     return result_data

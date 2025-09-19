@@ -22,6 +22,10 @@ class ExcelData(BaseModel):
     buyer: str = ""
     invoice: str = ""
     date_invoice: str = ""
+    sender_name: str = ""  # Название отправителя из XML
+    sender_address: str = ""  # Адрес отправителя из XML
+    recipient_name: str = ""  # Название получателя из XML
+    recipient_address: str = ""  # Адрес получателя из XML
 
 class RawDataRequest(BaseModel):
     """Модель для принятия сырых данных из localStorage"""

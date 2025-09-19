@@ -718,7 +718,9 @@
                 JSON.stringify({
                   xml_data: j.data.xml_data || null,
                   xml_documents: j.data.xml_documents || [],
-                  invoice_data: j.data.invoice_data || null
+                  invoice_data: j.data.invoice_data || null,
+                  spelling_check: j.data.spelling_check || null,
+                  gemini_analysis: j.data.gemini_analysis || null
                 })
               );
             } catch {}

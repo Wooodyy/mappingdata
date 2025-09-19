@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><ns5:TransitDeclaration xmlns="urn:EEC:M:SimpleDataObjects:v0.4.14" xmlns:ns5="urn:EEC:R:048:TransitDeclaration:v1.0.0" xmlns:ns2="urn:EEC:M:CA:SimpleDataObjects:v1.8.1" xmlns:ns4="urn:EEC:M:ComplexDataObjects:v0.4.14" xmlns:ns3="urn:EEC:M:CA:ComplexDataObjects:v1.8.1">
+    <EDocCode>R.048</EDocCode>
+    <ns2:DeclarationKindCode>ТТ</ns2:DeclarationKindCode>
+    <ns2:DeclarationFeatureCode codeListId="2007"/>
+    <ns2:TransitProcedureCode codeListId="2019">ИМ</ns2:TransitProcedureCode>
+    <ns2:EDocIndicatorCode>ЭД</ns2:EDocIndicatorCode>
+    <ns2:GoodsQuantity>3</ns2:GoodsQuantity>
+    <ns2:CargoQuantity>3</ns2:CargoQuantity>
+    <ns2:TotalAmount currencyCode="CNY" currencyCodeListId="2022">269746</ns2:TotalAmount>
+    <ns2:ContainerIndicator>true</ns2:ContainerIndicator>
+    <ns3:TransportMeansItemDetails>
+        <ObjectOrdinal>1</ObjectOrdinal>
+        <UnifiedTransportModeCode codeListId="2004">20</UnifiedTransportModeCode>
+        <ns2:RegistrationNationalityCode codeListId="2021"></ns2:RegistrationNationalityCode>
+        <TransportMeansRegId>HNKU6143870</TransportMeansRegId>
+        <ns2:TransportTypeCode codeListId="2024">901</ns2:TransportTypeCode>
+    </ns3:TransportMeansItemDetails>
+    <ns3:DeclarantDetails>
+        <SubjectName>Акционерное общество "Кедентранссервис"</SubjectName>
+        <SubjectBriefName>АО "Кедентранссервис"</SubjectBriefName>
+        <TaxpayerId>990840000825</TaxpayerId>
+        <ns4:SubjectAddressDetails>
+            <AddressKindCode>1</AddressKindCode>
+            <UnifiedCountryCode codeListId="2021">KZ</UnifiedCountryCode>
+            <RegionName>город Астана</RegionName>
+            <DistrictName>район Есиль</DistrictName>
+            <CityName>-</CityName>
+            <SettlementName></SettlementName>
+            <StreetName>улица Достық</StreetName>
+            <BuildingNumberId>18</BuildingNumberId>
+            <RoomNumberId></RoomNumberId>
+        </ns4:SubjectAddressDetails>
+    </ns3:DeclarantDetails>
+    <ns3:TDGoodsShipmentDetails>
+        <ObjectOrdinal>1</ObjectOrdinal>
+        <ns3:TransportDocumentDetails>
+            <DocKindCode codeListId="2009"/>
+        </ns3:TransportDocumentDetails>
+        <ns2:GoodsQuantity>3</ns2:GoodsQuantity>
+        <ns2:CargoQuantity>3</ns2:CargoQuantity>
+        <ns2:DepartureCountryCode codeListId="2021">CN</ns2:DepartureCountryCode>
+        <ns2:DestinationCountryCode codeListId="2021">RU</ns2:DestinationCountryCode>
+        <ns2:TotalGrossMassMeasure measurementUnitCode="166" measurementUnitCodeListId="2064">4935</ns2:TotalGrossMassMeasure>
+        <ns2:TotalAmount currencyCode="CNY" currencyCodeListId="2022">269746</ns2:TotalAmount>
+        <ns3:ConsignorDetails>
+            <SubjectName>CHANGAN INTERNATIONAL CORPORATION </SubjectName>
+            <ns4:SubjectAddressDetails>
+                <AddressKindCode>1</AddressKindCode>
+                <UnifiedCountryCode codeListId="2021">CN</UnifiedCountryCode>
+                <CityName>Chongqing</CityName>
+                <StreetName>NО.260 Jiaxin Donglu, Jiangbei District</StreetName>
+            </ns4:SubjectAddressDetails>
+        </ns3:ConsignorDetails>
+        <ns3:ConsigneeDetails>
+            <SubjectName>ООО ЦТ для LLC CHANGAN MOTORS RUS</SubjectName>
+            <ns4:SubjectAddressDetails>
+                <AddressKindCode>1</AddressKindCode>
+                <UnifiedCountryCode codeListId="2021">RU</UnifiedCountryCode>
+                <RegionName>Москювская область</RegionName>
+                <DistrictName>г. Электросталь</DistrictName>
+                <CityName> г.о. Электросталь</CityName>
+                <StreetName>Пионерская ул. д. 29А, этаж 3 офис 3/6</StreetName>
+            </ns4:SubjectAddressDetails>
+        </ns3:ConsigneeDetails>
+        <ns3:TransitDestinationDetails>
+            <ns4:CustomsOfficeDetails>
+                <CustomsOfficeCode>10132030</CustomsOfficeCode>
+                <CustomsOfficeName>т/п Восточный</CustomsOfficeName>
+            </ns4:CustomsOfficeDetails>
+            <ns2:RailwayStationCode>23060</ns2:RailwayStationCode>
+        </ns3:TransitDestinationDetails>
+        <ns3:TransitGoodsItemDetails>
+            <ns2:ConsignmentItemOrdinal>1</ns2:ConsignmentItemOrdinal>
+            <CommodityCode>870322</CommodityCode>
+            <ns2:GoodsDescriptionText>Новый автомобиль легковой CHANGAN CS35 Plus 2025 1392сс LS5A3DKR0SA003621</ns2:GoodsDescriptionText>
+            <UnifiedGrossMassMeasure measurementUnitCode="166" measurementUnitCodeListId="2064">1465</UnifiedGrossMassMeasure>
+            <ns3:GoodsMeasureDetails>
+                <ns2:GoodsMeasure measurementUnitCodeListId="2064"/>
+            </ns3:GoodsMeasureDetails>
+            <ns2:GoodsProhibitionFreeCode>C</ns2:GoodsProhibitionFreeCode>
+            <ns3:CargoPackagePalletDetails>
+                <ns2:PackageAvailabilityCode>0</ns2:PackageAvailabilityCode>
+                <ns2:CargoQuantity>1</ns2:CargoQuantity>
+                <ns3:PackagePalletDetails>
+                    <PackageKindCode codeListId="2013">PP</PackageKindCode>
+                    <PackageQuantity>1</PackageQuantity>
+                </ns3:PackagePalletDetails>
+            </ns3:CargoPackagePalletDetails>
+            <ns3:ContainerListDetails>
+                <ns3:ContainerDetails>
+                    <ns2:ContainerId>HNKU6143870</ns2:ContainerId>
+                </ns3:ContainerDetails>
+            </ns3:ContainerListDetails>
+            <ns2:CAValueAmount currencyCode="CNY" currencyCodeListId="2022">68329</ns2:CAValueAmount>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">02013</DocKindCode>
+                <DocName>жд</DocName>
+                <DocId>36335957</DocId>
+                <DocCreationDate>2025-09-03</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09034</DocKindCode>
+                <DocName>ПРИКАЗ</DocName>
+                <DocId>396</DocId>
+                <DocCreationDate>2011-05-31</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04021</DocKindCode>
+                <DocName>инвойс </DocName>
+                <DocId>2025CA0712CQ</DocId>
+                <DocCreationDate>2025-08-29</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04131</DocKindCode>
+                <DocName>Упаковочный лист</DocName>
+                <DocId>2025CA0712CQ</DocId>
+                <DocCreationDate>2025-08-29</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">10999</DocKindCode>
+                <DocName>РЕШЕНИЕ 21/15</DocName>
+                <DocId>РЕШЕНИЯ ОКТС 21/15</DocId>
+                <DocCreationDate>2016-11-30</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">11002</DocKindCode>
+                <DocName>ДОГОВОР</DocName>
+                <DocId>396/1606</DocId>
+                <DocCreationDate>2025-08-11</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+        </ns3:TransitGoodsItemDetails>
+        <ns3:TransitGoodsItemDetails>
+            <ns2:ConsignmentItemOrdinal>2</ns2:ConsignmentItemOrdinal>
+            <CommodityCode>870322</CommodityCode>
+            <ns2:GoodsDescriptionText>Новый автомобиль легковой CHANGAN CS35 Plus 2025 1392сс LS5A3DKR5SA005221</ns2:GoodsDescriptionText>
+            <UnifiedGrossMassMeasure measurementUnitCode="166" measurementUnitCodeListId="2064">1465</UnifiedGrossMassMeasure>
+            <ns3:GoodsMeasureDetails>
+                <ns2:GoodsMeasure measurementUnitCodeListId="2064"/>
+            </ns3:GoodsMeasureDetails>
+            <ns2:GoodsProhibitionFreeCode>C</ns2:GoodsProhibitionFreeCode>
+            <ns3:CargoPackagePalletDetails>
+                <ns2:PackageAvailabilityCode>0</ns2:PackageAvailabilityCode>
+                <ns2:CargoQuantity>1</ns2:CargoQuantity>
+                <ns3:PackagePalletDetails>
+                    <PackageKindCode codeListId="2013">PP</PackageKindCode>
+                    <PackageQuantity>1</PackageQuantity>
+                </ns3:PackagePalletDetails>
+            </ns3:CargoPackagePalletDetails>
+            <ns3:ContainerListDetails>
+                <ns3:ContainerDetails>
+                    <ns2:ContainerId>HNKU6143870</ns2:ContainerId>
+                </ns3:ContainerDetails>
+            </ns3:ContainerListDetails>
+            <ns2:CAValueAmount currencyCode="CNY" currencyCodeListId="2022">64271</ns2:CAValueAmount>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">02013</DocKindCode>
+                <DocName>жд</DocName>
+                <DocId>36335957</DocId>
+                <DocCreationDate>2025-09-03</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">10999</DocKindCode>
+                <DocName>РЕШЕНИЕ 21/15</DocName>
+                <DocId>РЕШЕНИЯ ОКТС 21/15</DocId>
+                <DocCreationDate>2016-11-30</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09034</DocKindCode>
+                <DocName>ПРИКАЗ</DocName>
+                <DocId>396</DocId>
+                <DocCreationDate>2011-05-31</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04021</DocKindCode>
+                <DocName>инвойс </DocName>
+                <DocId>2025CA0712CQ</DocId>
+                <DocCreationDate>2025-08-29</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04131</DocKindCode>
+                <DocName>Упаковочный лист</DocName>
+                <DocId>2025CA0712CQ</DocId>
+                <DocCreationDate>2025-08-29</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">11002</DocKindCode>
+                <DocName>ДОГОВОР</DocName>
+                <DocId>396/1606</DocId>
+                <DocCreationDate>2025-08-11</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+        </ns3:TransitGoodsItemDetails>
+        <ns3:TransitGoodsItemDetails>
+            <ns2:ConsignmentItemOrdinal>3</ns2:ConsignmentItemOrdinal>
+            <CommodityCode>870323</CommodityCode>
+            <ns2:GoodsDescriptionText>Новый автомобиль легковой CHANGAN UNI-K 2025 1998сс LS4ASE2A4SA997553</ns2:GoodsDescriptionText>
+            <UnifiedGrossMassMeasure measurementUnitCode="166" measurementUnitCodeListId="2064">2005</UnifiedGrossMassMeasure>
+            <ns3:GoodsMeasureDetails>
+                <ns2:GoodsMeasure measurementUnitCodeListId="2064"/>
+            </ns3:GoodsMeasureDetails>
+            <ns2:GoodsProhibitionFreeCode>C</ns2:GoodsProhibitionFreeCode>
+            <ns3:CargoPackagePalletDetails>
+                <ns2:PackageAvailabilityCode>0</ns2:PackageAvailabilityCode>
+                <ns2:CargoQuantity>1</ns2:CargoQuantity>
+                <ns3:PackagePalletDetails>
+                    <PackageKindCode codeListId="2013">PP</PackageKindCode>
+                    <PackageQuantity>1</PackageQuantity>
+                </ns3:PackagePalletDetails>
+            </ns3:CargoPackagePalletDetails>
+            <ns3:ContainerListDetails>
+                <ns3:ContainerDetails>
+                    <ns2:ContainerId>HNKU6143870</ns2:ContainerId>
+                </ns3:ContainerDetails>
+            </ns3:ContainerListDetails>
+            <ns2:CAValueAmount currencyCode="CNY" currencyCodeListId="2022">137146</ns2:CAValueAmount>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">02013</DocKindCode>
+                <DocName>жд</DocName>
+                <DocId>36335957</DocId>
+                <DocCreationDate>2025-09-03</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">10999</DocKindCode>
+                <DocName>РЕШЕНИЕ 21/15</DocName>
+                <DocId>РЕШЕНИЯ ОКТС 21/15</DocId>
+                <DocCreationDate>2016-11-30</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">09034</DocKindCode>
+                <DocName>ПРИКАЗ</DocName>
+                <DocId>396</DocId>
+                <DocCreationDate>2011-05-31</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04021</DocKindCode>
+                <DocName>инвойс </DocName>
+                <DocId>2025CA0712CQ</DocId>
+                <DocCreationDate>2025-08-29</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">04131</DocKindCode>
+                <DocName>Упаковочный лист</DocName>
+                <DocId>2025CA0712CQ</DocId>
+                <DocCreationDate>2025-08-29</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+            <ns3:TDPresentedDocDetails>
+                <DocKindCode codeListId="2009">11002</DocKindCode>
+                <DocName>ДОГОВОР</DocName>
+                <DocId>396/1606</DocId>
+                <DocCreationDate>2025-08-11</DocCreationDate>
+                <ns3:DocumentPresentingDetails>
+                    <ns2:DocPresentKindCode>1</ns2:DocPresentKindCode>
+                    <DocKindCode codeListId="2009"/>
+                </ns3:DocumentPresentingDetails>
+            </ns3:TDPresentedDocDetails>
+        </ns3:TransitGoodsItemDetails>
+    </ns3:TDGoodsShipmentDetails>
+    <ns3:CustomsIdentificationDetails>
+        <ns2:CustomsIdentificationMethodCode>01</ns2:CustomsIdentificationMethodCode>
+        <ns2:CustomsIdentificationMeansKindCode>01</ns2:CustomsIdentificationMeansKindCode>
+        <ns2:SealQuantity>1</ns2:SealQuantity>
+        <ns3:CustomsIdentificationMeansIdDetails>
+            <ns2:CustomsIdentificationMeansId>124050</ns2:CustomsIdentificationMeansId>
+        </ns3:CustomsIdentificationMeansIdDetails>
+    </ns3:CustomsIdentificationDetails>
+    <ns3:CarrierDetails>
+        <SubjectName>Товарищество с ограниченной ответственностью «КТЖ-Грузовые перевозки»</SubjectName>
+        <SubjectBriefName>ТОО «КТЖ-Грузовые перевозки»</SubjectBriefName>
+        <TaxpayerId>031040001799</TaxpayerId>
+        <ns4:SubjectAddressDetails>
+            <AddressKindCode>1</AddressKindCode>
+            <UnifiedCountryCode codeListId="2021">KZ</UnifiedCountryCode>
+            <DistrictName>Есиль</DistrictName>
+            <CityName>Астана</CityName>
+            <StreetName>Конаев</StreetName>
+            <BuildingNumberId>6</BuildingNumberId>
+        </ns4:SubjectAddressDetails>
+    </ns3:CarrierDetails>
+    <ns3:TransitGuaranteeDetails>
+        <ns2:GuaranteePresentCode>2</ns2:GuaranteePresentCode>
+        <ns2:NoGuaranteeCauseCode codeListId="2068">104</ns2:NoGuaranteeCauseCode>
+        <ns3:TransitGuaranteeDocDetails>
+            <DocKindCode codeListId="2009">02013</DocKindCode>
+            <DocId>36335957</DocId>
+            <DocCreationDate>2025-09-03</DocCreationDate>
+            <ns2:GuaranteeAmount currencyCodeListId="2022"/>
+            <ns2:PaymentGuaranteeMethodCode codeListId="2018"/>
+        </ns3:TransitGuaranteeDocDetails>
+    </ns3:TransitGuaranteeDetails>
+    <ns3:SignatoryRepresentativeDetails/>
+    <EventDate>2025-09-18</EventDate>
+    <ns3:SignatoryPersonV2Details/>
+</ns5:TransitDeclaration>
