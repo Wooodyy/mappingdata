@@ -2,7 +2,7 @@ from .xinjiang import process_xinjiang
 from .mtl import process_mtl
 from .astana import process_astana
 from .changan import process_changan
-from .testoviy import process_testoviy
+from .unified import process_unified
 
 # Регистрируем доступные алгоритмы отправителей
 PROCESSORS = {
@@ -10,7 +10,7 @@ PROCESSORS = {
     "mtl шаблон": process_mtl,
     "changan international corporation": process_changan,
     "astana motors company": process_astana,
-    "универсальный шаблон - не готов": process_testoviy,
+    "единый шаблон": process_unified,
 }
 
 def get_processor(sender: str):

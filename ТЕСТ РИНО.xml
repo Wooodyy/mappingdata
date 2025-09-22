@@ -12,7 +12,7 @@
         <ObjectOrdinal>1</ObjectOrdinal>
         <UnifiedTransportModeCode codeListId="2004">20</UnifiedTransportModeCode>
         <ns2:RegistrationNationalityCode codeListId="2021"></ns2:RegistrationNationalityCode>
-        <TransportMeansRegId>HNKU6143870</TransportMeansRegId>
+        <TransportMeansRegId>AMKU7771819</TransportMeansRegId>
         <ns2:TransportTypeCode codeListId="2024">901</ns2:TransportTypeCode>
     </ns3:TransportMeansItemDetails>
     <ns3:DeclarantDetails>
@@ -88,7 +88,7 @@
             </ns3:CargoPackagePalletDetails>
             <ns3:ContainerListDetails>
                 <ns3:ContainerDetails>
-                    <ns2:ContainerId>HNKU6143870</ns2:ContainerId>
+                    <ns2:ContainerId>AMKU7771819</ns2:ContainerId>
                 </ns3:ContainerDetails>
             </ns3:ContainerListDetails>
             <ns2:CAValueAmount currencyCode="CNY" currencyCodeListId="2022">68329</ns2:CAValueAmount>
@@ -172,7 +172,7 @@
             </ns3:CargoPackagePalletDetails>
             <ns3:ContainerListDetails>
                 <ns3:ContainerDetails>
-                    <ns2:ContainerId>HNKU6143870</ns2:ContainerId>
+                    <ns2:ContainerId>AMKU7771819</ns2:ContainerId>
                 </ns3:ContainerDetails>
             </ns3:ContainerListDetails>
             <ns2:CAValueAmount currencyCode="CNY" currencyCodeListId="2022">64271</ns2:CAValueAmount>
@@ -240,7 +240,7 @@
         <ns3:TransitGoodsItemDetails>
             <ns2:ConsignmentItemOrdinal>3</ns2:ConsignmentItemOrdinal>
             <CommodityCode>870323</CommodityCode>
-            <ns2:GoodsDescriptionText>Новый автомобиль легковой CHANGAN UNI-K 2025 1998сс LS4ASE2A4SA997553</ns2:GoodsDescriptionText>
+            <ns2:GoodsDescriptionText>АНовый автомобиль легковой CHANGAN UNI-K 2025 1998сс LS4ASE2A4SA997553</ns2:GoodsDescriptionText>
             <UnifiedGrossMassMeasure measurementUnitCode="166" measurementUnitCodeListId="2064">2005</UnifiedGrossMassMeasure>
             <ns3:GoodsMeasureDetails>
                 <ns2:GoodsMeasure measurementUnitCodeListId="2064"/>
@@ -256,7 +256,7 @@
             </ns3:CargoPackagePalletDetails>
             <ns3:ContainerListDetails>
                 <ns3:ContainerDetails>
-                    <ns2:ContainerId>HNKU6143870</ns2:ContainerId>
+                    <ns2:ContainerId>AMKU7771819</ns2:ContainerId>
                 </ns3:ContainerDetails>
             </ns3:ContainerListDetails>
             <ns2:CAValueAmount currencyCode="CNY" currencyCodeListId="2022">137146</ns2:CAValueAmount>

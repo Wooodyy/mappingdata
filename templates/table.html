@@ -515,6 +515,8 @@
                                   onchange="changeBulkPackageTypeForContainer('${containerNo}', this.value)"
                                 >
                                   <option value="">Изменить все</option>
+                                  <option value="BG">BG</option>
+                                  <option value="BX">BX</option>
                                   <option value="CT">CT</option>
                                   <option value="PK">PK</option>
                                   <option value="CS">CS</option>
@@ -590,6 +592,12 @@
                                             <option value="PP" ${
                                               value === "PP" ? "selected" : ""
                                             }>PP</option>
+                                            <option value="BG" ${
+                                              value === "BG" ? "selected" : ""
+                                            }>BG</option>
+                                            <option value="BX" ${
+                                              value === "BX" ? "selected" : ""
+                                            }>BX</option>
                                         </select>
                                     `
                                         : key === "Информация об упаковке (0-БЕЗ, 1 С)"
