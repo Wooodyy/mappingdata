@@ -273,29 +273,6 @@
                    </div>
                    
                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
-                     <!-- Поле отправителя -->
-                     <div class="space-y-2">
-                      <label for="senderSearch" class="block text-sm font-semibold text-gray-900">
-                        Отправитель
-                        <span class="text-red-500 ml-1">*</span>
-                      </label>
-
-                <div class="relative autocomplete-wrap">
-                  <div id="suggestion" class="suggestion-layer rounded-xl border border-transparent px-4 py-3 text-sm"></div>
-                  <input id="senderSearch" name="senderSearch" type="text" class="input-ghost w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="Начните вводить имя отправителя..." autocomplete="off" aria-autocomplete="both"/>
-
-                  <button id="clearBtn" type="button" class="absolute right-3 top-3 w-6 h-6 text-gray-400 hover:text-gray-600 hidden rounded-full hover:bg-gray-100 flex items-center justify-center z-10" title="Очистить поле">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                  </button>
-
-                  <div id="senderDropdown" class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto hidden"></div>
-                </div>
-
-                <input type="hidden" id="sender" name="sender" required />
-
-              </div>
 
               <div class="space-y-2">
                 <div id="uploadWrapper" class="relative">
@@ -354,24 +331,6 @@
                   </div>
                   
                   <form id="compareForm" action="/compare" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
-                    <!-- Поле отправителя -->
-                    <div class="space-y-2">
-                      <label class="block text-sm font-semibold text-gray-900">
-                        Отправитель
-                        <span class="text-red-500 ml-1">*</span>
-                      </label>
-                      <div class="relative autocomplete-wrap">
-                        <div id="compareSuggestion" class="suggestion-layer rounded-xl border border-transparent px-4 py-3 text-sm"></div>
-                        <input id="compareSenderSearch" type="text" class="input-ghost w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500" placeholder="Начните вводить имя отправителя..." autocomplete="off" aria-autocomplete="both"/>
-                        <button id="compareClearBtn" type="button" class="absolute right-3 top-3 w-6 h-6 text-gray-400 hover:text-gray-600 hidden rounded-full hover:bg-gray-100 flex items-center justify-center z-10" title="Очистить поле">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                          </svg>
-                        </button>
-                        <div id="compareSenderDropdown" class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto hidden"></div>
-                      </div>
-                      <input type="hidden" id="compareSenderHidden" name="sender" required />
-                    </div>
 
                     <!-- Файлы для сравнения -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -472,12 +431,6 @@
       </main>
     </div>
 
-    <script type="application/json" id="processors-data">
-      {{ processors|tojson|safe }}
-    </script>
-    <script type="application/json" id="compare-senders-data">
-      {{ compare_senders|tojson|safe }}
-    </script>
 
     <script>
       function clearAllCache() {
@@ -486,16 +439,6 @@
       }
       clearAllCache();
 
-      const processorsData = document.getElementById("processors-data").textContent;
-      const processorsList = JSON.parse(processorsData);
-      const compareSendersData = document.getElementById("compare-senders-data").textContent || "[]";
-      const compareSendersList = JSON.parse(compareSendersData);
-
-      const senderSearch = document.getElementById("senderSearch");
-      const senderHidden = document.getElementById("sender");
-      const suggestionEl = document.getElementById("suggestion");
-      const clearBtn = document.getElementById("clearBtn");
-      const senderDropdown = document.getElementById("senderDropdown");
 
       const fileInput = document.getElementById("file");
       const uploadZone = document.getElementById("uploadZone");
@@ -521,11 +464,6 @@
       const compareSubmit = document.getElementById("compareSubmit");
       const compareSpinner = document.getElementById("compareSpinner");
       const compareResult = document.getElementById("compareResult");
-      const cSuggest = document.getElementById("compareSuggestion");
-      const cSearch = document.getElementById("compareSenderSearch");
-      const cHidden = document.getElementById("compareSenderHidden");
-      const cClear = document.getElementById("compareClearBtn");
-      const cDropdown = document.getElementById("compareSenderDropdown");
       const invoiceFile2 = document.getElementById("invoiceFile");
       const invoiceZone2 = document.getElementById("invoiceZone2");
       const invoiceView2 = document.getElementById("invoiceView2");
@@ -540,76 +478,6 @@
       const removeDeclBtn2 = document.getElementById("removeDeclBtn2");
 
       const VALID_RE = /\.(xlsx|xls)$/i;
-      // Compare sender autocomplete (copy behaviour from mode1)
-      let cCurrentSuggestion = null;
-      let cSelectedDropdownIndex = -1;
-      function cFindExactMatch(input) { const nq = normalize(input); return compareSendersList.find(p => normalize(p) === nq) || null; }
-      function cFindSuggestion(prefix) {
-        const nq = normalize(prefix); if (!nq) return null;
-        for (const p of compareSendersList) { const n = normalize(p); if (n.startsWith(nq) && n !== nq) return p; }
-        for (const p of compareSendersList) { const n = normalize(p); if (n.includes(nq) && n !== nq) return p; }
-        return null;
-      }
-      function cShowSuggestionFor(value) {
-        const sug = cFindSuggestion(value); cCurrentSuggestion = sug; if (!sug) { cSuggest.innerHTML = ""; return null; }
-        const prefix = value; const rem = remainderFromPrefix(sug, prefix);
-        cSuggest.innerHTML = `<span class="suggestion-prefix">${escapeHtml(prefix)}</span><span>${escapeHtml(rem)}</span>`; return sug;
-      }
-      function cGetFiltered(query) {
-        if (!query) return compareSendersList; const nq = normalize(query); const exact = [], starts = [], contains = [];
-        for (const p of compareSendersList) { const n = normalize(p); if (n === nq) exact.push(p); else if (n.startsWith(nq)) starts.push(p); else if (n.includes(nq)) contains.push(p); }
-        return [...exact, ...starts, ...contains];
-      }
-      function cShowDropdown(query = "") {
-        const filtered = cGetFiltered(query); cSelectedDropdownIndex = -1; if (filtered.length === 0) { cDropdown.classList.add("hidden"); return; }
-        cDropdown.innerHTML = filtered.map((processor, index) => {
-          const highlighted = highlightMatch(processor, query);
-          return `<div class="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors duration-150 border-b border-gray-100 last:border-b-0" data-value="${escapeHtml(processor)}" data-index="${index}">${highlighted}</div>`;
-        }).join("");
-        cDropdown.classList.remove("hidden");
-      }
-      function cHideDropdown() { cDropdown.classList.add("hidden"); cSelectedDropdownIndex = -1; }
-      function cSelectDropdownItem(index) {
-        const items = cDropdown.querySelectorAll("[data-value]");
-        if (items.length > 0 && index >= 0 && index < items.length) {
-          const value = items[index].dataset.value; cSearch.value = value; cHidden.value = value; cHideDropdown(); cSuggest.innerHTML = ""; cCurrentSuggestion = null; cUpdateCompareInputState(); return true;
-        }
-        return false;
-      }
-      function cUpdateCompareInputState() {
-        const hasValue = cSearch?.value?.length > 0; const hasValidSelection = cHidden?.value?.length > 0;
-        if (!cSearch) return;
-        cSearch.classList.remove("border-green-500", "border-red-500", "border-yellow-500");
-        if (!hasValue) cSearch.classList.add("border-gray-200");
-        else if (hasValidSelection) { cSearch.classList.remove("border-gray-200"); cSearch.classList.add("border-green-500"); }
-        else if (cCurrentSuggestion) { cSearch.classList.remove("border-gray-200"); cSearch.classList.add("border-yellow-500"); }
-        else { cSearch.classList.remove("border-gray-200"); cSearch.classList.add("border-red-500"); }
-      }
-      if (cSearch) {
-        cSearch.addEventListener("input", (e) => {
-          const value = e.target.value; cHidden.value = ""; cClear.classList.toggle("hidden", !value);
-          const exactMatch = cFindExactMatch(value);
-          if (exactMatch) { cHidden.value = exactMatch; cSuggest.innerHTML = ""; cCurrentSuggestion = null; cHideDropdown(); }
-          else { cShowSuggestionFor(value); cShowDropdown(value); }
-          cUpdateCompareInputState();
-        });
-        cSearch.addEventListener("keydown", (e) => {
-          const dropdownVisible = !cDropdown.classList.contains("hidden"); const dropdownItems = cDropdown.querySelectorAll("[data-value]");
-          if (e.key === "ArrowDown") { e.preventDefault(); if (dropdownVisible && dropdownItems.length > 0) { cSelectedDropdownIndex = Math.min(cSelectedDropdownIndex + 1, dropdownItems.length - 1); cUpdateDropdownSelection(); } else { cShowDropdown(cSearch.value); } }
-          else if (e.key === "ArrowUp") { e.preventDefault(); if (dropdownVisible && dropdownItems.length > 0) { cSelectedDropdownIndex = Math.max(cSelectedDropdownIndex - 1, -1); cUpdateDropdownSelection(); } }
-          else if (e.key === "Enter") { e.preventDefault(); if (dropdownVisible && cSelectedDropdownIndex >= 0) { cSelectDropdownItem(cSelectedDropdownIndex); } else { const exact = cFindExactMatch(cSearch.value); if (exact) { cHidden.value = exact; cSuggest.innerHTML = ""; cCurrentSuggestion = null; cHideDropdown(); } else if (cCurrentSuggestion) { cSearch.value = cCurrentSuggestion; cHidden.value = cCurrentSuggestion; cCurrentSuggestion = null; cSuggest.innerHTML = ""; cHideDropdown(); } } cClear.classList.toggle("hidden", !cSearch.value); cUpdateCompareInputState(); }
-          else if (e.key === "Tab") { if (cCurrentSuggestion) { e.preventDefault(); cSearch.value = cCurrentSuggestion; cHidden.value = cCurrentSuggestion; cCurrentSuggestion = null; cSuggest.innerHTML = ""; cHideDropdown(); cClear.classList.toggle("hidden", !cSearch.value); cUpdateCompareInputState(); } else if (dropdownVisible && cSelectedDropdownIndex >= 0) { e.preventDefault(); cSelectDropdownItem(cSelectedDropdownIndex); } else if (dropdownVisible && cSelectedDropdownIndex === -1) { e.preventDefault(); if (!cSelectDropdownItem(0)) cHideDropdown(); } else { cHideDropdown(); } }
-          else if (e.key === "Escape") { cSuggest.innerHTML = ""; cCurrentSuggestion = null; cHideDropdown(); cUpdateCompareInputState(); }
-        });
-        function cUpdateDropdownSelection() {
-          const items = cDropdown.querySelectorAll("[data-value]"); items.forEach((item, index) => { if (index === cSelectedDropdownIndex) { item.classList.add("bg-blue-100"); item.scrollIntoView({ block: "nearest" }); } else { item.classList.remove("bg-blue-100"); } });
-        }
-        cSearch.addEventListener("blur", () => { setTimeout(() => { const exact = cFindExactMatch(cSearch.value); if (exact) { cSearch.value = exact; cHidden.value = exact; } cSuggest.innerHTML = ""; cCurrentSuggestion = null; cHideDropdown(); cUpdateCompareInputState(); }, 200); });
-        cSearch.addEventListener("focus", () => { if (cSearch.value) { cShowSuggestionFor(cSearch.value); cShowDropdown(cSearch.value); } else { cShowDropdown(""); } cUpdateCompareInputState(); });
-        cDropdown.addEventListener("click", (e) => { const item = e.target.closest("[data-value]"); if (item) { const value = item.dataset.value; cSearch.value = value; cHidden.value = value; cHideDropdown(); cSuggest.innerHTML = ""; cCurrentSuggestion = null; cClear.classList.toggle("hidden", !value); cUpdateCompareInputState(); cSearch.focus(); } });
-        cClear.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); cSearch.value = ""; cHidden.value = ""; cClear.classList.add("hidden"); cSuggest.innerHTML = ""; cCurrentSuggestion = null; cHideDropdown(); cUpdateCompareInputState(); cSearch.focus(); });
-        document.addEventListener("click", (e) => { const wrap = cSearch.closest(".autocomplete-wrap"); if (wrap && !wrap.contains(e.target)) cHideDropdown(); });
-      }
 
       // Compare file zones (like mode1 style)
       function showSelectedFile2(file) { invoiceFileName2.textContent = file.name; invoiceFileSize2.textContent = humanFileSize(file.size); invoiceView2.classList.remove("hidden"); invoiceZone2.classList.add("hidden"); invoiceZone2.setAttribute("aria-disabled", "true"); }
@@ -635,9 +503,6 @@
       }
       if (removeDeclBtn2) removeDeclBtn2.addEventListener("click", clearSelectedDecl2);
 
-      function normalize(s) {
-        return (s || "").toString().toLowerCase().replace(/\s+/g, " ").trim();
-      }
       
       function showNotification(msg, type = "success") {
         notification.classList.remove("hidden");
@@ -678,12 +543,7 @@
         if (!compareForm) return;
         const inv = document.getElementById("invoiceFile");
         const decl = document.getElementById("declFile");
-        if (!cHidden.value) {
-          const exact = cFindExactMatch(cSearch.value);
-          if (exact) { cHidden.value = exact; cSearch.value = exact; }
-          else if (cCurrentSuggestion) { cHidden.value = cCurrentSuggestion; cSearch.value = cCurrentSuggestion; }
-        }
-        if (!cHidden.value) { showNotification("Пожалуйста, выберите отправителя", "error"); cSearch?.focus(); return; }
+        
         if (!inv.files.length) {
           showNotification("Пожалуйста, выберите файл инвойса", "error");
           return;
@@ -719,8 +579,6 @@
                   xml_data: j.data.xml_data || null,
                   xml_documents: j.data.xml_documents || [],
                   invoice_data: j.data.invoice_data || null,
-                  spelling_check: j.data.spelling_check || null,
-                  gemini_analysis: j.data.gemini_analysis || null
                 })
               );
             } catch {}
@@ -735,195 +593,8 @@
         }
       }
 
-      function findSuggestion(prefix) {
-        const nq = normalize(prefix);
-        if (!nq) return null;
-        
-        for (const p of processorsList) {
-          const normalized = normalize(p);
-          if (normalized.startsWith(nq) && normalized !== nq) return p;
-        }
-        
-        for (const p of processorsList) {
-          const normalized = normalize(p);
-          if (normalized.includes(nq) && normalized !== nq) return p;
-        }
-        
-        return null;
-      }
 
-      function findExactMatch(input) {
-        const nq = normalize(input);
-        return processorsList.find(p => normalize(p) === nq) || null;
-      }
 
-      function escapeHtml(s) {
-        return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-      }
-
-      function remainderFromPrefix(original, prefix) {
-        const target = normalize(prefix);
-        if (!target) return original;
-        
-        const originalNorm = normalize(original);
-        const startIndex = originalNorm.indexOf(target);
-        if (startIndex === -1) return original;
-        
-        let charCount = 0;
-        let realIndex = 0;
-        
-        for (let i = 0; i < original.length; i++) {
-          const ch = original[i];
-          if (/\s/.test(ch)) {
-            if (charCount > 0 && !normalize(original.slice(0, i)).endsWith(" ")) {
-              charCount++;
-            }
-          } else {
-            charCount++;
-          }
-          
-          if (charCount > startIndex + target.length) {
-            realIndex = i;
-            break;
-          }
-        }
-        
-        return original.slice(realIndex);
-      }
-
-      let currentSuggestion = null;
-      let selectedDropdownIndex = -1;
-
-      function showSuggestionFor(value) {
-        const sug = findSuggestion(value);
-        currentSuggestion = sug;
-        if (!sug) {
-          suggestionEl.innerHTML = "";
-          return null;
-        }
-        
-        const prefix = value;
-        const rem = remainderFromPrefix(sug, prefix);
-        const safePrefix = escapeHtml(prefix);
-        const safeRem = escapeHtml(rem);
-        suggestionEl.innerHTML = `<span class="suggestion-prefix">${safePrefix}</span><span>${safeRem}</span>`;
-        return sug;
-      }
-
-      function getFilteredProcessors(query) {
-        if (!query) return processorsList;
-        
-        const nq = normalize(query);
-        const exactMatches = [];
-        const startsWithMatches = [];
-        const containsMatches = [];
-        
-        for (const p of processorsList) {
-          const normalized = normalize(p);
-          if (normalized === nq) {
-            exactMatches.push(p);
-          } else if (normalized.startsWith(nq)) {
-            startsWithMatches.push(p);
-          } else if (normalized.includes(nq)) {
-            containsMatches.push(p);
-          }
-        }
-        
-        return [...exactMatches, ...startsWithMatches, ...containsMatches];
-      }
-
-      function showDropdown(query = "") {
-        const filtered = getFilteredProcessors(query);
-        selectedDropdownIndex = -1;
-        
-        if (filtered.length === 0) {
-          senderDropdown.classList.add("hidden");
-          return;
-        }
-        
-        senderDropdown.innerHTML = filtered
-          .map((processor, index) => {
-            const highlighted = highlightMatch(processor, query);
-            return `<div class="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors duration-150 border-b border-gray-100 last:border-b-0" data-value="${escapeHtml(processor)}" data-index="${index}">${highlighted}</div>`;
-          })
-          .join("");
-        
-        senderDropdown.classList.remove("hidden");
-      }
-
-      function highlightMatch(text, query) {
-        if (!query) return escapeHtml(text);
-        
-        const escapedText = escapeHtml(text);
-        const escapedQuery = escapeHtml(query);
-        
-        return escapedText.replace(
-          new RegExp(`(${escapedQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi"),
-          '<mark class="bg-yellow-200 font-semibold">$1</mark>'
-        );
-      }
-
-      function hideDropdown() {
-        senderDropdown.classList.add("hidden");
-        selectedDropdownIndex = -1;
-      }
-
-      function selectDropdownItem(index) {
-        const items = senderDropdown.querySelectorAll("[data-value]");
-        if (items.length > 0 && index >= 0 && index < items.length) {
-          const value = items[index].dataset.value;
-          senderSearch.value = value;
-          senderHidden.value = value;
-          hideDropdown();
-          suggestionEl.innerHTML = "";
-          currentSuggestion = null;
-          updateInputState();
-          return true;
-        }
-        return false;
-      }
-
-      function updateInputState() {
-        const input = senderSearch;
-        const hasValue = input.value.length > 0;
-        const hasValidSelection = senderHidden.value.length > 0;
-        
-        input.classList.remove("border-green-500", "border-red-500", "border-yellow-500");
-        
-        if (!hasValue) {
-          input.classList.add("border-gray-200");
-        } else if (hasValidSelection) {
-          input.classList.remove("border-gray-200");
-          input.classList.add("border-green-500");
-        } else if (currentSuggestion) {
-          input.classList.remove("border-gray-200");
-          input.classList.add("border-yellow-500");
-        } else {
-          input.classList.remove("border-gray-200");
-          input.classList.add("border-red-500");
-        }
-      }
-
-      senderSearch.addEventListener("input", (e) => {
-        const value = e.target.value;
-        senderHidden.value = "";
-        clearBtn.classList.toggle("hidden", !value);
-
-        // Проверяем на точное совпадение
-        const exactMatch = findExactMatch(value);
-        if (exactMatch) {
-          senderHidden.value = exactMatch;
-          suggestionEl.innerHTML = "";
-          currentSuggestion = null;
-          hideDropdown();
-        } else {
-          showSuggestionFor(value);
-          showDropdown(value);
-        }
-
-        // Обновляем визуальное состояние
-        updateInputState();
-      });
 
       // Intercept nav to toggle panels without leaving the page
       if (mode1Btn && mode2Btn) {
@@ -952,160 +623,6 @@
         compareForm.addEventListener("submit", submitCompareForm);
       }
 
-      // Tab accepts suggestion
-      senderSearch.addEventListener("keydown", (e) => {
-        const dropdownVisible = !senderDropdown.classList.contains("hidden");
-        const dropdownItems = senderDropdown.querySelectorAll("[data-value]");
-
-        if (e.key === "ArrowDown") {
-          e.preventDefault();
-          if (dropdownVisible && dropdownItems.length > 0) {
-            selectedDropdownIndex = Math.min(
-              selectedDropdownIndex + 1,
-              dropdownItems.length - 1
-            );
-            updateDropdownSelection();
-          } else {
-            showDropdown(senderSearch.value);
-          }
-        } else if (e.key === "ArrowUp") {
-          e.preventDefault();
-          if (dropdownVisible && dropdownItems.length > 0) {
-            selectedDropdownIndex = Math.max(selectedDropdownIndex - 1, -1);
-            updateDropdownSelection();
-          }
-        } else if (e.key === "Enter") {
-          e.preventDefault();
-          if (dropdownVisible && selectedDropdownIndex >= 0) {
-            selectDropdownItem(selectedDropdownIndex);
-          } else {
-            const exact = findExactMatch(senderSearch.value);
-            if (exact) {
-              senderHidden.value = exact;
-              suggestionEl.innerHTML = "";
-              currentSuggestion = null;
-              hideDropdown();
-            } else if (currentSuggestion) {
-              senderSearch.value = currentSuggestion;
-              senderHidden.value = currentSuggestion;
-              currentSuggestion = null;
-              suggestionEl.innerHTML = "";
-              hideDropdown();
-            }
-          }
-          clearBtn.classList.toggle("hidden", !senderSearch.value);
-          updateInputState();
-        } else if (e.key === "Tab") {
-          // Приоритет 1: Если есть inline подсказка, используем её
-          if (currentSuggestion) {
-            e.preventDefault();
-            senderSearch.value = currentSuggestion;
-            senderHidden.value = currentSuggestion;
-            currentSuggestion = null;
-            suggestionEl.innerHTML = "";
-            hideDropdown();
-            clearBtn.classList.toggle("hidden", !senderSearch.value);
-            updateInputState();
-          }
-          // Приоритет 2: Если dropdown открыт и что-то выделено
-          else if (dropdownVisible && selectedDropdownIndex >= 0) {
-            e.preventDefault();
-            selectDropdownItem(selectedDropdownIndex);
-          }
-          // Приоритет 3: Если dropdown открыт, но ничего не выделено - выбираем первый элемент
-          else if (dropdownVisible && selectedDropdownIndex === -1) {
-            e.preventDefault();
-            if (!selectDropdownItem(0)) {
-              // Если не удалось выбрать первый элемент (нет элементов), закрываем dropdown
-              hideDropdown();
-            }
-          }
-          // Иначе просто закрываем dropdown и даем Tab сработать нормально
-          else {
-            hideDropdown();
-          }
-        } else if (e.key === "Escape") {
-          suggestionEl.innerHTML = "";
-          currentSuggestion = null;
-          hideDropdown();
-          updateInputState();
-        }
-      });
-
-      function updateDropdownSelection() {
-        const items = senderDropdown.querySelectorAll("[data-value]");
-        items.forEach((item, index) => {
-          if (index === selectedDropdownIndex) {
-            item.classList.add("bg-blue-100");
-            item.scrollIntoView({ block: "nearest" });
-          } else {
-            item.classList.remove("bg-blue-100");
-          }
-        });
-      }
-
-      senderSearch.addEventListener("blur", () => {
-        // Даем немного времени для обработки кликов по dropdown
-        setTimeout(() => {
-          const exact = findExactMatch(senderSearch.value);
-          if (exact) {
-            senderSearch.value = exact;
-            senderHidden.value = exact;
-          }
-          suggestionEl.innerHTML = "";
-          currentSuggestion = null;
-          hideDropdown();
-          updateInputState();
-        }, 200);
-      });
-
-      // Обработчик фокуса
-      senderSearch.addEventListener("focus", () => {
-        if (senderSearch.value) {
-          showSuggestionFor(senderSearch.value);
-          showDropdown(senderSearch.value);
-        } else {
-          showDropdown("");
-        }
-        updateInputState();
-      });
-
-      // Обработчик кликов по dropdown
-      senderDropdown.addEventListener("click", (e) => {
-        const item = e.target.closest("[data-value]");
-        if (item) {
-          const value = item.dataset.value;
-          senderSearch.value = value;
-          senderHidden.value = value;
-          hideDropdown();
-          suggestionEl.innerHTML = "";
-          currentSuggestion = null;
-          clearBtn.classList.toggle("hidden", !value);
-          updateInputState();
-          senderSearch.focus();
-        }
-      });
-
-      clearBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        senderSearch.value = "";
-        senderHidden.value = "";
-        clearBtn.classList.add("hidden");
-        suggestionEl.innerHTML = "";
-        currentSuggestion = null;
-        hideDropdown();
-        updateInputState();
-        senderSearch.focus();
-      });
-
-      // Закрытие dropdown при клике вне элемента
-      document.addEventListener("click", (e) => {
-        const autocompleteWrap = senderSearch.closest(".autocomplete-wrap");
-        if (autocompleteWrap && !autocompleteWrap.contains(e.target)) {
-          hideDropdown();
-        }
-      });
 
       function humanFileSize(bytes) {
         if (bytes === 0) return "0 B";
@@ -1130,7 +647,6 @@
           fileInput.parentNode.replaceChild(newInput, fileInput);
           location.reload();
         }
-        senderHidden.removeAttribute("data-file");
         fileView.classList.add("hidden");
         uploadZone.classList.remove("hidden");
         uploadZone.removeAttribute("aria-disabled");
@@ -1238,31 +754,6 @@
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        
-        if (!senderHidden.value) {
-          const exact = findExactMatch(senderSearch.value);
-          if (exact) {
-            senderHidden.value = exact;
-            senderSearch.value = exact;
-          } else if (currentSuggestion) {
-            senderHidden.value = currentSuggestion;
-            senderSearch.value = currentSuggestion;
-          }
-        }
-        
-        if (!senderHidden.value) {
-          showNotification("Пожалуйста, выберите отправителя из списка", "error");
-          senderSearch.focus();
-          return;
-        }
-        
-        const validSender = findExactMatch(senderHidden.value);
-        if (!validSender) {
-          showNotification("Выбранный отправитель не найден в списке доступных", "error");
-          senderSearch.focus();
-          senderSearch.select();
-          return;
-        }
         
         if (fileInput.files.length === 0) {
           showNotification("Пожалуйста, выберите файл", "error");

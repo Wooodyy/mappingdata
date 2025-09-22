@@ -129,14 +129,79 @@ def extract_xml_data_and_documents(xml_bytes: bytes, invoice_data=None) -> tuple
                         
                         # Проверяем документы с кодами 04021 и 04131 на соответствие данным инвойса
                         elif doc_kind in ["04021", "04131"] and invoice_data:
+                            # Нормализуем номера инвойсов для сравнения (убираем ведущие нули)
+                            def normalize_invoice_number(invoice_num):
+                                """Нормализует номер инвойса, убирая ведущие нули"""
+                                if not invoice_num:
+                                    return ""
+                                
+                                # Преобразуем в строку, если это не строка
+                                invoice_str = str(invoice_num).strip()
+                                
+                                # Если это число, убираем ведущие нули
+                                if invoice_str.isdigit():
+                                    return str(int(invoice_str))
+                                
+                                return invoice_str
+                            
+                            normalized_doc_id = normalize_invoice_number(doc_id)
+                            normalized_invoice_id = normalize_invoice_number(invoice_data.invoice)
+                            
                             # Проверяем соответствие DocId с invoice_data.invoice
-                            if doc_id != invoice_data.invoice:
+                            if normalized_doc_id != normalized_invoice_id:
                                 has_error = True
-                                error_message = f"Ошибка: Документ с кодом {doc_kind} должен иметь DocId равный номеру инвойса ({invoice_data.invoice}), но получен: {doc_id}"
+                                error_message = f"Ошибка: Документ с кодом {doc_kind} должен иметь DocId равный номеру инвойса ({invoice_data.invoice}), но получен: {doc_id}. Типы: DocId={type(doc_id)}, Invoice={type(invoice_data.invoice)}"
                             # Проверяем соответствие DocCreationDate с invoice_data.date_invoice
-                            elif doc_date != invoice_data.date_invoice:
-                                has_error = True
-                                error_message = f"Ошибка: Документ с кодом {doc_kind} должен иметь дату равную дате инвойса ({invoice_data.date_invoice}), но получена дата: {doc_date}"
+                            else:
+                                # Преобразуем даты в формат YYYY-MM-DD для сравнения
+                                def convert_to_yyyy_mm_dd(date_str):
+                                    """Преобразует дату в формат YYYY-MM-DD"""
+                                    if not date_str or date_str.strip() == "":
+                                        return ""
+                                    
+                                    date_str = date_str.strip()
+                                    
+                                    # Если дата уже в формате YYYY-MM-DD, возвращаем как есть
+                                    if len(date_str) == 10 and date_str.count('-') == 2:
+                                        return date_str
+                                    
+                                    # Если дата в формате DD.MM.YYYY, конвертируем в YYYY-MM-DD
+                                    if len(date_str) == 10 and date_str.count('.') == 2:
+                                        try:
+                                            parts = date_str.split('.')
+                                            if len(parts) == 3:
+                                                return f"{parts[2]}-{parts[1]}-{parts[0]}"
+                                        except:
+                                            pass
+                                    
+                                    # Если дата в формате YYYY/MM/DD, конвертируем в YYYY-MM-DD
+                                    if len(date_str) == 10 and date_str.count('/') == 2:
+                                        try:
+                                            parts = date_str.split('/')
+                                            if len(parts) == 3:
+                                                return f"{parts[0]}-{parts[1]}-{parts[2]}"
+                                        except:
+                                            pass
+                                    
+                                    # Если дата содержит время (ISO формат), извлекаем только дату
+                                    if 'T' in date_str:
+                                        date_part = date_str.split('T')[0]
+                                        return convert_to_yyyy_mm_dd(date_part)
+                                    
+                                    # Если дата содержит пробел и время (формат YYYY-MM-DD HH:MM:SS), извлекаем только дату
+                                    if ' ' in date_str:
+                                        date_part = date_str.split(' ')[0]
+                                        return convert_to_yyyy_mm_dd(date_part)
+                                    
+                                    # Если ничего не подошло, возвращаем исходную строку
+                                    return date_str
+                                
+                                doc_date_formatted = convert_to_yyyy_mm_dd(doc_date)
+                                invoice_date_formatted = convert_to_yyyy_mm_dd(invoice_data.date_invoice)
+                                
+                                if doc_date_formatted != invoice_date_formatted:
+                                    has_error = True
+                                    error_message = f"Ошибка: Документ с кодом {doc_kind} должен иметь дату равную дате инвойса ({invoice_date_formatted}), но получена дата: {doc_date_formatted}"
                         
                         doc = DocumentInfo(
                             DocKindCode=doc_kind,

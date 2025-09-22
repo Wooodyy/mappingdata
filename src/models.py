@@ -15,11 +15,6 @@ class ExcelData(BaseModel):
     containers: Dict[str, List[dict]] = {}
     totals: Totals
     calc: Calc
-    sender: str = ""
-    truck: str = ""
-    seller: str = ""
-    recipient: str = ""
-    buyer: str = ""
     invoice: str = ""
     date_invoice: str = ""
     sender_name: str = ""  # Название отправителя из XML
@@ -46,10 +41,3 @@ class DocumentInfo(BaseModel):
     DocCreationDate: str = ""
     has_error: bool = False
     error_message: str = ""
-
-
-class CompareData(BaseModel):
-    """Данные ответа для страницы сравнения."""
-    xml_data: Optional[ExcelData] = None  # XML данные в формате ExcelData
-    xml_documents: List[DocumentInfo] = []  # Документы из XML
-    invoice_data: Optional[ExcelData] = None

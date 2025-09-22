@@ -1,7 +1,6 @@
 import pandas as pd
 import io
 from src.models import ExcelData, Totals, Calc
-from src.gemini_api import detect_currency, detect_recipient, detect_sender
 
 def process_unified(file_content: bytes, CON_NUMBER: str = None) -> dict:
     
@@ -9,11 +8,6 @@ def process_unified(file_content: bytes, CON_NUMBER: str = None) -> dict:
         containers={},
         totals=Totals(),
         calc=Calc(),
-        sender="-",
-        truck="-",
-        seller="-",
-        recipient="-",
-        buyer="-",
         invoice="-",
         date_invoice="-",
         sender_name="-",
@@ -81,7 +75,7 @@ def process_unified(file_content: bytes, CON_NUMBER: str = None) -> dict:
                     "Вес брутто": float(row.get('Unnamed: 7', 0)) if pd.notna(row.get('Unnamed: 7')) else 0,
                     "Валюта": str(row.get('Unnamed: 8', '')).strip() if pd.notna(row.get('Unnamed: 8')) else '',
                     "Сумма": float(row.get('Unnamed: 9', 0)) if pd.notna(row.get('Unnamed: 9')) else 0,
-                    "Номер инвойса": str(row.get('Unnamed: 11', '')).strip() if pd.notna(row.get('Unnamed: 11')) else '',
+                    #"Номер инвойса": str(row.get('Unnamed: 11', '')).strip() if pd.notna(row.get('Unnamed: 11')) else '',
                     #"Case No": str(row.get('Unnamed: 10', '')).strip() if pd.notna(row.get('Unnamed: 10')) else '',
                 }
                 

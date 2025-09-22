@@ -27,15 +27,14 @@ templates = Jinja2Templates(directory="templates")
 async def home(request: Request):
     return templates.TemplateResponse(
         "upload.html",
-        {"request": request, "processors": list(PROCESSORS.keys()), "compare_senders": list(COMPARE_HANDLERS.keys())}
+        {"request": request}
     )
 
 @app.post("/upload")
-async def upload_file(sender: str = Form(...), file: UploadFile = File(...)):
-    processor = PROCESSORS.get(sender.strip().lower())
-    if processor is None:
-        return {"error": f"Алгоритм для отправителя '{sender}' ещё не готов"}
-
+async def upload_file(file: UploadFile = File(...)):
+    # Используем только единый алгоритм
+    processor = PROCESSORS["единый шаблон"]
+    
     contents = await file.read()
     result = processor(contents)
 
@@ -50,10 +49,12 @@ async def upload_file(sender: str = Form(...), file: UploadFile = File(...)):
             "containers": storage.containers,  # Основные данные в контейнерах
             "totals": storage.totals.__dict__,
             "calc": storage.calc.__dict__,
-            "sender": storage.sender,
-            "truck": storage.truck,
-            "recipient": storage.recipient,
-            "buyer": storage.buyer,
+            "sender_name": storage.sender_name,
+            "sender_address": storage.sender_address,
+            "recipient_name": storage.recipient_name,
+            "recipient_address": storage.recipient_address, 
+            "invoice": storage.invoice,
+            "date_invoice": storage.date_invoice,
         }
     }
 
@@ -65,18 +66,16 @@ async def table_page(request: Request):
 async def compare_page(request: Request):
     return templates.TemplateResponse(
         "compare.html",
-        {"request": request, "compare_senders": list(COMPARE_HANDLERS.keys())}
+        {"request": request}
     )
 
 @app.post("/compare")
 async def compare_files(
-    sender: str = Form(...),
     invoice: UploadFile = File(...),
     declaration: UploadFile = File(...),
 ):
-    handler = COMPARE_HANDLERS.get(sender.strip().lower())
-    if handler is None:
-        return {"success": False, "error": f"Алгоритм сравнения для '{sender}' ещё не готов"}
+    # Используем только единый алгоритм сравнения
+    handler = COMPARE_HANDLERS["единый шаблон"]
 
     invoice_bytes = await invoice.read()
     decl_bytes = await declaration.read()
