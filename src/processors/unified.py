@@ -62,7 +62,7 @@ def process_unified(file_content: bytes, CON_NUMBER: str = None) -> dict:
             if CON_NUMBER == container_number or CON_NUMBER is None:
                 # Создаем запись товара
                 item = {
-                    "Код ТН ВЭД": str(row.get('Unnamed: 1', '')).strip() if pd.notna(row.get('Unnamed: 1')) else '',
+                    "Код ТН ВЭД": str(row.get('Unnamed: 1', '')).strip()[:6] if pd.notna(row.get('Unnamed: 1')) else '',
                     "Коммерческое описание товара": str(row.get('Unnamed: 2', '')).strip() if pd.notna(row.get('Unnamed: 2')) else '',
                     "Признак товара, свободного от применения запретов и ограничений (всегда 1)": 1,
                     "Количество товара с указанием дополнительной ед.изм.": float(row.get('Unnamed: 3', 0)) if pd.notna(row.get('Unnamed: 3')) else 0,
@@ -87,9 +87,9 @@ def process_unified(file_content: bytes, CON_NUMBER: str = None) -> dict:
                 
                 storage.containers[container_number].append(item)
                 
-                sender_name = str(row.get('Unnamed: 13', '')).strip() +" П/П "+ str(row.get('Unnamed: 15', '')).strip()
+                sender_name = str(row.get('Unnamed: 13', '')).strip() + (f" П/П {str(row.get('Unnamed: 15', '')).strip()}" if pd.notna(row.get('Unnamed: 15')) and str(row.get('Unnamed: 15')).strip() else "")
                 sender_address = str(row.get('Unnamed: 14', '')).strip()
-                recipient_name = str(row.get('Unnamed: 16', '')).strip() +" ДЛЯ "+ str(row.get('Unnamed: 18', '')).strip()
+                recipient_name = str(row.get('Unnamed: 16', '')).strip() + (f" ДЛЯ {str(row.get('Unnamed: 18', '')).strip()}" if pd.notna(row.get('Unnamed: 18')) and str(row.get('Unnamed: 18')).strip() else "")
                 recipient_address = str(row.get('Unnamed: 17', '')).strip()
                
                 # Сохраняем информацию об отправителе и получателе для каждого контейнера
@@ -98,7 +98,9 @@ def process_unified(file_content: bytes, CON_NUMBER: str = None) -> dict:
                         'sender_name': sender_name,
                         'sender_address': sender_address,
                         'recipient_name': recipient_name,
-                        'recipient_address': recipient_address
+                        'recipient_address': recipient_address,
+                        'invoice': str(row.get('Unnamed: 11', '')).strip() if pd.notna(row.get('Unnamed: 11')) else '',
+                        'date_invoice': str(row.get('Unnamed: 12', '')).strip() if pd.notna(row.get('Unnamed: 12')) else ''
                     }
                 
                 # Также сохраняем общую информацию для совместимости

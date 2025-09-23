@@ -18,22 +18,49 @@
       };
     </script>
   </head>
-  <body class="min-h-screen bg-slate-50 font-inter">
+  <body class="min-h-screen bg-white font-inter">
     <main class=" max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
 
       <!-- Updated main table header to match compare.html style -->
       <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-slate-700 px-6 py-4 flex justify-between items-center">
-          <h2 class="text-xl font-semibold text-white flex items-center">
-            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <rect x="3" y="5" width="18" height="14" rx="2" ry="2" stroke-width="2"/>
-              <line x1="3" y1="9" x2="21" y2="9" stroke-width="2"/>
-              <line x1="9" y1="9" x2="9" y2="19" stroke-width="2"/>
-              <line x1="15" y1="9" x2="15" y2="19" stroke-width="2"/>
-            </svg>
-            Таблица данных
-          </h2>
-          <div class="flex space-x-2">
+        <div class="bg-slate-700 px-6 pt-6 rounded-2xl">
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-white flex items-center">
+              <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="3" y="5" width="18" height="14" rx="2" ry="2" stroke-width="2"/>
+                <line x1="3" y1="9" x2="21" y2="9" stroke-width="2"/>
+                <line x1="9" y1="9" x2="9" y2="19" stroke-width="2"/>
+                <line x1="15" y1="9" x2="15" y2="19" stroke-width="2"/>
+              </svg>
+              Таблица данных
+            </h2>
+            
+            <!-- Поле поиска в центре -->
+            <div class="flex items-center space-x-3 flex-1 max-w-md mx-8">
+              <div class="flex-1 relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                </div>
+                <input 
+                  type="text" 
+                  id="search-input" 
+                  placeholder="Поиск по контейнерам, товарам, кодам ТН ВЭД..." 
+                  class="w-full pl-10 pr-4 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors duration-200"
+                />
+              </div>
+              <button 
+                id="clear-search-btn" 
+                class="px-3 py-2 bg-slate-600 text-white text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors duration-200 shadow-sm"
+                style="display: none;"
+              >
+                Очистить
+              </button>
+            </div>
+            
+            <!-- Кнопки справа -->
+            <div class="flex space-x-2">
           <!-- Updated button styles to match muted theme -->
           <button id="copy-btn" class="inline-flex items-center px-4 py-2 bg-white text-slate-700 text-sm border border-slate-300 font-medium rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-colors duration-200 shadow-sm">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,6 +79,12 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
               Скачать JSON
+          </button>
+          <button onclick="goBackToUpload()" class="inline-flex items-center gap-2 px-4 py-2 border-2 border-slate-500 bg-slate-600 hover:bg-slate-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"></path>
+            </svg>
+            Загрузить новый файл
           </button>
           </div>
         </div>
@@ -88,6 +121,60 @@
         });
       }
 
+      function formatDate(dateString) {
+        if (!dateString || dateString === "Не указана" || dateString.trim() === "") {
+          return "Не указана";
+        }
+        
+        try {
+          // Пытаемся распарсить дату в различных форматах
+          let date;
+          
+          // Если дата уже в формате DD.MM.YYYY
+          if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateString.trim())) {
+            return dateString.trim();
+          }
+          
+          // Если дата в формате YYYY-MM-DD
+          if (/^\d{4}-\d{2}-\d{2}$/.test(dateString.trim())) {
+            date = new Date(dateString.trim());
+          }
+          // Если дата в формате DD/MM/YYYY
+          else if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString.trim())) {
+            const parts = dateString.trim().split('/');
+            date = new Date(parts[2], parts[1] - 1, parts[0]);
+          }
+          // Если дата в формате MM/DD/YYYY
+          else if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString.trim())) {
+            const parts = dateString.trim().split('/');
+            date = new Date(parts[2], parts[0] - 1, parts[1]);
+          }
+          // Если дата содержит время (ISO формат)
+          else if (dateString.includes('T')) {
+            date = new Date(dateString);
+          }
+          // Пытаемся создать дату из строки
+          else {
+            date = new Date(dateString);
+          }
+          
+          // Проверяем, что дата валидна
+          if (isNaN(date.getTime())) {
+            return dateString; // Возвращаем исходную строку если не удалось распарсить
+          }
+          
+          // Форматируем в DD.MM.YYYY
+          const day = String(date.getDate()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const year = date.getFullYear();
+          
+          return `${day}.${month}.${year}`;
+        } catch (error) {
+          console.error("Ошибка форматирования даты:", error);
+          return dateString; // Возвращаем исходную строку при ошибке
+        }
+      }
+
       function showToast(message, type = "success") {
         const toast = document.getElementById("toast");
         const toastContent = toast.querySelector("div");
@@ -98,7 +185,7 @@
         
         toastContent.querySelector("span").textContent = message;
         toast.classList.remove("translate-x-full");
-        setTimeout(() => toast.classList.add("translate-x-full"), 500);
+        setTimeout(() => toast.classList.add("translate-x-full"), 1000);
       }
 
       async function fetchData() {
@@ -108,7 +195,7 @@
           
           if (!savedData) {
             showNoDataMessage();
-            return;
+            return Promise.resolve();
           }
 
           const data = JSON.parse(savedData);
@@ -120,11 +207,13 @@
 
           document.getElementById("loading-state").style.display = "none";
           generateTable(data.containers);
-          generateCalc(data.calc);
+          
+          return Promise.resolve();
         } catch (error) {
           console.error("Error loading data:", error);
           showToast("Ошибка загрузки данных", "error");
           showErrorMessage();
+          return Promise.resolve();
         }
       }
 
@@ -252,6 +341,8 @@
           let containerRecipientInfo = "Не указан";
           let containerSenderAddress = "Нет данных";
           let containerRecipientAddress = "Нет данных";
+          let containerInvoice = "Не указан";
+          let containerDateInvoice = "Не указана";
           
           if (savedData) {
             try {
@@ -261,6 +352,8 @@
                 containerRecipientInfo = data.container_info[containerNo].recipient_name || "Не указан";
                 containerSenderAddress = data.container_info[containerNo].sender_address || "Нет данных";
                 containerRecipientAddress = data.container_info[containerNo].recipient_address || "Нет данных";
+                containerInvoice = data.container_info[containerNo].invoice || "Не указан";
+                containerDateInvoice = data.container_info[containerNo].date_invoice || "Не указана";
               }
             } catch (e) {
               console.error("Ошибка при получении информации о контейнере:", e);
@@ -290,8 +383,48 @@
           console.log(`Итоги для контейнера ${containerNo}:`, containerTotals);
 
           const tableHtml = `
-            <div class="mb-4  pb-0 bg-slate-50">
-              <div class="px-6 py-3 bg-slate-200 rounded mb-0">
+            <div class="mb-6 mt-6 pb-0 bg-slate-50 rounded-2xl">
+              <div class="px-0 py-0 bg-slate-700 rounded-2xl mb-0">
+
+                <!-- Информация об инвойсе -->
+                <div class="mt-2 mb-2 bg-slate-100 rounded-lg p-3 border border-slate-200">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                      <div class="flex items-center">
+                        <div class="w-6 h-6 bg-orange-400 rounded flex items-center justify-center border border-orange-500 mr-2">
+                          <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                          </svg>
+                        </div>
+                        <span class="text-sm font-semibold text-slate-800">Номер Инвойса:</span>
+                      </div>
+                      <div 
+                        class="bg-slate-200 border border-slate-300 rounded px-2 py-1 cursor-pointer hover:bg-slate-300 transition-colors duration-200"
+                        onclick="copyToClipboard('${containerInvoice}', 'Номер инвойса скопирован')"
+                        title="Кликните для копирования номера инвойса"
+                      >
+                        <span class="text-sm text-slate-900 font-medium">${containerInvoice}</span>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                      <div class="flex items-center">
+                        <div class="w-6 h-6 bg-purple-400 rounded flex items-center justify-center border border-purple-500 mr-2">
+                          <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                          </svg>
+                        </div>
+                        <span class="text-sm font-semibold text-slate-800">Дата:</span>
+                      </div>
+                      <div 
+                        class="bg-slate-200 border border-slate-300 rounded px-2 py-1 cursor-pointer hover:bg-slate-300 transition-colors duration-200"
+                        onclick="copyToClipboard('${formatDate(containerDateInvoice)}', 'Дата инвойса скопирована')"
+                        title="Кликните для копирования даты инвойса"
+                      >
+                        <span class="text-sm text-slate-900 font-medium">${formatDate(containerDateInvoice)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <!-- Подробная информация об отправителе и получателе -->
                 <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -307,13 +440,21 @@
                     <div class="space-y-2">
                       <div>
                         <div class="text-xs font-medium text-slate-700 mb-1">Название</div>
-                        <div class="bg-slate-100 border border-slate-300 rounded p-1">
+                        <div 
+                          class="bg-slate-100 border border-slate-300 rounded p-1 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
+                          onclick="copyToClipboard('${containerSenderInfo}', 'Название отправителя скопировано')"
+                          title="Кликните для копирования названия отправителя"
+                        >
                           <div class="text-sm text-slate-900 break-words leading-relaxed font-medium">${containerSenderInfo}</div>
                         </div>
                       </div>
                       <div>
                         <div class="text-xs font-medium text-slate-700 mb-1">Адрес</div>
-                        <div class="bg-slate-100 border border-slate-300 rounded p-1">
+                        <div 
+                          class="bg-slate-100 border border-slate-300 rounded p-1 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
+                          onclick="copyToClipboard('${containerSenderAddress || 'Нет данных'}', 'Адрес отправителя скопирован')"
+                          title="Кликните для копирования адреса отправителя"
+                        >
                           <div class="text-sm text-slate-900 break-words leading-relaxed font-medium">${containerSenderAddress || 'Нет данных'}</div>
                         </div>
                       </div>
@@ -332,13 +473,21 @@
                     <div class="space-y-2">
                       <div>
                         <div class="text-xs font-medium text-slate-700 mb-1">Название</div>
-                        <div class="bg-slate-100 border border-slate-300 rounded p-1">
+                        <div 
+                          class="bg-slate-100 border border-slate-300 rounded p-1 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
+                          onclick="copyToClipboard('${containerRecipientInfo}', 'Название получателя скопировано')"
+                          title="Кликните для копирования названия получателя"
+                        >
                           <div class="text-sm text-slate-900 break-words leading-relaxed font-medium">${containerRecipientInfo}</div>
                         </div>
                       </div>
                       <div>
                         <div class="text-xs font-medium text-slate-700 mb-1">Адрес</div>
-                        <div class="bg-slate-100 border border-slate-300 rounded p-1">
+                        <div 
+                          class="bg-slate-100 border border-slate-300 rounded p-1 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
+                          onclick="copyToClipboard('${containerRecipientAddress || 'Нет данных'}', 'Адрес получателя скопирован')"
+                          title="Кликните для копирования адреса получателя"
+                        >
                           <div class="text-sm text-slate-900 break-words leading-relaxed font-medium">${containerRecipientAddress || 'Нет данных'}</div>
                         </div>
                       </div>
@@ -346,7 +495,7 @@
                   </div>
                 </div>
 
-                <div class="flex justify-between items-center cursor-pointer bg-slate-100 hover:bg-slate-300 transition-colors duration-200 rounded-lg p-2 mt-2 " onclick="toggleContainer('${containerNo}')">
+                <div class="flex justify-between items-center cursor-pointer bg-slate-50  hover:bg-slate-300 transition-colors duration-200 rounded-lg p-2 mt-2 " onclick="toggleContainer('${containerNo}')">
                   <div class="flex items-center">
                     <button
                       onclick="event.stopPropagation(); toggleContainer('${containerNo}')"
@@ -360,22 +509,20 @@
                     <h3 class="text-lg font-semibold text-slate-800">
                       Контейнер ${
                         Object.keys(containerData).indexOf(containerNo) + 1
-                      }: ${containerNo}
+                      }: 
+                      <span 
+                        class="bg-slate-50 border-2 border-slate-400 hover:bg-slate-700 hover:border-slate-900 hover:text-slate-50 px-2 py-1 rounded cursor-pointer transition-colors duration-200"
+                        onclick="event.stopPropagation(); copyContainerNoToClipboard('${containerNo}')"
+                        title="Кликните для копирования номера контейнера"
+                      >
+                        ${containerNo}
+                      </span>
                       <span class="text-sm font-normal text-slate-600 ml-2">(${
                         rows.length
                       } позиций)</span>
                     </h3>
                   </div>
                   <div class="flex space-x-2" onclick="event.stopPropagation()">
-                    <button
-                      onclick="copyContainerNoToClipboard('${containerNo}')"
-                      class="inline-flex items-center px-3 py-1 bg-white text-slate-800 text-sm border border-gray-300 font-medium rounded-lg hover:bg-blue-600 hover:text-white transition-colors duration-200 shadow-sm"
-                    >
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                      </svg>
-                      Скопировать номер контейнера
-                    </button>
                     <button
                       onclick="copyContainerToClipboard('${containerNo}')"
                       class="inline-flex items-center px-3 py-1 bg-white text-slate-800 text-sm border border-gray-300 font-medium rounded-lg hover:bg-blue-600 hover:text-white transition-colors duration-200 shadow-sm"
@@ -415,6 +562,8 @@
                                   <option value="CS">CS</option>
                                   <option value="PP">PP</option>
                                   <option value="FR">FR</option>
+                                  <option value="PX">PX</option>
+                                  <option value="NF">NF</option>
                                 </select>
                               </div>
                             ` : header === "Информация об упаковке (0-БЕЗ, 1 С)" ? `
@@ -472,6 +621,12 @@
                                             data-row-index="${globalRowIndex}"
                                             data-container="${containerNo}"
                                         >
+                                            <option value="BG" ${
+                                              value === "BG" ? "selected" : ""
+                                            }>BG</option>
+                                            <option value="BX" ${
+                                              value === "BX" ? "selected" : ""
+                                            }>BX</option>
                                             <option value="CT" ${
                                               value === "CT" ? "selected" : ""
                                             }>CT</option>
@@ -484,15 +639,15 @@
                                             <option value="PP" ${
                                               value === "PP" ? "selected" : ""
                                             }>PP</option>
-                                            <option value="BG" ${
-                                              value === "BG" ? "selected" : ""
-                                            }>BG</option>
-                                            <option value="BX" ${
-                                              value === "BX" ? "selected" : ""
-                                            }>BX</option>
                                             <option value="FR" ${
                                               value === "FR" ? "selected" : ""
                                             }>FR</option>
+                                            <option value="PX" ${
+                                              value === "PX" ? "selected" : ""
+                                            }>PX</option>
+                                            <option value="NF" ${
+                                              value === "NF" ? "selected" : ""
+                                            }>NF</option>
                                         </select>
                                     `
                                         : key === "Информация об упаковке (0-БЕЗ, 1 С)"
@@ -552,8 +707,6 @@
           tableWrapper.insertAdjacentHTML("beforeend", tableHtml);
         });
 
-        // Добавляем итоговую таблицу с калькуляцией в конце
-        addCalcTotalsTable();
 
         // Добавляем функцию для сворачивания/разворачивания контейнеров
         window.toggleContainer = function (containerNo) {
@@ -572,83 +725,8 @@
         };
       }
 
-      // Добавляем итоговую таблицу с калькуляцией
-      function addCalcTotalsTable() {
-        console.log("addCalcTotalsTable вызвана");
-        
-        const savedData = localStorage.getItem("mapato_data");
-        if (!savedData) {
-          console.log("Нет данных в localStorage для калькуляции");
-          return;
-        }
-
-        const data = JSON.parse(savedData);
-        const calc = data.calc;
-        
-        console.log("Данные калькуляции:", calc);
-        
-        if (!calc) {
-          console.log("Нет данных калькуляции");
-          return;
-        }
-
-        const calcNames = {
-          calc_quantity: "Кол-во мест",
-          calc_weight: "Вес брутто", 
-          calc_amount: "Сумма",
-        };
-
-        const tableContainer = document.querySelector(
-          ".bg-white.rounded-lg.shadow-sm.border.border-slate-200.overflow-hidden"
-        );
-        const tableWrapper = tableContainer.querySelector(".overflow-x-auto");
-
-        const calcTableHtml = `
-          <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-4">
-            <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-4 py-3">
-              <h2 class="text-base font-medium text-white flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                </svg>
-                Рассчитанные данные
-              </h2>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="w-full border-collapse text-sm" style="table-layout: fixed;">
-                <thead class="bg-slate-50 border-b border-slate-200">
-                  <tr>
-                    <th class="px-3 py-3 text-left text-xs font-semibold text-slate-700 tracking-normal border-r border-slate-200" style="width: 50%;">Показатель</th>
-                    <th class="px-3 py-3 text-left text-xs font-semibold text-slate-700 tracking-normal border-r border-slate-200" style="width: 50%;">Значение</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">
-                  ${Object.entries(calc)
-                    .map(([key, value]) => `
-                      <tr class="hover:bg-slate-50 transition-colors duration-150 bg-white">
-                        <td class="px-3 py-2 text-sm text-slate-900 border-r border-slate-200">
-                          ${calcNames[key] || key}
-                        </td>
-                        <td class="px-3 py-2 text-sm text-slate-900 font-semibold">
-                          ${formatNumber(value)}
-                        </td>
-                      </tr>
-                    `)
-                    .join('')}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        `;
-
-        tableWrapper.insertAdjacentHTML("beforeend", calcTableHtml);
-      }
 
 
-      // Generate summary for calc (legacy function - now handled by addCalcTotalsTable)
-      function generateCalc(calc) {
-        // Эта функция больше не используется, так как калькуляция отображается в отдельной таблице
-        return;
-      }
 
 
       // Copy table to clipboard
@@ -671,8 +749,18 @@
         //let text = `Контейнер: ${containerNo}\n`;
         let text = "";
 
-        // Get rows for this container
+        // Get rows for this container, excluding the totals row
         containerTable.querySelectorAll("tbody tr").forEach((row) => {
+          // Проверяем, является ли строка строкой итогов
+          const isTotalsRow = row.classList.contains('bg-slate-100') && 
+                             row.classList.contains('border-t-2') && 
+                             row.classList.contains('border-slate-300');
+          
+          // Пропускаем строку итогов
+          if (isTotalsRow) {
+            return;
+          }
+          
           const cells = [...row.querySelectorAll("td")].map((td) => {
             // Проверяем, есть ли в ячейке селект для вида упаковки
             const packageSelect = td.querySelector("select.package-type-select");
@@ -715,6 +803,21 @@
           .catch(() => showToast("Ошибка копирования", "error"));
       }
 
+      function copyContainerNoToClipboard(containerNo) {
+        if (!containerNo) {
+          showToast("Нет номера контейнера для копирования", "error");
+          return;
+        }
+        
+        navigator.clipboard.writeText(containerNo)
+          .then(() => {
+            showToast(`Номер контейнера ${containerNo} скопирован в буфер обмена!`);
+          })
+          .catch((err) => {
+            console.error("Ошибка копирования номера контейнера:", err);
+            showToast("Ошибка копирования номера контейнера", "error");
+          });
+      }
 
       function clearLocalData() {
         localStorage.removeItem("mapato_data");
@@ -915,10 +1018,138 @@
         }
       }
 
+      // Функции поиска
+      let originalContainerData = null;
+      let filteredContainerData = null;
+
+      function initializeSearch() {
+        const searchInput = document.getElementById("search-input");
+        const clearBtn = document.getElementById("clear-search-btn");
+        
+        if (searchInput) {
+          searchInput.addEventListener("input", handleSearch);
+        }
+        
+        if (clearBtn) {
+          clearBtn.addEventListener("click", clearSearch);
+        }
+      }
+
+      function handleSearch(event) {
+        const searchTerm = event.target.value.toLowerCase().trim();
+        const clearBtn = document.getElementById("clear-search-btn");
+        
+        // Показываем/скрываем кнопку очистки
+        if (searchTerm) {
+          clearBtn.style.display = "block";
+        } else {
+          clearBtn.style.display = "none";
+        }
+        
+        if (!searchTerm) {
+          // Если поиск пустой, показываем все контейнеры
+          restoreAllContainers();
+          return;
+        }
+        
+        // Сохраняем оригинальные данные при первом поиске
+        if (!originalContainerData) {
+          const savedData = localStorage.getItem("mapato_data");
+          if (savedData) {
+            const data = JSON.parse(savedData);
+            originalContainerData = data.containers;
+          }
+        }
+        
+        // Фильтруем контейнеры
+        filterContainers(searchTerm);
+      }
+
+      function filterContainers(searchTerm) {
+        if (!originalContainerData) return;
+        
+        filteredContainerData = {};
+        
+        Object.entries(originalContainerData).forEach(([containerNo, rows]) => {
+          const matchingRows = rows.filter(row => {
+            // Ищем по различным полям
+            return Object.values(row).some(value => {
+              if (typeof value === 'string' || typeof value === 'number') {
+                return value.toString().toLowerCase().includes(searchTerm);
+              }
+              return false;
+            });
+          });
+          
+          if (matchingRows.length > 0) {
+            filteredContainerData[containerNo] = matchingRows;
+          }
+        });
+        
+        // Обновляем отображение
+        updateContainerDisplay();
+      }
+
+      function updateContainerDisplay() {
+        const tableContainer = document.querySelector(
+          ".bg-white.rounded-lg.shadow-sm.border.border-slate-200.overflow-hidden"
+        );
+        const tableWrapper = tableContainer.querySelector(".overflow-x-auto");
+        
+        // Очищаем существующие таблицы
+        tableWrapper.innerHTML = "";
+        
+        // Генерируем новые таблицы с отфильтрованными данными
+        if (filteredContainerData && Object.keys(filteredContainerData).length > 0) {
+          generateGroupedTables(filteredContainerData);
+        } else {
+          // Показываем сообщение о том, что ничего не найдено
+          tableWrapper.innerHTML = `
+            <div class="text-center py-8 text-slate-500">
+              <svg class="w-16 h-16 text-slate-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <p class="text-lg font-semibold text-slate-600">Ничего не найдено</p>
+              <p class="text-slate-500 mt-2">Попробуйте изменить поисковый запрос</p>
+            </div>
+          `;
+        }
+      }
+
+      function restoreAllContainers() {
+        if (!originalContainerData) return;
+        
+        filteredContainerData = null;
+        
+        const tableContainer = document.querySelector(
+          ".bg-white.rounded-lg.shadow-sm.border.border-slate-200.overflow-hidden"
+        );
+        const tableWrapper = tableContainer.querySelector(".overflow-x-auto");
+        
+        // Очищаем существующие таблицы
+        tableWrapper.innerHTML = "";
+        
+        // Генерируем таблицы с оригинальными данными
+        generateGroupedTables(originalContainerData);
+      }
+
+      function clearSearch() {
+        const searchInput = document.getElementById("search-input");
+        const clearBtn = document.getElementById("clear-search-btn");
+        
+        searchInput.value = "";
+        clearBtn.style.display = "none";
+        
+        restoreAllContainers();
+      }
 
       // Удален обработчик для неиспользуемой кнопки копирования
       document.getElementById("save-btn").addEventListener("click", saveDataToServer);
-      fetchData();
+      
+      // Инициализируем поиск после загрузки данных
+      fetchData().then(() => {
+        initializeSearch();
+      });
     </script>
   </body>
 </html>

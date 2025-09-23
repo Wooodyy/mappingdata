@@ -140,8 +140,50 @@
             return code1 === code2;
           }
           
+          // Для коммерческого описания товара используем специальную логику
+          if (header === 'Коммерческое описание товара') {
+            // Проверяем в обе стороны: слова из более короткого описания должны входить в более длинное
+            const processed1 = str1.replace(/[^a-zA-Zа-яА-Я0-9\s]/g, '').toLowerCase().trim();
+            const processed2 = str2.replace(/[^a-zA-Zа-яА-Я0-9\s]/g, '').toLowerCase().trim();
+            
+            const words1 = processed1.split(/\s+/).filter(word => word.length > 0);
+            const words2 = processed2.split(/\s+/).filter(word => word.length > 0);
+            
+            // Если одно из описаний пустое, считаем совпадением
+            if (words1.length === 0 || words2.length === 0) {
+              return true;
+            }
+            
+            // Определяем, какое описание короче - его слова должны входить в более длинное
+            let shorterWords, longerWords;
+            if (words1.length <= words2.length) {
+              shorterWords = words1;
+              longerWords = words2;
+            } else {
+              shorterWords = words2;
+              longerWords = words1;
+            }
+            
+            // Проверяем, входят ли все слова из более короткого описания в более длинное
+            for (const shortWord of shorterWords) {
+              let wordFound = false;
+              for (const longWord of longerWords) {
+                if (longWord.includes(shortWord) || shortWord.includes(longWord)) {
+                  wordFound = true;
+                  break;
+                }
+              }
+              if (!wordFound) {
+                return false;
+              }
+            }
+            
+            return true;
+          }
+          
           return str1 === str2;
         }
+
 
         // Получаем данные для сравнения (если есть)
         let comparisonRows = [];

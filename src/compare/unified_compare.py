@@ -4,6 +4,22 @@ from src.models import ExcelData, Totals, Calc, DocumentInfo
 from src.processors.unified import process_unified
 
 
+def sort_records_by_criteria(records: List[dict]) -> List[dict]:
+    """
+    Сортирует записи по трём критериям:
+    1. Количество грузовых мест (по убыванию)
+    2. Вес брутто (по убыванию)
+    3. Коммерческое описание товара (по алфавиту, без учёта регистра)
+    """
+    def sort_key(record):
+        cargo_quantity = float(record.get("Количество грузовых мест") or 0)
+        gross_weight = float(record.get("Вес брутто") or 0)
+        description = str(record.get("Коммерческое описание товара") or "").strip().lower()
+        return (-cargo_quantity, -gross_weight, description)
+
+    return sorted(records, key=sort_key)
+
+
 def extract_xml_data_and_documents(xml_bytes: bytes, invoice_data=None) -> tuple[ExcelData, List[DocumentInfo]]:
     """Извлекает данные из XML в формате ExcelData и отдельно документы."""
     try:
@@ -203,9 +219,14 @@ def extract_xml_data_and_documents(xml_bytes: bytes, invoice_data=None) -> tuple
                                     has_error = True
                                     error_message = f"Ошибка: Документ с кодом {doc_kind} должен иметь дату равную дате инвойса ({invoice_date_formatted}), но получена дата: {doc_date_formatted}"
                         
+                        # Устанавливаем специальное название для документов с кодом 02013
+                        final_doc_name = doc_name
+                        if doc_kind == "02013" and doc_name == "":
+                            final_doc_name = "ЖД НАКЛАДНАЯ"
+                        
                         doc = DocumentInfo(
                             DocKindCode=doc_kind,
-                            DocName=doc_name,
+                            DocName=final_doc_name,
                             DocId=doc_id,
                             DocCreationDate=doc_date,
                             has_error=has_error,
@@ -305,9 +326,9 @@ def unified_compare_handler(invoice_bytes: bytes, decl_bytes: bytes, invoice_nam
     # Обрабатываем XML декларацию с данными инвойса для валидации документов
     xml_data, xml_documents = extract_xml_data_and_documents(decl_bytes, invoice_data)
     
-    # Сортируем записи в каждом контейнере по алфавиту по полю "Коммерческое описание товара"
+    # Сортируем записи в каждом контейнере по трем критериям
     for container_id, records in xml_data.containers.items():
-        xml_data.containers[container_id] = sorted(records, key=lambda x: x.get("Коммерческое описание товара", ""))
+        xml_data.containers[container_id] = sort_records_by_criteria(records)
     
     # Создаем результат согласно требуемой структуре
     result_data = {
@@ -325,11 +346,10 @@ def unified_compare_handler(invoice_bytes: bytes, decl_bytes: bytes, invoice_nam
             "invoice_data": None
         }
     }
-    # Сортируем записи в каждом контейнере по алфавиту по полю "Коммерческое описание товара"
+    # Сортируем записи в каждом контейнере по трем критериям
     if invoice_data:
-        # Сортируем записи в каждом контейнере по алфавиту по полю "Коммерческое описание товара"
         for container_id, records in invoice_data.containers.items():
-            invoice_data.containers[container_id] = sorted(records, key=lambda x: x.get("Коммерческое описание товара", ""))
+            invoice_data.containers[container_id] = sort_records_by_criteria(records)
     
     # Добавляем данные инвойса, если они есть
     if invoice_data:
