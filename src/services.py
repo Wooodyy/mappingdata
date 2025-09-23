@@ -2,6 +2,8 @@
 Модуль для обработки и сохранения данных в формате 1.json
 """
 import json
+import os
+from datetime import datetime
 from typing import Dict, Any, List
 from src.models import RawDataRequest
 
@@ -34,10 +36,12 @@ class DataHandler:
                 # Создаем данные в формате 1.json для этого контейнера
                 json_data = {
                     "container": container_no,
-                    "consignor": raw_data.sender or "отправитель",
-                    "consignee": raw_data.recipient or "получатель", 
-                    "seller": raw_data.seller,
-                    "buyer": raw_data.buyer,
+                    "consignor": raw_data.sender_name or raw_data.sender or "отправитель",
+                    "consignee": raw_data.recipient_name or raw_data.recipient or "получатель", 
+                    "sender_address": raw_data.sender_address or "",
+                    "recipient_address": raw_data.recipient_address or "",
+                    "invoice_number": raw_data.invoice or "",
+                    "invoice_date": raw_data.date_invoice or "",
                     "items": []
                 }
                 
@@ -97,9 +101,50 @@ class DataHandler:
                 "error": str(e)
             }
     
+    def save_json_file(self) -> Dict[str, Any]:
+        """
+        Сохраняет подготовленные данные в JSON файл
+        
+        Returns:
+            Dict с результатом операции и именем файла
+        """
+        try:
+            if not self.prepared_data:
+                return {
+                    "success": False,
+                    "error": "Нет подготовленных данных для сохранения"
+                }
+            
+            # Создаем папку для сохранения файлов, если её нет
+            output_dir = "static/downloads"
+            os.makedirs(output_dir, exist_ok=True)
+            
+            # Генерируем имя файла с текущей датой и временем
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"mapping_data_{timestamp}.json"
+            filepath = os.path.join(output_dir, filename)
+            
+            # Сохраняем данные в файл
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(self.prepared_data, f, ensure_ascii=False, indent=4)
+            
+            return {
+                "success": True,
+                "message": f"JSON файл успешно сохранен! Файл: {filename}",
+                "filename": filename,
+                "filepath": filepath,
+                "containers_saved": len(self.prepared_data)
+            }
+            
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
     def post_data(self) -> Dict[str, Any]:
         """
-        Выводит подготовленные данные в консоль (функция POST)
+        Выводит подготовленные данные в консоль и сохраняет в JSON файл
         
         Returns:
             Dict с результатом операции
@@ -115,10 +160,21 @@ class DataHandler:
             for json_data in self.prepared_data:
                 print(json.dumps(json_data, ensure_ascii=False, indent=4))
             
+            # Сохраняем данные в JSON файл
+            save_result = self.save_json_file()
+            
+            if not save_result["success"]:
+                return {
+                    "success": False,
+                    "error": f"Ошибка при сохранении файла: {save_result['error']}"
+                }
+            
             return {
                 "success": True,
-                "message": f"Данные успешно отправлены! Отправлено контейнеров: {len(self.prepared_data)}",
-                "containers_sent": len(self.prepared_data)
+                "message": f"Данные успешно отправлены и сохранены! Отправлено контейнеров: {len(self.prepared_data)}",
+                "containers_sent": len(self.prepared_data),
+                "filename": save_result["filename"],
+                "download_url": f"/download/{save_result['filename']}"
             }
             
         except Exception as e:
@@ -154,5 +210,7 @@ def handle_raw_data(raw_data: RawDataRequest) -> Dict[str, Any]:
         "success": True,
         "message": f"Данные успешно обработаны и отправлены! Подготовлено: {prepare_result['containers_processed']}, отправлено: {post_result['containers_sent']}",
         "containers_processed": prepare_result["containers_processed"],
-        "containers_sent": post_result["containers_sent"]
+        "containers_sent": post_result["containers_sent"],
+        "filename": post_result.get("filename"),
+        "download_url": post_result.get("download_url")
     }

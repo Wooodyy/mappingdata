@@ -6,6 +6,7 @@ def process_unified(file_content: bytes, CON_NUMBER: str = None) -> dict:
     
     storage = ExcelData(
         containers={},
+        container_info={},
         totals=Totals(),
         calc=Calc(),
         invoice="-",
@@ -64,6 +65,7 @@ def process_unified(file_content: bytes, CON_NUMBER: str = None) -> dict:
                     "Код ТН ВЭД": str(row.get('Unnamed: 1', '')).strip() if pd.notna(row.get('Unnamed: 1')) else '',
                     "Коммерческое описание товара": str(row.get('Unnamed: 2', '')).strip() if pd.notna(row.get('Unnamed: 2')) else '',
                     "Признак товара, свободного от применения запретов и ограничений (всегда 1)": 1,
+                    "Количество товара с указанием дополнительной ед.изм.": float(row.get('Unnamed: 3', 0)) if pd.notna(row.get('Unnamed: 3')) else 0,
                     "Информация об упаковке (0-БЕЗ, 1 С)": 1 if (pd.notna(row.get("Unnamed: 7")) and pd.notna(row.get("Unnamed: 6")) and float(row.get("Unnamed: 7", 0)) > float(row.get("Unnamed: 6", 0))) else 0,
                     #"Кол-во штук": float(row.get('Unnamed: 3', 0)) if pd.notna(row.get('Unnamed: 3')) else 0,
                     "Количество грузовых мест": float(row.get('Unnamed: 4', 0)) if pd.notna(row.get('Unnamed: 4')) else 0,
@@ -90,6 +92,16 @@ def process_unified(file_content: bytes, CON_NUMBER: str = None) -> dict:
                 recipient_name = str(row.get('Unnamed: 16', '')).strip() +" ДЛЯ "+ str(row.get('Unnamed: 18', '')).strip()
                 recipient_address = str(row.get('Unnamed: 17', '')).strip()
                
+                # Сохраняем информацию об отправителе и получателе для каждого контейнера
+                if container_number not in storage.container_info:
+                    storage.container_info[container_number] = {
+                        'sender_name': sender_name,
+                        'sender_address': sender_address,
+                        'recipient_name': recipient_name,
+                        'recipient_address': recipient_address
+                    }
+                
+                # Также сохраняем общую информацию для совместимости
                 storage.sender_name = sender_name
                 storage.sender_address = sender_address
                 storage.recipient_name = recipient_name
