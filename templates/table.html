@@ -113,10 +113,20 @@
 
     <script>
       function formatNumber(value) {
+        // Если это строка с множественными нулями, сначала очищаем её
+        if (typeof value === 'string') {
+          // Убираем лишние нули в конце
+          value = value.replace(/\.?0+$/, '');
+        }
+        
         const num = parseFloat(value);
         if (isNaN(num)) return value;
-        return num.toLocaleString('ru-RU', {
-          minimumFractionDigits: 2,
+        
+        // Округляем до 2 знаков после запятой, чтобы убрать лишние нули
+        const rounded = Math.round(num * 100) / 100;
+        
+        return rounded.toLocaleString('ru-RU', {
+          minimumFractionDigits: 0,
           maximumFractionDigits: 2
         });
       }
@@ -666,7 +676,14 @@
                                             }>1 - С</option>
                                         </select>
                                     `
-                                        : value
+                                        : (() => {
+                                          // Определяем числовые поля
+                                          const numericFields = ['Количество грузовых мест', 'Количество упаковок', 'Вес брутто', 'Сумма'];
+                                          if (numericFields.includes(key) && value !== null && value !== undefined && value !== '') {
+                                            return formatNumber(value);
+                                          }
+                                          return value;
+                                        })()
                                     }
                                 </td>
                             `
@@ -685,7 +702,7 @@
                             const width = columnWidths[header] || '7%';
                             
                             if (containerTotals.hasOwnProperty(header)) {
-                              const value = containerTotals[header].toFixed(2);
+                              const value = containerTotals[header];
                               return `<td class="px-3 py-2 bg-slate-300 text-sm text-slate-800 whitespace-nowrap border-r border-slate-200 font-semibold" style="width: ${width}; min-width: ${width}; max-width: ${width};">
                                 ${formatNumber(value)}
                               </td>`;

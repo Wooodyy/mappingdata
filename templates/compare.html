@@ -53,6 +53,26 @@
     </main>
 
     <script>
+      // Функция для форматирования чисел
+      function formatNumber(value) {
+        // Если это строка с множественными нулями, сначала очищаем её
+        if (typeof value === 'string') {
+          // Убираем лишние нули в конце
+          value = value.replace(/\.?0+$/, '');
+        }
+        
+        const num = parseFloat(value);
+        if (isNaN(num)) return value;
+        
+        // Округляем до 2 знаков после запятой, чтобы убрать лишние нули
+        const rounded = Math.round(num * 100) / 100;
+        
+        return rounded.toLocaleString('ru-RU', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2
+        });
+      }
+
       // Глобальная переменная для хранения общей структуры столбцов
       let globalHeaders = [];
       let globalColumnWidths = {};
@@ -196,14 +216,29 @@
         const rowsHtml = allRows.map((row, i) => `
           <tr class="hover:bg-slate-50 transition-colors duration-150 ${i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}">
             ${headers.map(header => {
-              const value = (row[header] ?? '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
+              // Определяем, является ли поле числовым
+              const numericFields = ['Количество грузовых мест', 'Количество упаковок', 'Вес брутто', 'Сумма'];
+              const isNumericField = numericFields.includes(header);
+              
+              let value;
+              if (isNumericField && row[header] !== null && row[header] !== undefined && row[header] !== '') {
+                value = formatNumber(row[header]);
+              } else {
+                value = (row[header] ?? '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
+              }
+              
               const width = globalColumnWidths[header] || '7%';
               
               // Проверяем состояние сравнения: 0 - равны (зеленый), 1 - неравны (красный), 2 - нет строки (фиолетовый)
               let comparisonState = 0; // по умолчанию равны (зеленый)
               if (comparisonRows.length > i) {
                 const comparisonRow = comparisonRows[i];
-                comparisonState = compareValues(row[header], comparisonRow[header], header) ? 0 : 1; // 0 - равны, 1 - неравны
+                // Для числовых полей сравниваем исходные значения, а не отформатированные
+                if (isNumericField) {
+                  comparisonState = compareValues(row[header], comparisonRow[header], header) ? 0 : 1;
+                } else {
+                  comparisonState = compareValues(row[header], comparisonRow[header], header) ? 0 : 1;
+                }
               } else {
                 comparisonState = 2; // нет строки для сравнения (фиолетовый)
               }
@@ -280,8 +315,17 @@
               const width = globalColumnWidths[header] || '7%';
               
               if (totals.hasOwnProperty(header)) {
-                const value = totals[header].toFixed(2);
-                const comparisonValue = comparisonTotals.hasOwnProperty(header) ? comparisonTotals[header].toFixed(2) : '';
+                // Округляем до 2 знаков после запятой, чтобы убрать лишние нули
+                const roundedValue = Math.round(totals[header] * 100) / 100;
+                const value = roundedValue.toLocaleString('ru-RU', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2
+                });
+                const roundedComparisonValue = comparisonTotals.hasOwnProperty(header) ? Math.round(comparisonTotals[header] * 100) / 100 : null;
+                const comparisonValue = roundedComparisonValue ? roundedComparisonValue.toLocaleString('ru-RU', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2
+                }) : '';
                 
                 let cellClass = '';
                 if (!comparisonValue) {
