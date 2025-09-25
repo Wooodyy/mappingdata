@@ -6,16 +6,18 @@ from src.processors.unified import process_unified
 
 def sort_records_by_criteria(records: List[dict]) -> List[dict]:
     """
-    Сортирует записи по трём критериям:
+    Сортирует записи по четырём критериям:
     1. Количество грузовых мест (по убыванию)
-    2. Вес брутто (по убыванию)
-    3. Коммерческое описание товара (по алфавиту, без учёта регистра)
+    2. Сумма (по убыванию)
+    3. Вес брутто (по убыванию)
+    4. Коммерческое описание товара (по алфавиту, без учёта регистра)
     """
     def sort_key(record):
         cargo_quantity = float(record.get("Количество грузовых мест") or 0)
+        sum_value = float(record.get("Сумма") or 0)
         gross_weight = float(record.get("Вес брутто") or 0)
         description = str(record.get("Коммерческое описание товара") or "").strip().lower()
-        return (-cargo_quantity, -gross_weight, description)
+        return (-cargo_quantity, -sum_value, -gross_weight, description)
 
     return sorted(records, key=sort_key)
 
