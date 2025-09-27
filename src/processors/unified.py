@@ -65,7 +65,6 @@ def process_unified(file_content: bytes, CON_NUMBER: str = None) -> dict:
                     "Код ТН ВЭД": str(row.get('Unnamed: 1', '')).strip()[:6] if pd.notna(row.get('Unnamed: 1')) else '',
                     "Коммерческое описание товара": str(row.get('Unnamed: 2', '')).strip() if pd.notna(row.get('Unnamed: 2')) else '',
                     "Признак товара, свободного от применения запретов и ограничений (всегда 1)": 1,
-                    "Количество товара с указанием дополнительной ед.изм.": float(row.get('Unnamed: 3', 0)) if pd.notna(row.get('Unnamed: 3')) else 0,
                     "Информация об упаковке (0-БЕЗ, 1 С)": 1 if (pd.notna(row.get("Unnamed: 7")) and pd.notna(row.get("Unnamed: 6")) and float(row.get("Unnamed: 7", 0)) > float(row.get("Unnamed: 6", 0))) else 0,
                     #"Кол-во штук": float(row.get('Unnamed: 3', 0)) if pd.notna(row.get('Unnamed: 3')) else 0,
                     "Количество грузовых мест": float(row.get('Unnamed: 4', 0)) if pd.notna(row.get('Unnamed: 4')) else 0,

@@ -763,37 +763,36 @@
           return;
         }
 
-        //let text = `Контейнер: ${containerNo}\n`;
+        // Получаем исходные данные из localStorage для корректного копирования числовых значений
+        const savedData = localStorage.getItem("mapato_data");
+        if (!savedData) {
+          showToast("Нет данных для копирования", "error");
+          return;
+        }
+
+        const data = JSON.parse(savedData);
+        const containerData = data.containers[containerNo];
+        
+        if (!containerData) {
+          showToast("Данные контейнера не найдены", "error");
+          return;
+        }
+
         let text = "";
 
-        // Get rows for this container, excluding the totals row
-        containerTable.querySelectorAll("tbody tr").forEach((row) => {
-          // Проверяем, является ли строка строкой итогов
-          const isTotalsRow = row.classList.contains('bg-slate-100') && 
-                             row.classList.contains('border-t-2') && 
-                             row.classList.contains('border-slate-300');
-          
-          // Пропускаем строку итогов
-          if (isTotalsRow) {
-            return;
-          }
-          
-          const cells = [...row.querySelectorAll("td")].map((td) => {
-            // Проверяем, есть ли в ячейке селект для вида упаковки
-            const packageSelect = td.querySelector("select.package-type-select");
-            if (packageSelect) {
-              // Если есть селект вида упаковки, берем его выбранное значение
-              return packageSelect.value;
-            }
-            // Проверяем, есть ли в ячейке селект для информации об упаковке
-            const packageInfoSelect = td.querySelector("select.package-info-select");
-            if (packageInfoSelect) {
-              // Если есть селект информации об упаковке, берем его выбранное значение
-              return packageInfoSelect.value;
-            }
-            // Иначе берем обычный текст
-            return td.textContent.trim();
-          });
+        // Копируем данные строк, используя исходные значения
+        containerData.forEach((row) => {
+          const cells = Object.entries(row)
+            .filter(([key, value]) => key !== "Case No")
+            .map(([key, value]) => {
+              // Для числовых полей возвращаем исходное значение без форматирования
+              const numericFields = ['Количество грузовых мест', 'Количество упаковок', 'Вес брутто', 'Сумма'];
+              if (numericFields.includes(key) && value !== null && value !== undefined && value !== '') {
+                // Возвращаем число без пробелов между разрядами
+                return parseFloat(value).toString();
+              }
+              return value;
+            });
           text += cells.join("\t") + "\n";
         });
 
