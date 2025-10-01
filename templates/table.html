@@ -6,6 +6,46 @@
     <title>Управление контейнерами</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .editable-cell {
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .editable-cell:hover {
+            background-color: #f3f4f6 !important;
+            border-radius: 4px;
+        }
+        
+        .editable-cell:hover::after {
+            content: "✏️";
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .editable-cell.editing {
+            background-color: #eff6ff !important;
+            border: 2px solid #3b82f6;
+            border-radius: 4px;
+        }
+        
+        .editable-cell input,
+        .editable-cell textarea {
+            background-color: white;
+            border: 1px solid #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        
+        .editable-cell input:focus,
+        .editable-cell textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+    </style>
     <script>
       tailwind.config = {
         theme: {
@@ -166,6 +206,227 @@
             </div>
             <span id="toast-message" class="text-sm font-medium">Успешно!</span>
       </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-4 text-white">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold">Редактирование товара</h3>
+                            <p class="text-sm text-primary-100" id="modal-container-info">Контейнер: -</p>
+                        </div>
+                    </div>
+                    <button onclick="closeEditModal()" class="text-white hover:text-gray-200 transition-colors duration-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+                <div class="space-y-6">
+                    <!-- Basic Information -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- TN VED Code -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Код ТН ВЭД *
+                            </label>
+                            <input 
+                                type="text"
+                                id="modal-tn-ved-code"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="Введите код ТН ВЭД..."
+                                maxlength="6"
+                            />
+                        </div>
+                        
+                        <!-- Container Number -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Номер контейнера
+                            </label>
+                            <input 
+                                type="text"
+                                id="modal-container-number"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="Номер контейнера..."
+                            />
+                        </div>
+                    </div>
+                    
+                    <!-- Commercial Description -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Коммерческое описание товара *
+                        </label>
+                        <textarea 
+                            id="modal-commercial-description"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
+                            rows="3"
+                            placeholder="Введите описание товара..."
+                        ></textarea>
+                    </div>
+                    
+                    <!-- Package Information -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Package Type -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Вид упаковки
+                            </label>
+                            <select 
+                                id="modal-package-type"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                            >
+                                <option value="BG">BG</option>
+                                <option value="BX">BX</option>
+                                <option value="CT">CT</option>
+                                <option value="PK">PK</option>
+                                <option value="CS">CS</option>
+                                <option value="PP">PP</option>
+                                <option value="FR">FR</option>
+                                <option value="PX">PX</option>
+                                <option value="NF">NF</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Package Info -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Информация об упаковке
+                            </label>
+                            <select 
+                                id="modal-package-info"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                            >
+                                <option value="0">0 - БЕЗ</option>
+                                <option value="1">1 - С</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Currency -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Валюта
+                            </label>
+                            <input 
+                                type="text"
+                                id="modal-currency"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="USD, EUR, RUB..."
+                                maxlength="3"
+                            />
+                        </div>
+                    </div>
+                    
+                    <!-- Quantities and Values -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Cargo Places -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Количество грузовых мест
+                            </label>
+                            <input 
+                                type="number"
+                                id="modal-cargo-places"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="0"
+                                step="0.01"
+                                min="0"
+                            />
+                        </div>
+                        
+                        <!-- Package Quantity -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Количество упаковок
+                            </label>
+                            <input 
+                                type="number"
+                                id="modal-package-quantity"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="0"
+                                step="0.01"
+                                min="0"
+                            />
+                        </div>
+                        
+                        <!-- Gross Weight -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Вес брутто (кг)
+                            </label>
+                            <input 
+                                type="number"
+                                id="modal-gross-weight"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="0"
+                                step="0.01"
+                                min="0"
+                            />
+                        </div>
+                        
+                        <!-- Amount -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Сумма
+                            </label>
+                            <input 
+                                type="number"
+                                id="modal-amount"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                placeholder="0"
+                                step="0.01"
+                                min="0"
+                            />
+                        </div>
+                    </div>
+                    
+                    <!-- System Fields (read-only) -->
+                    <div class="bg-gray-50 p-4 rounded-xl">
+                        <h4 class="text-sm font-medium text-gray-700 mb-3">Системные поля (только для чтения)</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">Признак товара</label>
+                                <div class="px-4 py-3 bg-gray-100 rounded-xl text-sm text-gray-700" id="modal-goods-prohibition">1</div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">Вид информации об упаковке</label>
+                                <div class="px-4 py-3 bg-gray-100 rounded-xl text-sm text-gray-700" id="modal-package-info-type">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="bg-gray-50 px-6 py-4 flex items-center justify-end space-x-3">
+                <button 
+                    onclick="closeEditModal()"
+                    class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors duration-200"
+                >
+                    Отмена
+                </button>
+                <button 
+                    onclick="saveEditModal()"
+                    class="px-6 py-2 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+                    Сохранить изменения
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -557,6 +818,9 @@
                                                 `}
                                             </th>
                                         `).join('')}
+                                        <th class="px-2 py-2 text-center text-xs font-medium text-gray-700 tracking-wide border-r border-gray-300" style="width: 50px; min-width: 50px; max-width: 50px;">
+                                            
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
@@ -566,6 +830,8 @@
                                                 <td class="px-3 py-1 text-sm text-gray-900 border-r border-gray-200" style="width: ${columnWidths[key] || '7%'}; min-width: ${columnWidths[key] || '7%'}; max-width: ${columnWidths[key] || '7%'};">
                                                     ${key === "Коммерческое описание товара" ? `
                                                         <div class="text-sm leading-relaxed" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-wrap: break-word;" title="${value}">${value}</div>
+                                                    ` : key === "Код ТН ВЭД" ? `
+                                                        <div class="text-sm">${value}</div>
                                                     ` : key === "Вид упаковки " ? `
                                                         <select 
                                                             class="package-type-select text-sm bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-full"
@@ -597,6 +863,17 @@
                                                         formatNumber(value) : value}
                                 </td>
                                             `).join('')}
+                                            <td class="px-2 py-1 text-center border-r border-gray-200" style="width: 50px; min-width: 50px; max-width: 50px;">
+                                                <button 
+                                                    onclick="openEditModal('${containerNo}', ${index})"
+                                                    class="w-6 h-6 bg-primary-600 hover:bg-primary-700 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md"
+                                                    title="Редактировать товар"
+                                                >
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                    </svg>
+                                                </button>
+                                            </td>
                         </tr>
                                     `).join('')}
                                     
@@ -611,6 +888,7 @@
                                                 return `<td class="px-3 py-2 border-r border-gray-200" style="width: ${columnWidths[header] || '7%'}; min-width: ${columnWidths[header] || '7%'}; max-width: ${columnWidths[header] || '7%'};"></td>`;
                             }
                                         }).join('')}
+                                        <td class="px-2 py-2 border-r border-gray-200" style="width: 50px; min-width: 50px; max-width: 50px;"></td>
                       </tr>
                   </tbody>
                 </table>
@@ -942,6 +1220,158 @@
             
             showToast(`Информация об упаковке изменена на ${value} для контейнера ${containerNo}`);
         }
+
+        // Modal functions
+        let currentEditData = null;
+        
+        function openEditModal(containerNo, rowIndex) {
+            const savedData = localStorage.getItem("mapato_data");
+            if (!savedData) {
+                showToast("Нет данных для редактирования", "error");
+                return;
+            }
+            
+            const data = JSON.parse(savedData);
+            const containerData = data.containers[containerNo];
+            
+            if (!containerData || !containerData[rowIndex]) {
+                showToast("Данные товара не найдены", "error");
+                return;
+            }
+            
+            const rowData = containerData[rowIndex];
+            currentEditData = { containerNo, rowIndex, rowData };
+            
+            // Fill modal with current data
+            document.getElementById('modal-container-info').textContent = `Контейнер: ${containerNo}`;
+            
+            // Fill editable fields
+            document.getElementById('modal-tn-ved-code').value = rowData['Код ТН ВЭД'] || '';
+            document.getElementById('modal-container-number').value = rowData['Номер контейнера'] || '';
+            document.getElementById('modal-commercial-description').value = rowData['Коммерческое описание товара'] || '';
+            document.getElementById('modal-package-type').value = rowData['Вид упаковки '] || 'PK';
+            document.getElementById('modal-package-info').value = rowData['Информация об упаковке (0-БЕЗ, 1 С)'] || '0';
+            document.getElementById('modal-currency').value = rowData['Валюта'] || '';
+            document.getElementById('modal-cargo-places').value = rowData['Количество грузовых мест'] || '';
+            document.getElementById('modal-package-quantity').value = rowData['Количество упаковок'] || '';
+            document.getElementById('modal-gross-weight').value = rowData['Вес брутто'] || '';
+            document.getElementById('modal-amount').value = rowData['Сумма'] || '';
+            
+            // Fill read-only system fields
+            document.getElementById('modal-goods-prohibition').textContent = rowData['Признак товара, свободного от применения запретов и ограничений (всегда 1)'] || '1';
+            document.getElementById('modal-package-info-type').textContent = rowData['Вид информации об упаковке (всегда 0)'] || '0';
+            
+            // Show modal
+            document.getElementById('edit-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            // Focus on first input
+            setTimeout(() => {
+                document.getElementById('modal-tn-ved-code').focus();
+            }, 100);
+        }
+        
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            currentEditData = null;
+        }
+        
+        function saveEditModal() {
+            if (!currentEditData) {
+                showToast("Нет данных для сохранения", "error");
+                return;
+            }
+            
+            // Get all field values
+            const tnVedCode = document.getElementById('modal-tn-ved-code').value.trim();
+            const containerNumber = document.getElementById('modal-container-number').value.trim();
+            const commercialDescription = document.getElementById('modal-commercial-description').value.trim();
+            const packageType = document.getElementById('modal-package-type').value;
+            const packageInfo = parseInt(document.getElementById('modal-package-info').value);
+            const currency = document.getElementById('modal-currency').value.trim();
+            const cargoPlaces = parseFloat(document.getElementById('modal-cargo-places').value) || 0;
+            const packageQuantity = parseFloat(document.getElementById('modal-package-quantity').value) || 0;
+            const grossWeight = parseFloat(document.getElementById('modal-gross-weight').value) || 0;
+            const amount = parseFloat(document.getElementById('modal-amount').value) || 0;
+            
+            // Validation
+            if (!tnVedCode) {
+                showToast("Код ТН ВЭД обязателен для заполнения", "error");
+                document.getElementById('modal-tn-ved-code').focus();
+                return;
+            }
+            
+            if (!commercialDescription) {
+                showToast("Коммерческое описание товара обязательно для заполнения", "error");
+                document.getElementById('modal-commercial-description').focus();
+                return;
+            }
+            
+            if (tnVedCode.length > 6) {
+                showToast("Код ТН ВЭД не должен превышать 6 символов", "error");
+                document.getElementById('modal-tn-ved-code').focus();
+                return;
+            }
+            
+            if (currency && currency.length > 3) {
+                showToast("Код валюты не должен превышать 3 символа", "error");
+                document.getElementById('modal-currency').focus();
+                return;
+            }
+            
+            // Update localStorage
+            const savedData = localStorage.getItem("mapato_data");
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                const { containerNo, rowIndex } = currentEditData;
+                
+                if (data.containers && data.containers[containerNo] && data.containers[containerNo][rowIndex]) {
+                    // Update all fields
+                    data.containers[containerNo][rowIndex]['Код ТН ВЭД'] = tnVedCode;
+                    data.containers[containerNo][rowIndex]['Номер контейнера'] = containerNumber;
+                    data.containers[containerNo][rowIndex]['Коммерческое описание товара'] = commercialDescription;
+                    data.containers[containerNo][rowIndex]['Вид упаковки '] = packageType;
+                    data.containers[containerNo][rowIndex]['Информация об упаковке (0-БЕЗ, 1 С)'] = packageInfo;
+                    data.containers[containerNo][rowIndex]['Валюта'] = currency;
+                    data.containers[containerNo][rowIndex]['Количество грузовых мест'] = cargoPlaces;
+                    data.containers[containerNo][rowIndex]['Количество упаковок'] = packageQuantity;
+                    data.containers[containerNo][rowIndex]['Вес брутто'] = grossWeight;
+                    data.containers[containerNo][rowIndex]['Сумма'] = amount;
+                    
+                    localStorage.setItem("mapato_data", JSON.stringify(data));
+                    
+                    // Refresh the table display
+                    refreshTableDisplay();
+                    
+                    showToast("Товар успешно обновлен");
+                    closeEditModal();
+                } else {
+                    showToast("Ошибка при обновлении данных", "error");
+                }
+            } else {
+                showToast("Нет данных для обновления", "error");
+            }
+        }
+        
+        function refreshTableDisplay() {
+            // Re-fetch and regenerate containers to show updated data
+            fetchData();
+        }
+        
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !document.getElementById('edit-modal').classList.contains('hidden')) {
+                closeEditModal();
+            }
+        });
+        
+        // Close modal on backdrop click
+        document.getElementById('edit-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
+            }
+        });
 
         // Event listeners
       document.getElementById("save-btn").addEventListener("click", saveDataToServer);
