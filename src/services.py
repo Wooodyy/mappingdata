@@ -32,16 +32,25 @@ class DataHandler:
             for container_no, container_rows in raw_data.containers.items():
                 if not container_rows:
                     continue
+                
+                # Получаем информацию о контейнере (включая номер инвойса)
+                container_info = raw_data.container_info.get(container_no, {})
+                container_invoice = container_info.get('invoice', '') or raw_data.invoice or ""
+                container_invoice_date = container_info.get('date_invoice', '') or raw_data.date_invoice or ""
+                container_sender_name = container_info.get('sender_name', '') or raw_data.sender_name or raw_data.sender or "отправитель"
+                container_recipient_name = container_info.get('recipient_name', '') or raw_data.recipient_name or raw_data.recipient or "получатель"
+                container_sender_address = container_info.get('sender_address', '') or raw_data.sender_address or ""
+                container_recipient_address = container_info.get('recipient_address', '') or raw_data.recipient_address or ""
                     
                 # Создаем данные в формате 1.json для этого контейнера
                 json_data = {
                     "container": container_no,
-                    "consignor": raw_data.sender_name or raw_data.sender or "отправитель",
-                    "consignee": raw_data.recipient_name or raw_data.recipient or "получатель", 
-                    "sender_address": raw_data.sender_address or "",
-                    "recipient_address": raw_data.recipient_address or "",
-                    "invoice_number": raw_data.invoice or "",
-                    "invoice_date": raw_data.date_invoice or "",
+                    "consignor": container_sender_name,
+                    "consignee": container_recipient_name, 
+                    "sender_address": container_sender_address,
+                    "recipient_address": container_recipient_address,
+                    "invoice_number": container_invoice,
+                    "invoice_date": container_invoice_date,
                     "items": []
                 }
                 

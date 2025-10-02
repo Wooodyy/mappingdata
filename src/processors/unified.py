@@ -122,7 +122,7 @@ def process_unified(file_content: bytes, CON_NUMBER: str = None) -> dict:
                     'sender_address': sender_address,
                     'recipient_name': recipient_name,
                     'recipient_address': recipient_address,
-                    'invoice': invoice_number,
+                    'invoice': str(row.get('Unnamed: 11', '')).strip() if pd.notna(row.get('Unnamed: 11')) else '',
                     'date_invoice': str(row.get('Unnamed: 12', '')).strip() if pd.notna(row.get('Unnamed: 12')) else ''
                 }
             
@@ -147,7 +147,6 @@ def process_unified(file_content: bytes, CON_NUMBER: str = None) -> dict:
     storage.calc.calc_quantity = round(calculated_total_quantity, 2)
     storage.calc.calc_weight = round(calculated_total_weight, 2)
     storage.calc.calc_amount = round(calculated_total_amount, 2)
-    
     # Устанавливаем значения по умолчанию для totals (можно будет обновить при необходимости)
     storage.totals.total_quantity = round(calculated_total_quantity, 2)
     storage.totals.total_weight = round(calculated_total_weight, 2)

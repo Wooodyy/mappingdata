@@ -583,10 +583,9 @@
             // Есть invoice_data, но нет контейнеров - показываем ошибку
             tableHtml += `
               <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-                <h3 class="text-base font-medium text-amber-800 mb-2">Проблема с обработкой инвойса</h3>
-                <p class="text-amber-700 text-sm">Инвойс был обработан, но данные контейнеров не найдены.</p>
-                <pre class="mt-2 text-xs text-amber-600 bg-amber-100 p-2 rounded max-h-32 overflow-y-auto">${JSON.stringify(data.invoice_data, null, 2)}</pre>
-              </div>
+                <h3 class="text-base font-medium text-amber-800 mb-2">Этого контейнера нету в инвойсе</h3>
+                <p class="text-amber-700 text-sm">Инвойс был обработан, но внутри именно этого контейнера нет, проверьте данные инвойса есть ли там этот контейнер</p>
+                </div>
             `;
           } else {
             // Совсем нет данных об инвойсе
