@@ -254,6 +254,7 @@ def extract_xml_data_and_documents(xml_bytes: bytes, invoice_data=None) -> tuple
             goods_description = find_first_text(item, "GoodsDescriptionText")
             gross_mass = find_first_text(item, "UnifiedGrossMassMeasure")
             goods_prohibition_free_code = find_first_text(item, "GoodsProhibitionFreeCode")
+            package_availability_code = find_first_text(item, "PackageAvailabilityCode")
             cargo_quantity = find_first_text(item, "CargoQuantity")
             package_quantity = find_first_text(item, "PackageQuantity")
             container_id = find_first_text(item, "ContainerId")
@@ -269,7 +270,7 @@ def extract_xml_data_and_documents(xml_bytes: bytes, invoice_data=None) -> tuple
                 "Код ТН ВЭД": int(commodity_code) if commodity_code and commodity_code.isdigit() else 0,
                 "Коммерческое описание товара": goods_description,
                 "Признак товара, свободного от применения запретов и ограничений (всегда 1)": 1 if goods_prohibition_free_code == "C" else 0,
-                "Информация об упаковке (0-БЕЗ, 1 С)": 1,
+                "Информация об упаковке (0-БЕЗ, 1 С)": package_availability_code,
                 "Количество грузовых мест": float(cargo_quantity) if cargo_quantity else 0,
                 "Вид информации об упаковке (всегда 0)": 0,
                 "Вид упаковки ": package_kind if package_kind else "PK",
