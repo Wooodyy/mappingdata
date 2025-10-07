@@ -5,5 +5,3 @@ python-multipart
 pydantic
 pandas
 openpyxl
-sqlalchemy
-psycopg2-binary
