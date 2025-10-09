@@ -22,6 +22,10 @@ class ExcelData(BaseModel):
     sender_address: str = ""  # Адрес отправителя из XML
     recipient_name: str = ""  # Название получателя из XML
     recipient_address: str = ""  # Адрес получателя из XML
+    departure_country_code: str = ""  # Код страны отправления (из XML)
+    destination_country_code: str = ""  # Код страны назначения (из XML)
+    seal_quantity: int = 0  # Количество пломб (из XML)
+    seal_ids: List[str] = []  # Список номеров пломб (из XML)
 
 class RawDataRequest(BaseModel):
     """Модель для принятия сырых данных из localStorage"""

@@ -82,6 +82,27 @@ def extract_xml_data_and_documents(xml_bytes: bytes, invoice_data=None) -> tuple
         # Объединяем компоненты адреса получателя в одну строку
         recipient_address = ", ".join(recipient_address_parts) if recipient_address_parts else ""
         
+        # Определяем коды стран отправления и назначения
+        departure_country_code = ""
+        destination_country_code = ""
+        for elem in root.iter():
+            if elem.tag.endswith("DepartureCountryCode") and (elem.text or "").strip():
+                departure_country_code = (elem.text or "").strip()
+            if elem.tag.endswith("DestinationCountryCode") and (elem.text or "").strip():
+                destination_country_code = (elem.text or "").strip()
+
+        # Пломбы (количество и номера)
+        seal_quantity = 0
+        seal_ids: List[str] = []
+        for elem in root.iter():
+            if elem.tag.endswith("SealQuantity") and (elem.text or "").strip():
+                try:
+                    seal_quantity = int((elem.text or "").strip())
+                except Exception:
+                    pass
+            if elem.tag.endswith("CustomsIdentificationMeansId") and (elem.text or "").strip():
+                seal_ids.append((elem.text or "").strip())
+
         # Создаем ExcelData
         excel_data = ExcelData(
             containers={},
@@ -91,6 +112,10 @@ def extract_xml_data_and_documents(xml_bytes: bytes, invoice_data=None) -> tuple
             sender_address=sender_address,
             recipient_name=recipient_name,
             recipient_address=recipient_address,
+            departure_country_code=departure_country_code,
+            destination_country_code=destination_country_code,
+            seal_quantity=seal_quantity,
+            seal_ids=seal_ids,
         )
         
         documents = []
@@ -334,7 +359,7 @@ def unified_compare_handler(invoice_bytes: bytes, decl_bytes: bytes, invoice_nam
         xml_data.containers[container_id] = sort_records_by_criteria(records)
     
     # Создаем результат согласно требуемой структуре
-    result_data = {
+        result_data = {
         "success": True,
         "data": {
             "xml_data": {
@@ -343,7 +368,11 @@ def unified_compare_handler(invoice_bytes: bytes, decl_bytes: bytes, invoice_nam
                 "sender_name": xml_data.sender_name,
                 "sender_address": xml_data.sender_address,
                 "recipient_name": xml_data.recipient_name,
-                "recipient_address": xml_data.recipient_address,
+                    "recipient_address": xml_data.recipient_address,
+                    "departure_country_code": xml_data.departure_country_code,
+                    "destination_country_code": xml_data.destination_country_code,
+                    "seal_quantity": xml_data.seal_quantity,
+                    "seal_ids": xml_data.seal_ids,
             },
             "xml_documents": [doc.dict() for doc in xml_documents],
             "invoice_data": None

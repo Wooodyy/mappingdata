@@ -494,7 +494,7 @@
               }
               
               // Секция данных из XML
-              if (data.xml_data && (data.xml_data.sender_name || data.xml_data.sender_address || data.xml_data.recipient_name || data.xml_data.recipient_address)) {
+              if (data.xml_data && (data.xml_data.sender_name || data.xml_data.sender_address || data.xml_data.recipient_name || data.xml_data.recipient_address || data.xml_data.departure_country_code || data.xml_data.destination_country_code)) {
                 const xmlData = data.xml_data;
                 
                 infoHtml += `
@@ -562,12 +562,118 @@
                   </div>
                 `;
                 
+                
                 infoHtml += `
                     </div>
                   </div>
                 `;
               }
               
+             
+              
+              // Три вертикальных блока: Страны, Пломбы, ЖД накладная
+              (function appendTripletBlocks() {
+                const xmlData = data.xml_data || {};
+                const departureCode = (xmlData.departure_country_code || '').toString();
+                const destinationCode = (xmlData.destination_country_code || '').toString();
+                const sealQty = (typeof xmlData.seal_quantity !== 'undefined' && xmlData.seal_quantity !== null) ? xmlData.seal_quantity : '';
+                const sealIdsArr = Array.isArray(xmlData.seal_ids) ? xmlData.seal_ids : [];
+                const sealIdsDisplay = sealIdsArr.length > 0 ? sealIdsArr.map(x => (x ?? '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;')).join(', ') : '';
+                // Найдём ЖД накладную (02013)
+                let railDocId = '';
+                let railDocDate = '';
+                if (data.xml_documents && data.xml_documents.length > 0) {
+                  const railDoc = data.xml_documents.find(doc => {
+                    const name = (doc.DocName || '').toString().toLowerCase();
+                    return doc.DocKindCode === '02013' || name.includes('жд наклад') || name.includes('железнодорож');
+                  });
+                  if (railDoc) {
+                    railDocId = (railDoc.DocId || '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                    railDocDate = (railDoc.DocCreationDate || '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                  }
+                }
+                // Показываем блоки, даже если часть данных отсутствует
+                infoHtml += `
+                  <div class="mt-3">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <!-- Блок Страны -->
+                      <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+                        <div class="px-4 py-2 border-b border-slate-200 flex items-center">
+                          <svg class="w-4 h-4 text-slate-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a10 10 0 100 20 10 10 0 000-20z"/>
+                          </svg>
+                          <span class="text-sm font-semibold text-slate-800">Страны</span>
+                        </div>
+                        <div class="p-4">
+                          <div class="text-xs font-medium text-slate-600 mb-2">Маршрут</div>
+                          <div class="flex items-center gap-3">
+                            <!-- Отправление -->
+                            <div class="flex flex-col items-start">
+                              <span class="text-[10px] uppercase tracking-wide text-slate-500 mb-1">Отправление</span>
+                              <span class="inline-flex items-center rounded-full px-3 py-1 bg-slate-50 border border-slate-200 text-sm font-semibold text-slate-900">
+                                ${departureCode ? departureCode.replace(/</g,'&lt;').replace(/>/g,'&gt;') : 'Нет данных'}
+                              </span>
+                            </div>
+                            <!-- Линия маршрута с стрелкой -->
+                            <div class="relative flex-1 h-7 flex items-center">
+                              <div class="w-full h-[2px] bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200"></div>
+                              <svg class="absolute left-1/2 -translate-x-1/2 w-5 h-5 text-slate-500 bg-white rounded-full shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                              </svg>
+                            </div>
+                            <!-- Назначение -->
+                            <div class="flex flex-col items-end">
+                              <span class="text-[10px] uppercase tracking-wide text-slate-500 mb-1">Назначение</span>
+                              <span class="inline-flex items-center rounded-full px-3 py-1 bg-slate-50 border border-slate-200 text-sm font-semibold text-slate-900">
+                                ${destinationCode ? destinationCode.replace(/</g,'&lt;').replace(/>/g,'&gt;') : 'Нет данных'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- Блок Пломбы -->
+                      <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+                        <div class="px-4 py-2 border-b border-slate-200 flex items-center">
+                          <svg class="w-4 h-4 text-slate-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a5 5 0 10-10 0v2H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2h-2zM9 7a3 3 0 016 0v2H9V7z"/>
+                          </svg>
+                          <span class="text-sm font-semibold text-slate-800">Пломбы</span>
+                        </div>
+                        <div class="p-4 space-y-3">
+                          <div>
+                            <div class="text-xs font-medium text-slate-600 mb-1">Количество пломб</div>
+                            <div class="bg-slate-50 border border-slate-200 rounded p-1"><div class="text-sm text-slate-900">${(sealQty === '' ? 'Нет данных' : sealQty)}</div></div>
+                          </div>
+                          <div>
+                            <div class="text-xs font-medium text-slate-600 mb-1">Номера пломб</div>
+                            <div class="bg-slate-50 border border-slate-200 rounded p-1"><div class="text-sm text-slate-900">${sealIdsDisplay || 'Нет данных'}</div></div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- Блок ЖД накладная -->
+                      <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+                        <div class="px-4 py-2 border-b border-slate-200 flex items-center">
+                          <svg class="w-4 h-4 text-slate-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0117 4.707V19a2 2 0 01-2 2z"/>
+                          </svg>
+                          <span class="text-sm font-semibold text-slate-800">ЖД накладная</span>
+                        </div>
+                        <div class="p-4 space-y-3">
+                          <div>
+                            <div class="text-xs font-medium text-slate-600 mb-1">Номер</div>
+                            <div class="bg-slate-50 border border-slate-200 rounded p-1"><div class="text-sm text-slate-900">${railDocId || 'Нет данных'}</div></div>
+                          </div>
+                          <div>
+                            <div class="text-xs font-medium text-slate-600 mb-1">Дата</div>
+                            <div class="bg-slate-50 border border-slate-200 rounded p-1"><div class="text-sm text-slate-900">${railDocDate || 'Нет данных'}</div></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              })();
+
               invoiceInfoContent.innerHTML = infoHtml;
               invoiceInfoContainer.classList.remove("hidden");
             }
