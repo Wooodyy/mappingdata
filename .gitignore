@@ -1,0 +1,68 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+__pycache__
+*.py[cod]
+*$py.class
+
+
+
+# VSCode settings
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python environment
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Local config
+*.local
+
+# Test, coverage, and profiling
+.coverage
+.tox/
+.cache/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Logs
+*.log
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Node
+node_modules/
+
+# Docker
+*.pid
+
+# Misc
+*.bak
+*.swp
+*.swo
+*.tmp
+
+# IDEs
+.idea/
+*.iml
+
+# Project specific
+src/__pycache__/
+src/**/*.pyc
+src/**/*.pyo
+src/**/*.pyd
+src/**/__pycache__/
+
+# Gemini API key
+apikey.txt

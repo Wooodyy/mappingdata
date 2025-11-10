@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: fastapi-app
+    env: docker
+    region: frankfurt   
+    plan: free
+    branch: main  
+    autoDeploy: true
+    healthCheckPath: /

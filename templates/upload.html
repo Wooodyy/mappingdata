@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Invoice/Packing List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="/assets/favicon.png" type="image/png">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .autocomplete-wrap { position: relative; }
+      .suggestion-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        padding-left: 0.75rem;
+        padding-right: 2.5rem;
+        color: rgba(107, 114, 128, 0.5);
+        font-size: 1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .suggestion-prefix { color: transparent; }
+      .input-ghost {
+        background: transparent;
+        position: relative;
+        z-index: 2;
+      }
+      .sr-only {
+        position: absolute !important;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      
+      /* More professional and subdued color scheme */
+      .gradient-bg { background: linear-gradient(135deg, #475569 0%, #64748b 100%); }
+      .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+      .pulse-animation { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+      
+      /* Professional sidebar design with muted colors */
+      .sidebar-nav {
+        background: linear-gradient(135deg, #334155 0%, #475569 100%);
+        backdrop-filter: blur(20px);
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+      
+      .nav-item {
+        backdrop-filter: blur(10px);
+        transition: all 0.2s ease-in-out;
+      }
+      
+      .nav-item.active {
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      
+      .nav-item:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      
+      /* Smooth content transitions without jerky movement */
+      .content-container {
+        min-height: 500px;
+      }
+
+      .main-content {
+        min-height: auto;
+        height: fit-content;
+      }
+      
+      .mode-content {
+        display: none;
+        opacity: 0;
+        transition: opacity 0.25s ease-in-out;
+      }
+      
+      .mode-content.active {
+        display: block;
+        opacity: 1;
+      }
+      
+      /* Fade-in animation for smooth appearance */
+      .mode-content.active {
+        animation: fadeIn 0.25s ease-in-out;
+      }
+      
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      
+      /* Enhanced upload zone hover animations */
+      .upload-zone {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .upload-zone:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border-color: #3b82f6;
+        background-color: rgba(59, 130, 246, 0.05);
+      }
+      
+      .upload-zone:hover .upload-icon-container {
+        transform: scale(1.1);
+        background-color: #3b82f6;
+      }
+      
+      .upload-zone:hover .upload-icon-container img {
+        filter: brightness(0) invert(1);
+      }
+      
+      .upload-icon-container {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .upload-icon-container img {
+        transition: filter 0.3s ease;
+      }
+      
+      /* Drag and drop enhanced effects */
+      .upload-zone.drag-over {
+        border-color: #10b981;
+        background-color: rgba(16, 185, 129, 0.1);
+        transform: scale(1.02);
+      }
+      
+      .upload-zone.drag-over .upload-icon-container {
+        background-color: #10b981;
+        transform: scale(1.15);
+      }
+      
+      .upload-zone.drag-over .upload-icon-container img {
+        filter: brightness(0) invert(1);
+      }
+      
+      /* Enhanced file uploaded view */
+      .file-uploaded-view {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid #10b981;
+        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .file-uploaded-view::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: left 0.5s;
+      }
+      
+      .file-uploaded-view:hover::before {
+        left: 100%;
+      }
+      
+      .file-icon-container {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      }
+      
+      .file-info {
+        flex: 1;
+        min-width: 0;
+      }
+      
+      .file-name {
+        font-weight: 600;
+        color: #065f46;
+        margin-bottom: 2px;
+      }
+      
+      .file-size {
+        color: #047857;
+        font-size: 0.75rem;
+      }
+      
+      .remove-btn {
+        background: #fee2e2;
+        color: #dc2626;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(220, 38, 38, 0.1);
+      }
+      
+      .remove-btn:hover {
+        background: #fecaca;
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(220, 38, 38, 0.2);
+      }
+      
+    </style>
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-slate-100 via-gray-50 to-slate-200 font-sans">
+    <div class="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <main class="w-full max-w-6xl">
+        <div class="flex gap-6">
+          <!-- Сайдбар навигации -->
+          <div class="sidebar-nav w-80 p-6 flex-shrink-0">
+            <div class="text-center mb-8">
+              <h1 class="text-2xl font-bold text-white mb-2">
+                Обработка данных
+              </h1>
+              <p class="text-white/80 text-sm">
+                Выберите режим работы
+              </p>
+            </div>
+            
+            <nav class="space-y-3">
+              <button id="mode1Btn" class="nav-item active w-full text-left p-4 rounded-xl text-white font-medium flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-semibold">Импорт из Инвойса</div>
+                  <div class="text-white/70 text-sm">Обработка Excel файлов</div>
+                </div>
+              </button>
+              
+              <button id="mode2Btn" class="nav-item w-full text-left p-4 rounded-xl text-white font-medium flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-semibold">Проверка ТД</div>
+                  <div class="text-white/70 text-sm">Таможенная декларация</div>
+                </div>
+              </button>
+            </nav>
+          </div>
+          
+          <!-- Основной контент -->
+          <div class="flex-1 bg-white/95 backdrop-blur-sm rounded-2xl card-shadow overflow-hidden">
+            <div class="main-content p-8"> <!-- Added main-content class for auto height -->
+              <!-- Режим 1: Импорт из Инвойса -->
+              <div id="mode1Panel" class="mode-content active">
+                   <div class="mb-6">
+                     <h2 class="text-2xl font-bold text-gray-900 mb-2">Импорт из Инвойса</h2>
+                     <p class="text-gray-600">Загрузите Excel файл для обработки данных</p>
+                   </div>
+                   
+                   <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
+
+              <div class="space-y-2">
+                <div id="uploadWrapper" class="relative">
+                   <label id="uploadZone" for="file" class="upload-zone flex flex-col items-center justify-center gap-3 border-2 border-dashed border-gray-300 rounded-2xl p-6 cursor-pointer bg-gray-50/50 h-40" tabindex="0">
+                     <div class="upload-icon-container w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center">
+                      <img id="uploadIcon" class="w-6 h-6" src="/assets/excel-icon.svg" alt="Excel icon">
+                    </div>
+
+                    <div class="text-center">
+                      <div id="uploadText" class="text-sm font-semibold text-gray-700">Файл документа (Excel) <span class="text-red-500">*</span></div>
+                    </div>
+                  </label>
+
+                  <div id="fileView" class="file-uploaded-view hidden relative rounded-2xl p-4 h-40 flex items-center">
+                    <div class="flex items-center justify-between gap-3 w-full">
+                      <div class="flex items-center gap-3 min-w-0">
+                        <div class="file-icon-container w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <img class="w-5 h-5 brightness-0 invert" src="/assets/excel-icon.svg" alt="Excel icon">
+                        </div>
+                        <div class="file-info min-w-0">
+                          <div id="selectedFileName" class="file-name text-sm truncate"></div>
+                          <div id="selectedFileSize" class="file-size mt-1"></div>
+                        </div>
+                      </div>
+
+                      <button id="removeFileBtn" type="button" class="remove-btn w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" aria-label="Удалить файл">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <input id="file" name="file" type="file" accept=".xlsx,.xls" class="sr-only" required/>
+
+              </div>
+
+              <div class="pt-0 mt-auto">
+                <button id="submitBtn" type="submit" class="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-semibold px-6 py-4 rounded-xl disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl">
+                  <svg id="btnSpinner" class="w-5 h-5 hidden pulse-animation" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" stroke-width="3" stroke="currentColor"/>
+                  </svg>
+                      Импортировать
+                    </button>
+                  </form>
+                </div>
+
+              </div>
+              
+              <!-- Режим 2: Сравнение данных -->
+              <div id="mode2Panel" class="mode-content">
+                  <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Сравнение данных</h2>
+                    <p class="text-gray-600">Сравните инвойс с таможенной декларацией</p>
+                  </div>
+                  
+                  <form id="compareForm" action="/compare" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
+
+                    <!-- Файлы для сравнения -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <!-- Инвойс (левый столбец) -->
+                  <div class="space-y-2">
+                    <div id="invoiceWrapper2" class="relative">
+                      <label id="invoiceZone2" for="invoiceFile" class="upload-zone flex flex-col items-center justify-center gap-3 border-2 border-dashed border-gray-300 rounded-2xl p-6 cursor-pointer bg-gray-50/50 h-40" tabindex="0">
+                        <div class="upload-icon-container w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center">
+                          <img class="w-6 h-6" src="/assets/excel-icon.svg" alt="Excel icon">
+                        </div>
+                        <div class="text-center">
+                          <div class="text-sm font-semibold text-gray-700">Инвойс (Excel) <span class="text-red-500">*</span></div>
+                        </div>
+                      </label>
+                      <div id="invoiceView2" class="file-uploaded-view hidden relative rounded-2xl p-4 h-40 flex items-center">
+                        <div class="flex items-center justify-between gap-3 w-full">
+                          <div class="flex items-center gap-3 min-w-0">
+                            <div class="file-icon-container w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
+                              <img class="w-5 h-5 brightness-0 invert" src="/assets/excel-icon.svg" alt="Excel icon">
+                            </div>
+                            <div class="file-info min-w-0">
+                              <div id="invoiceFileName2" class="file-name text-sm truncate"></div>
+                              <div id="invoiceFileSize2" class="file-size mt-1"></div>
+                            </div>
+                          </div>
+                        <button id="removeInvoiceBtn2" type="button" class="remove-btn w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" aria-label="Удалить файл">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                          </svg>
+                        </button>
+                        </div>
+                      </div>
+                    </div>
+                    <input id="invoiceFile" name="invoice" type="file" accept=".xlsx,.xls" class="sr-only" required />
+                  </div>
+
+                  <!-- Таможенная декларация (правый столбец) -->
+                  <div class="space-y-2">
+                    <div id="declWrapper2" class="relative">
+                      <label id="declZone2" for="declFile" class="upload-zone flex flex-col items-center justify-center gap-3 border-2 border-dashed border-gray-300 rounded-2xl p-6 cursor-pointer bg-gray-50/50 h-40" tabindex="0">
+                        <div class="upload-icon-container w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center">
+                          <img class="w-6 h-6" src="/assets/xml-icon.svg" alt="XML icon">
+                        </div>
+                        <div class="text-center">
+                          <div class="text-sm font-semibold text-gray-700">Таможенная декларация (XML) <span class="text-red-500">*</span></div>
+                        </div>
+                      </label>
+                      <div id="declView2" class="file-uploaded-view hidden relative rounded-2xl p-4 h-40 flex items-center">
+                        <div class="flex items-center justify-between gap-3 w-full">
+                          <div class="flex items-center gap-3 min-w-0">
+                            <div class="file-icon-container w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
+                              <img class="w-5 h-5 brightness-0 invert" src="/assets/xml-icon.svg" alt="XML icon">
+                            </div>
+                            <div class="file-info min-w-0">
+                              <div id="declFileName2" class="file-name text-sm truncate"></div>
+                              <div id="declFileSize2" class="file-size mt-1"></div>
+                            </div>
+                          </div>
+                          <button id="removeDeclBtn2" type="button" class="remove-btn w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" aria-label="Удалить файл">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <input id="declFile" name="declaration" type="file" accept=".xml" class="sr-only" required />
+                  </div>
+                </div>
+
+                    <div class="pt-0">
+                      <button id="compareSubmit" type="submit" class="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-semibold px-6 py-4 rounded-xl disabled:opacity-60 disabled:cursor-not-allowed shadow-lg hover:shadow-xl">
+                        <svg id="compareSpinner" class="w-5 h-5 hidden pulse-animation" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <circle cx="12" cy="12" r="10" stroke-width="3" stroke="currentColor"/>
+                        </svg>
+                        Проверить
+                      </button>
+                    </div>
+                    
+                    <div id="compareResult" class="hidden mt-4 text-sm text-gray-800 bg-blue-50 border border-blue-200 rounded-xl p-4"></div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+        <div id="notification" class="fixed right-6 top-6 hidden z-50">
+          <div id="notificationInner" class="px-6 py-4 rounded-xl shadow-2xl text-white font-semibold backdrop-blur-sm"></div>
+        </div>
+        <div id="loading" class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center hidden z-50">
+          <div class="bg-white rounded-2xl p-8 shadow-2xl flex items-center gap-4">
+            <div class="w-8 h-8 border-4 border-gray-200 rounded-full border-t-blue-500 animate-spin"></div>
+            <div class="text-gray-700 font-semibold">Загрузка файла...</div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+
+    <script>
+      function clearAllCache() {
+        localStorage.removeItem("mapato_data");
+        localStorage.removeItem("mapato_upload_time");
+      }
+      clearAllCache();
+
+
+      const fileInput = document.getElementById("file");
+      const uploadZone = document.getElementById("uploadZone");
+      const uploadWrapper = document.getElementById("uploadWrapper");
+      const fileView = document.getElementById("fileView");
+      const selectedFileName = document.getElementById("selectedFileName");
+      const selectedFileSize = document.getElementById("selectedFileSize");
+      const removeFileBtn = document.getElementById("removeFileBtn");
+      const form = document.getElementById("uploadForm");
+      const submitBtn = document.getElementById("submitBtn");
+      const loading = document.getElementById("loading");
+      const notification = document.getElementById("notification");
+      const notificationInner = document.getElementById("notificationInner");
+
+      // Tabs (toggle locally without navigation)
+      const mode1Btn = document.getElementById("mode1Btn");
+      const mode2Btn = document.getElementById("mode2Btn");
+      const mode1Panel = document.getElementById("mode1Panel");
+      const mode2Panel = document.getElementById("mode2Panel");
+
+      // Compare elements
+      const compareForm = document.getElementById("compareForm");
+      const compareSubmit = document.getElementById("compareSubmit");
+      const compareSpinner = document.getElementById("compareSpinner");
+      const compareResult = document.getElementById("compareResult");
+      const invoiceFile2 = document.getElementById("invoiceFile");
+      const invoiceZone2 = document.getElementById("invoiceZone2");
+      const invoiceView2 = document.getElementById("invoiceView2");
+      const invoiceFileName2 = document.getElementById("invoiceFileName2");
+      const invoiceFileSize2 = document.getElementById("invoiceFileSize2");
+      const removeInvoiceBtn2 = document.getElementById("removeInvoiceBtn2");
+      const declFile2 = document.getElementById("declFile");
+      const declZone2 = document.getElementById("declZone2");
+      const declView2 = document.getElementById("declView2");
+      const declFileName2 = document.getElementById("declFileName2");
+      const declFileSize2 = document.getElementById("declFileSize2");
+      const removeDeclBtn2 = document.getElementById("removeDeclBtn2");
+
+      const VALID_RE = /\.(xlsx|xls)$/i;
+
+      // Compare file zones (like mode1 style)
+      function showSelectedFile2(file) { invoiceFileName2.textContent = file.name; invoiceFileSize2.textContent = humanFileSize(file.size); invoiceView2.classList.remove("hidden"); invoiceZone2.classList.add("hidden"); invoiceZone2.setAttribute("aria-disabled", "true"); }
+      function clearSelectedFile2() { try { invoiceFile2.value = ""; } catch (e) { const newInput = invoiceFile2.cloneNode(); invoiceFile2.parentNode.replaceChild(newInput, invoiceFile2); location.reload(); } invoiceView2.classList.add("hidden"); invoiceZone2.classList.remove("hidden"); invoiceZone2.removeAttribute("aria-disabled"); }
+      function showSelectedDecl2(file) { declFileName2.textContent = file.name; declFileSize2.textContent = humanFileSize(file.size); declView2.classList.remove("hidden"); declZone2.classList.add("hidden"); declZone2.setAttribute("aria-disabled", "true"); }
+      function clearSelectedDecl2() { try { declFile2.value = ""; } catch (e) { const newInput = declFile2.cloneNode(); declFile2.parentNode.replaceChild(newInput, declFile2); location.reload(); } declView2.classList.add("hidden"); declZone2.classList.remove("hidden"); declZone2.removeAttribute("aria-disabled"); }
+      if (invoiceFile2) { invoiceFile2.addEventListener("change", (e) => { const f = e.target.files[0]; if (!f) return; if (!VALID_RE.test(f.name)) { showNotification("Инвойс должен быть Excel (.xlsx/.xls)", "error"); invoiceFile2.value = ""; return; } showSelectedFile2(f); }); }
+      if (invoiceZone2) {
+        invoiceZone2.addEventListener("dragover", (e) => { e.preventDefault(); if (!invoiceView2.classList.contains("hidden")) { invoiceZone2.classList.add("opacity-60"); return; } invoiceZone2.classList.add("drag-over"); });
+        invoiceZone2.addEventListener("dragleave", () => { invoiceZone2.classList.remove("drag-over", "opacity-60"); });
+        invoiceZone2.addEventListener("drop", (e) => { e.preventDefault(); invoiceZone2.classList.remove("drag-over", "opacity-60"); if (!invoiceView2.classList.contains("hidden")) { showNotification("Сначала удалите текущий файл", "error"); return; } const f = e.dataTransfer?.files?.[0]; if (f && VALID_RE.test(f.name)) { try { const dt = new DataTransfer(); dt.items.add(f); invoiceFile2.files = dt.files; } catch {} showSelectedFile2(f); } else { showNotification("Пожалуйста, выберите Excel (.xlsx/.xls)", "error"); } });
+        invoiceZone2.addEventListener("click", (e) => { if (!invoiceView2.classList.contains("hidden")) { e.preventDefault(); showNotification("Удалите текущий файл", "error"); } });
+        invoiceZone2.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && invoiceView2.classList.contains("hidden")) { invoiceFile2.click(); } });
+      }
+      if (removeInvoiceBtn2) removeInvoiceBtn2.addEventListener("click", clearSelectedFile2);
+      if (declFile2) { declFile2.addEventListener("change", (e) => { const f = e.target.files[0]; if (!f) return; if (!/\.xml$/i.test(f.name)) { showNotification("Декларация должна быть XML", "error"); declFile2.value = ""; return; } showSelectedDecl2(f); }); }
+      if (declZone2) {
+        declZone2.addEventListener("dragover", (e) => { e.preventDefault(); if (!declView2.classList.contains("hidden")) { declZone2.classList.add("opacity-60"); return; } declZone2.classList.add("drag-over"); });
+        declZone2.addEventListener("dragleave", () => { declZone2.classList.remove("drag-over", "opacity-60"); });
+        declZone2.addEventListener("drop", (e) => { e.preventDefault(); declZone2.classList.remove("drag-over", "opacity-60"); if (!declView2.classList.contains("hidden")) { showNotification("Сначала удалите текущий файл", "error"); return; } const f = e.dataTransfer?.files?.[0]; if (f && /\.xml$/i.test(f.name)) { try { const dt = new DataTransfer(); dt.items.add(f); declFile2.files = dt.files; } catch {} showSelectedDecl2(f); } else { showNotification("Пожалуйста, выберите XML", "error"); } });
+        declZone2.addEventListener("click", (e) => { if (!declView2.classList.contains("hidden")) { e.preventDefault(); showNotification("Удалите текущий файл", "error"); } });
+        declZone2.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && declView2.classList.contains("hidden")) { declFile2.click(); } });
+      }
+      if (removeDeclBtn2) removeDeclBtn2.addEventListener("click", clearSelectedDecl2);
+
+      
+      function showNotification(msg, type = "success") {
+        notification.classList.remove("hidden");
+        notificationInner.textContent = msg;
+        notificationInner.className = "px-6 py-4 rounded-xl shadow-2xl text-white font-semibold backdrop-blur-sm " + (type === "error" ? "bg-red-600" : "bg-green-600");
+        setTimeout(() => notification.classList.add("hidden"), 3000);
+      }
+      
+      function setLoading(on) {
+        loading.classList.toggle("hidden", !on);
+      }
+
+      function setActiveMode(mode) {
+        const panels = document.querySelectorAll('.mode-content');
+        panels.forEach(panel => {
+          panel.classList.remove('active');
+        });
+        
+        // Обновляем кнопки навигации
+        const buttons = document.querySelectorAll('.nav-item');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        if (mode === 1) {
+          mode1Btn.classList.add("active");
+          if (mode1Panel) {
+            mode1Panel.classList.add('active');
+          }
+        } else {
+          mode2Btn.classList.add("active");
+          if (mode2Panel) {
+            mode2Panel.classList.add('active');
+          }
+        }
+      }
+
+      async function submitCompareForm(e) {
+        e.preventDefault();
+        if (!compareForm) return;
+        const inv = document.getElementById("invoiceFile");
+        const decl = document.getElementById("declFile");
+        
+        if (!inv.files.length) {
+          showNotification("Пожалуйста, выберите файл инвойса", "error");
+          return;
+        }
+        if (!/\.(xlsx|xls)$/i.test(inv.files[0].name)) {
+          showNotification("Инвойс должен быть Excel (.xlsx/.xls)", "error");
+          return;
+        }
+        if (!decl.files.length) {
+          showNotification("Пожалуйста, выберите файл декларации", "error");
+          return;
+        }
+        if (!/\.xml$/i.test(decl.files[0].name)) {
+          showNotification("Декларация должна быть XML", "error");
+          return;
+        }
+
+        compareSubmit.disabled = true;
+        compareSpinner.classList.remove("hidden");
+        setLoading(true);
+
+        try {
+          const fd = new FormData(compareForm);
+          const resp = await fetch(compareForm.action || "/compare", { method: "POST", body: fd });
+          const j = await resp.json().catch(() => ({}));
+          if (!resp.ok || !j.success) {
+            showNotification("Ошибка: " + (j.error || ("Сервер вернул " + resp.status)), "error");
+          } else {
+            try {
+              localStorage.setItem(
+                "mapato_compare_result",
+                JSON.stringify({
+                  xml_data: j.data.xml_data || null,
+                  xml_documents: j.data.xml_documents || [],
+                  invoice_data: j.data.invoice_data || null,
+                })
+              );
+            } catch {}
+            location.href = "/compare";
+          }
+        } catch (err) {
+          showNotification("Ошибка при отправке формы сравнения", "error");
+        } finally {
+          setLoading(false);
+          compareSpinner.classList.add("hidden");
+          compareSubmit.disabled = false;
+        }
+      }
+
+
+
+
+      // Intercept nav to toggle panels without leaving the page
+      if (mode1Btn && mode2Btn) {
+        mode1Btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          setActiveMode(1);
+        });
+        mode2Btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          setActiveMode(2);
+        });
+      }
+
+      // Принудительная инициализация режима 1 при загрузке
+      document.addEventListener('DOMContentLoaded', function() {
+        // Ensure mode 1 is active by default
+        if (mode1Panel && mode2Panel) {
+          mode2Panel.classList.remove('active');
+          mode1Panel.classList.add('active');
+          mode1Btn.classList.add('active');
+          mode2Btn.classList.remove('active');
+        }
+      });
+
+      if (compareForm) {
+        compareForm.addEventListener("submit", submitCompareForm);
+      }
+
+
+      function humanFileSize(bytes) {
+        if (bytes === 0) return "0 B";
+        const units = ["B", "KB", "MB", "GB", "TB"];
+        const i = Math.floor(Math.log(bytes) / Math.log(1024));
+        return (bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1) + " " + units[i];
+      }
+
+      function showSelectedFile(file) {
+        selectedFileName.textContent = file.name;
+        selectedFileSize.textContent = humanFileSize(file.size);
+        fileView.classList.remove("hidden");
+        uploadZone.classList.add("hidden");
+        uploadZone.setAttribute("aria-disabled", "true");
+      }
+
+      function clearSelectedFile() {
+        try {
+          fileInput.value = "";
+        } catch (e) {
+          const newInput = fileInput.cloneNode();
+          fileInput.parentNode.replaceChild(newInput, fileInput);
+          location.reload();
+        }
+        fileView.classList.add("hidden");
+        uploadZone.classList.remove("hidden");
+        uploadZone.removeAttribute("aria-disabled");
+      }
+
+      // When user selects file via file dialog
+      fileInput.addEventListener("change", (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        if (!VALID_RE.test(f.name)) {
+          showNotification("Неподдерживаемый формат файла", "error");
+          fileInput.value = "";
+          return;
+        }
+        showSelectedFile(f);
+      });
+
+      // dragover/drop: blocked if a file is present
+      uploadZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        if (!fileView.classList.contains("hidden")) {
+          // show subtle feedback that drop is disabled
+          uploadZone.classList.add("opacity-60");
+          return;
+        }
+        uploadZone.classList.add("drag-over");
+      });
+      uploadZone.addEventListener("dragleave", () => {
+        uploadZone.classList.remove("drag-over", "opacity-60");
+      });
+
+      uploadZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove("drag-over", "opacity-60");
+        if (!fileView.classList.contains("hidden")) {
+          showNotification(
+            "Сначала удалите текущий файл, затем загрузите новый",
+            "error"
+          );
+          return;
+        }
+        const f = e.dataTransfer?.files?.[0];
+        if (f && VALID_RE.test(f.name)) {
+          // set file via DataTransfer
+          try {
+            const dt = new DataTransfer();
+            dt.items.add(f);
+            fileInput.files = dt.files;
+          } catch (err) {
+            // fallback: cannot set file programmatically -> ask user to click
+            showNotification(
+              "Браузер не позволяет установить файл автоматически, пожалуйста, используйте кнопку выбора",
+              "error"
+            );
+            return;
+          }
+          showSelectedFile(f);
+        } else {
+          showNotification(
+            "Пожалуйста, выберите файл Excel (.xlsx или .xls)",
+            "error"
+          );
+        }
+      });
+
+      // Clicking upload zone opens dialog only if no file selected
+      uploadZone.addEventListener("click", (e) => {
+        if (!fileView.classList.contains("hidden")) {
+          e.preventDefault();
+          showNotification(
+            "Удалите текущий файл, чтобы выбрать новый",
+            "error"
+          );
+          return;
+        }
+        // else default label behaviour triggers click on file input
+      });
+
+      // keyboard: allow Enter/Space to open only when no file selected
+      uploadZone.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          if (!fileView.classList.contains("hidden")) {
+            e.preventDefault();
+            showNotification(
+              "Удалите текущий файл, чтобы выбрать новый",
+              "error"
+            );
+          } else {
+            // open file picker
+            fileInput.click();
+          }
+        }
+      });
+
+      // remove button
+      removeFileBtn.addEventListener("click", () => {
+        clearSelectedFile();
+      });
+
+      function fetchWithTimeout(url, options = {}, timeout = 25000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        if (fileInput.files.length === 0) {
+          showNotification("Пожалуйста, выберите файл", "error");
+          return;
+        }
+
+        submitBtn.disabled = true;
+        setLoading(true);
+        
+        const formData = new FormData(form);
+        try {
+          const resp = await fetchWithTimeout(form.action || "/upload", { method: "POST", body: formData }, 25000);
+          if (!resp.ok) {
+            let errText = `Сервер вернул ${resp.status}`;
+            try {
+              const j = await resp.json();
+              if (j && j.error) errText = j.error;
+            } catch {}
+            showNotification("Ошибка: " + errText, "error");
+            submitBtn.disabled = false;
+            setLoading(false);
+            return;
+          }
+          const result = await resp.json().catch(() => ({ success: false }));
+          if (result && result.success) {
+            if (result.data) {
+              localStorage.setItem("mapato_data", JSON.stringify(result.data));
+              localStorage.setItem("mapato_upload_time", new Date().toISOString());
+            }
+            const redirect = result.redirect || "/table";
+            setTimeout(() => (location.href = redirect), 0);
+          } else {
+            showNotification("Ошибка: " + (result.error || "Не удалось обработать файл"), "error");
+            submitBtn.disabled = false;
+          }
+        } catch (err) {
+          if (err.name === "AbortError") {
+            showNotification("Превышено время ожидания сервера", "error");
+          } else {
+            showNotification("Ошибка при загрузке файла", "error");
+          }
+          submitBtn.disabled = false;
+        } finally {
+          setLoading(false);
+        }
+      });
+    </script>
+  </body>
+</html>
