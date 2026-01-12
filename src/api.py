@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from src.processors import PROCESSORS
 from src.compare import COMPARE_HANDLERS
 from src.models import RawDataRequest
-from src.services import handle_raw_data, DataHandler
+from src.services import DataHandler
 from src.database import init_db_pool, save_data_to_db
 
 # Загружаем переменные окружения
@@ -134,7 +134,7 @@ async def get_table_json():
 async def save_data(request: RawDataRequest):
     """
     Endpoint для сохранения данных из localStorage
-    Принимает сырые данные, преобразует их и сохраняет в БД и JSON файл
+    Принимает сырые данные, преобразует их и сохраняет в БД
     """
     try:
         # Отладочная информация
@@ -172,39 +172,35 @@ async def save_data(request: RawDataRequest):
             )
             if not db_result["success"]:
                 error_msg = db_result.get('error', 'Неизвестная ошибка')
-                print(f"Предупреждение: не удалось сохранить в БД: {error_msg}")
+                print(f"Ошибка: не удалось сохранить в БД: {error_msg}")
+                return JSONResponse(
+                    content={
+                        "success": False,
+                        "error": f"Ошибка при сохранении в БД: {error_msg}"
+                    },
+                    status_code=500
+                )
         except Exception as db_error:
             error_msg = str(db_error)
             print(f"Исключение при сохранении в БД: {error_msg}")
             import traceback
             traceback.print_exc()
-            db_result = {
-                "success": False,
-                "error": error_msg
-            }
+            return JSONResponse(
+                content={
+                    "success": False,
+                    "error": f"Критическая ошибка при сохранении в БД: {error_msg}"
+                },
+                status_code=500
+            )
         
-        # Сохраняем JSON файл (для обратной совместимости)
-        json_result = handler.save_json_file()
-        
-        # Формируем ответ
+        # Формируем успешный ответ
         response = {
             "success": True,
-            "message": "Данные успешно сохранены",
-            "containers_processed": prepare_result["containers_processed"]
+            "message": "Данные успешно сохранены в базу данных",
+            "containers_processed": prepare_result["containers_processed"],
+            "db_saved": True,
+            "containers_saved_to_db": db_result.get("containers_saved", 0)
         }
-        
-        if db_result and db_result["success"]:
-            response["message"] += " в базу данных"
-            response["db_saved"] = True
-            response["containers_saved_to_db"] = db_result.get("containers_saved", 0)
-        else:
-            response["db_saved"] = False
-            if db_result:
-                response["db_error"] = db_result.get("error", "Неизвестная ошибка")
-        
-        if json_result["success"]:
-            response["filename"] = json_result.get("filename")
-            response["download_url"] = f"/download/{json_result.get('filename')}"
         
         return response
             

@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="/assets/favicon.png" type="image/png">
+    <!-- Decimal.js для точных вычислений с плавающей точкой -->
+    <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
     <style>
         .editable-cell {
             position: relative;
@@ -155,16 +157,6 @@
                         Сохранить
           </button>
                     <button 
-                        id="download-btn" 
-                        class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-xl hover:bg-green-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                        style="display: none;"
-                    >
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-              </svg>
-                        Скачать
-          </button>
-                    <button 
                         onclick="goBackToUpload()" 
                         class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-xl hover:bg-gray-700 transition-all duration-200 shadow-md hover:shadow-lg"
                     >
@@ -301,6 +293,7 @@
                                 <option value="PX">PX</option>
                                 <option value="NG">NG</option>
                                 <option value="NF">NF</option>
+                                <option value="NF">44</option>
                             </select>
                         </div>
                         
@@ -345,7 +338,7 @@
                                 id="modal-cargo-places"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                                 placeholder="0"
-                                step="0.01"
+                                step="any"
                                 min="0"
                             />
                         </div>
@@ -360,7 +353,7 @@
                                 id="modal-package-quantity"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                                 placeholder="0"
-                                step="0.01"
+                                step="any"
                                 min="0"
                             />
                         </div>
@@ -375,7 +368,7 @@
                                 id="modal-gross-weight"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                                 placeholder="0"
-                                step="0.01"
+                                step="any"
                                 min="0"
                             />
                         </div>
@@ -390,7 +383,7 @@
                                 id="modal-amount"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                                 placeholder="0"
-                                step="0.01"
+                                step="any"
                                 min="0"
                             />
                         </div>
@@ -539,13 +532,10 @@
     <script>
         // Utility functions
         function formatNumber(value) {
-            if (typeof value === 'string') {
-                value = value.replace(/\.?0+$/, '');
-            }
             const num = parseFloat(value);
             if (isNaN(num)) return value;
-            const rounded = Math.round(num * 100) / 100;
-            return rounded.toFixed(2).replace(/\.0+$/, '').replace(/\./g, ',');
+            // Отображаем числа как в Excel - с точкой в качестве десятичного разделителя
+            return num.toString();
         }
 
       function formatDate(dateString) {
@@ -711,12 +701,25 @@
             }
           }
 
-            // Calculate totals
+            // Calculate totals with Decimal.js for precise floating-point arithmetic
             const numericFields = ['Количество грузовых мест', 'Количество упаковок', 'Вес брутто', 'Сумма'];
             const totals = {};
             numericFields.forEach(field => {
                 if (rows[0] && field in rows[0]) {
-                    totals[field] = rows.reduce((sum, row) => sum + (parseFloat(row[field]) || 0), 0);
+                    // Используем Decimal.js для точных вычислений
+                    let sum = new Decimal(0);
+                    rows.forEach(row => {
+                        const value = row[field];
+                        if (value !== null && value !== undefined && value !== '') {
+                            try {
+                                sum = sum.plus(new Decimal(value));
+                            } catch (e) {
+                                console.warn(`Ошибка при добавлении значения ${value} для поля ${field}:`, e);
+                            }
+                        }
+                    });
+                    // Конвертируем обратно в число для отображения
+                    totals[field] = sum.toNumber();
                 }
             });
 
@@ -907,6 +910,7 @@
                                                             <option value="PX">PX</option>
                                                             <option value="NG">NG</option>
                                                             <option value="NF">NF</option>
+                                                            <option value="NF">44</option>
                                                         </select>
                                                     </div>
                                                 ` : header === "Информация об упаковке (0-БЕЗ, 1 С)" ? `
@@ -957,6 +961,7 @@
                                                             <option value="PX" ${value === "PX" ? "selected" : ""}>PX</option>
                                                             <option value="NG" ${value === "NG" ? "selected" : ""}>NG</option>
                                                             <option value="NF" ${value === "NF" ? "selected" : ""}>NF</option>
+                                                            <option value="44" ${value === "44" ? "selected" : ""}>44</option>
                                                         </select>
                                                     ` : key === "Информация об упаковке (0-БЕЗ, 1 С)" ? `
                                                         <select 
@@ -1056,11 +1061,15 @@
                 const cells = headers.map(header => {
                     const value = row[header];
                     
-                    // Обрабатываем числовые поля
+                    // Обрабатываем числовые поля с использованием Decimal.js для точности
                     const numericFields = ['Количество грузовых мест', 'Количество упаковок', 'Вес брутто', 'Сумма'];
                     if (numericFields.includes(header) && value !== null && value !== undefined && value !== '') {
-                        const numValue = parseFloat(value);
-                        return isNaN(numValue) ? value : numValue.toString().replace('.', ',');
+                        try {
+                            const decimalValue = new Decimal(value);
+                            return decimalValue.toString().replace('.', ',');
+                        } catch (e) {
+                            return value;
+                        }
                     }
                     
                     // Обрабатываем обычные значения
@@ -1273,21 +1282,8 @@
             hideSaveLoading();
             closeSaveModal();
             
-            // Показываем уведомление о сохранении в БД
-            if (result.db_saved) {
-              showToast("Данные успешно сохранены в базу данных!", "success");
-            } else {
-              const errorMsg = result.db_error ? `Ошибка БД: ${result.db_error}` : "Данные сохранены, но возникла ошибка при сохранении в БД";
-              showToast(errorMsg, "error");
-            }
-            
-            if (result.download_url) {
-              const downloadBtn = document.getElementById("download-btn");
-              downloadBtn.style.display = "inline-flex";
-              downloadBtn.onclick = () => {
-                window.open(result.download_url, '_blank');
-              };
-            }
+            // Показываем уведомление об успешном сохранении
+            showToast("Данные успешно сохранены в базу данных!", "success");
           } else {
             hideSaveLoading();
             closeSaveModal();

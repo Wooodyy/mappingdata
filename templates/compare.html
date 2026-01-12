@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="/assets/favicon.png" type="image/png">
+    <!-- Decimal.js для точных вычислений с плавающей точкой -->
+    <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
     <script>
       tailwind.config = {
         theme: {
@@ -56,22 +58,27 @@
     <script>
       // Функция для форматирования чисел
       function formatNumber(value) {
-        // Если это строка с множественными нулями, сначала очищаем её
-        if (typeof value === 'string') {
-          // Убираем лишние нули в конце
-          value = value.replace(/\.?0+$/, '');
-        }
-        
         const num = parseFloat(value);
         if (isNaN(num)) return value;
-        
-        // Округляем до 2 знаков после запятой, чтобы убрать лишние нули
-        const rounded = Math.round(num * 100) / 100;
-        
-        return rounded.toLocaleString('ru-RU', {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 2
-        });
+        return num.toString();
+      }
+
+      // Функция для проверки "нулевых" значений
+      function isZeroOrInvalid(value, field) {
+        if (value === null || value === undefined || value === '') return true;
+        try {
+          const dec = new Decimal(value);
+          if (field === 'Сумма') {
+            // Сумма должна быть не менее 0.01
+            return dec.lt(0.01);
+          } else if (field === 'Вес нетто' || field === 'Вес брутто') {
+            // Нетто/Брутто не менее 0.000001
+            return dec.lt(0.000001);
+          }
+        } catch (_e) {
+          return true;
+        }
+        return false;
       }
 
       // Глобальная переменная для хранения общей структуры столбцов
@@ -104,7 +111,7 @@
               globalColumnWidths[header] = '6%';
             } else if (header === 'Сумма') {
               globalColumnWidths[header] = '8%';
-            } else if (header === 'Вес брутто') {
+            } else if (header === 'Вес брутто' || header === 'Вес нетто') {
               globalColumnWidths[header] = '8%';
             } else {
               globalColumnWidths[header] = '7%';
@@ -129,30 +136,66 @@
           allRows = allRows.concat(rows);
         }
         
-        // Рассчитываем итоги для числовых полей
+        // Рассчитываем итоги для числовых полей с использованием Decimal.js
         let totals = {};
         
         // Определяем числовые поля для суммирования
-        const numericFields = ['Количество грузовых мест', 'Количество упаковок', 'Вес брутто', 'Сумма'];
+        const numericFields = ['Количество грузовых мест', 'Количество упаковок', 'Вес брутто', 'Вес нетто', 'Сумма'];
         
         numericFields.forEach(field => {
           if (headers.includes(field)) {
-            totals[field] = 0;
+            totals[field] = new Decimal(0);
           }
         });
         
         allRows.forEach(row => {
           numericFields.forEach(field => {
             if (totals.hasOwnProperty(field)) {
-              totals[field] += parseFloat(row[field]) || 0;
+              const value = row[field];
+              if (value !== null && value !== undefined && value !== '') {
+                try {
+                  totals[field] = totals[field].plus(new Decimal(value));
+                } catch (e) {
+                  console.warn(`Ошибка при добавлении значения ${value} для поля ${field}:`, e);
+                }
+              }
             }
           });
+        });
+        
+        // Конвертируем Decimal обратно в числа для отображения
+        numericFields.forEach(field => {
+          if (totals.hasOwnProperty(field)) {
+            totals[field] = totals[field].toNumber();
+          }
         });
 
         // Функция для сравнения значений
         function compareValues(val1, val2, header = '') {
           const str1 = (val1 ?? '').toString().trim();
           const str2 = (val2 ?? '').toString().trim();
+
+          // Для дополнительных проверок нулей
+          if (header === 'Сумма') {
+            // оба >= 0.01 считаем true, оба < 0.01 считаем true, иначе false
+            const v1 = new Decimal(val1 || 0);
+            const v2 = new Decimal(val2 || 0);
+            const ok1 = v1.gte(0.01);
+            const ok2 = v2.gte(0.01);
+            if (!ok1 && !ok2) return true;
+            if (ok1 && ok2) return v1.equals(v2);
+            return false;
+          }
+          if (header === 'Вес брутто' || header === 'Вес нетто') {
+            // оба >= 0.000001 считаем true, оба < 0.000001 считаем true, иначе false
+            const v1 = new Decimal(val1 || 0);
+            const v2 = new Decimal(val2 || 0);
+            const ok1 = v1.gte(0.000001);
+            const ok2 = v2.gte(0.000001);
+            if (!ok1 && !ok2) return true;
+            if (ok1 && ok2) return v1.equals(v2);
+            return false;
+          }
           
           // Для кодов ТН ВЭД сравниваем только первые 6 цифр
           if (header === 'Код ТН ВЭД') {
@@ -163,19 +206,16 @@
           
           // Для коммерческого описания товара используем специальную логику
           if (header === 'Коммерческое описание товара') {
-            // Проверяем в обе стороны: слова из более короткого описания должны входить в более длинное
             const processed1 = str1.replace(/[^a-zA-Zа-яА-Я0-9\s]/g, '').toLowerCase().trim();
             const processed2 = str2.replace(/[^a-zA-Zа-яА-Я0-9\s]/g, '').toLowerCase().trim();
             
             const words1 = processed1.split(/\s+/).filter(word => word.length > 0);
             const words2 = processed2.split(/\s+/).filter(word => word.length > 0);
             
-            // Если одно из описаний пустое, считаем совпадением
             if (words1.length === 0 || words2.length === 0) {
               return true;
             }
             
-            // Определяем, какое описание короче - его слова должны входить в более длинное
             let shorterWords, longerWords;
             if (words1.length <= words2.length) {
               shorterWords = words1;
@@ -185,7 +225,6 @@
               longerWords = words1;
             }
             
-            // Проверяем, входят ли все слова из более короткого описания в более длинное
             for (const shortWord of shorterWords) {
               let wordFound = false;
               for (const longWord of longerWords) {
@@ -205,7 +244,6 @@
           return str1 === str2;
         }
 
-
         // Получаем данные для сравнения (если есть)
         let comparisonRows = [];
         if (compareWith && compareWith.containers) {
@@ -214,11 +252,23 @@
           }
         }
 
+        // Проверка: строки с нулями по "Сумма", "Вес брутто", "Вес нетто"
+        // Для каждой строки: если значение недопустимо, делаем специальную подсветку!
+        function getZeroCellClass(field, value) {
+          if (
+            (field === 'Сумма' && isZeroOrInvalid(value, 'Сумма')) ||
+            (field === 'Вес брутто' && isZeroOrInvalid(value, 'Вес брутто')) ||
+            (field === 'Вес нетто' && isZeroOrInvalid(value, 'Вес нетто'))
+          ) {
+            return 'bg-yellow-100 border border-yellow-400 rounded p-1';
+          }
+          return '';
+        }
+
         const rowsHtml = allRows.map((row, i) => `
           <tr class="hover:bg-slate-50 transition-colors duration-150 ${i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}">
             ${headers.map(header => {
-              // Определяем, является ли поле числовым
-              const numericFields = ['Количество грузовых мест', 'Количество упаковок', 'Вес брутто', 'Сумма'];
+              const numericFields = ['Количество грузовых мест', 'Количество упаковок', 'Вес брутто', 'Вес нетто', 'Сумма'];
               const isNumericField = numericFields.includes(header);
               
               let value;
@@ -230,30 +280,36 @@
               
               const width = globalColumnWidths[header] || '7%';
               
-              // Проверяем состояние сравнения: 0 - равны (зеленый), 1 - неравны (красный), 2 - нет строки (фиолетовый)
-              let comparisonState = 0; // по умолчанию равны (зеленый)
+              // Проверяем состояние сравнения: 0 - равны (зеленый), 1 - неравны (красный), 2 - нет строки (фиолетовый), 3 - "ноль" (желтый)
+              let comparisonState = 0;
               if (comparisonRows.length > i) {
                 const comparisonRow = comparisonRows[i];
-                // Для числовых полей сравниваем исходные значения, а не отформатированные
                 if (isNumericField) {
                   comparisonState = compareValues(row[header], comparisonRow[header], header) ? 0 : 1;
                 } else {
                   comparisonState = compareValues(row[header], comparisonRow[header], header) ? 0 : 1;
                 }
               } else {
-                comparisonState = 2; // нет строки для сравнения (фиолетовый)
+                comparisonState = 2;
+              }
+              
+              // Проверяем на нулевое значение (для выделения ячеек жёлтым)
+              let zeroClass = getZeroCellClass(header, row[header]);
+
+              // Если сравнение не ноль -- выделяем обычными цветами
+              let cellClass = zeroClass;
+              if (zeroClass) {
+                // жёлтый - приоритетней любого другого цвета
+                cellClass += ' border-2';
+              } else if (comparisonState === 0) {
+                cellClass = 'bg-green-100 border border-green-300 rounded p-1';
+              } else if (comparisonState === 1) {
+                cellClass = 'bg-red-100 border border-red-300 rounded p-1';
+              } else if (comparisonState === 2) {
+                cellClass = 'bg-purple-100 border border-purple-300 rounded p-1';
               }
               
               if (header === 'Коммерческое описание товара') {
-                let cellClass = '';
-                if (comparisonState === 0) {
-                  cellClass = 'bg-green-100 border border-green-300 rounded p-1'; // равны - зеленый
-                } else if (comparisonState === 1) {
-                  cellClass = 'bg-red-100 border border-red-300 rounded p-1'; // неравны - красный
-                } else {
-                  cellClass = 'bg-purple-100 border border-purple-300 rounded p-1'; // нет строки - фиолетовый
-                }
-                
                 return `<td class="px-2 py-1 text-sm text-slate-900 min-w-0 border-r border-slate-200" style="width: ${width}; min-width: ${width}; max-width: ${width};">
                   <div class="${cellClass}">
                     <div 
@@ -264,21 +320,14 @@
                     >
                       ${value}
                     </div>
+                    ${zeroClass ? `<div class="text-xs text-yellow-800 mt-1">Ошибка: значение не должно быть нулевым</div>` : ''}
                   </div>
                 </td>`;
               } else {
-                let cellClass = '';
-                if (comparisonState === 0) {
-                  cellClass = 'bg-green-100 border border-green-300 rounded p-1'; // равны - зеленый
-                } else if (comparisonState === 1) {
-                  cellClass = 'bg-red-100 border border-red-300 rounded p-1'; // неравны - красный
-                } else {
-                  cellClass = 'bg-purple-100 border border-purple-300 rounded p-1'; // нет строки - фиолетовый
-                }
-                
                 return `<td class="px-2 py-1 text-sm text-slate-900 min-w-0 border-r border-slate-200" style="width: ${width}; min-width: ${width}; max-width: ${width};">
                   <div class="${cellClass}">
                     <span class="p-0 m-0">${value}</span>
+                    ${zeroClass ? `<div class="text-xs text-yellow-800 mt-1">Ошибка: значение не должно быть нулевым</div>` : ''}
                   </div>
                 </td>`;
               }
@@ -286,7 +335,7 @@
           </tr>
         `).join('');
 
-        // Рассчитываем итоги для таблицы сравнения (если есть)
+        // Рассчитываем итоги для таблицы сравнения (если есть) с использованием Decimal.js
         let comparisonTotals = {};
         if (compareWith && compareWith.containers) {
           let comparisonAllRows = [];
@@ -296,17 +345,43 @@
           
           numericFields.forEach(field => {
             if (headers.includes(field)) {
-              comparisonTotals[field] = 0;
+              comparisonTotals[field] = new Decimal(0);
             }
           });
           
           comparisonAllRows.forEach(row => {
             numericFields.forEach(field => {
               if (comparisonTotals.hasOwnProperty(field)) {
-                comparisonTotals[field] += parseFloat(row[field]) || 0;
+                const value = row[field];
+                if (value !== null && value !== undefined && value !== '') {
+                  try {
+                    comparisonTotals[field] = comparisonTotals[field].plus(new Decimal(value));
+                  } catch (e) {
+                    console.warn(`Ошибка при добавлении значения ${value} для поля ${field}:`, e);
+                  }
+                }
               }
             });
           });
+          
+          // Конвертируем Decimal обратно в числа для отображения
+          numericFields.forEach(field => {
+            if (comparisonTotals.hasOwnProperty(field)) {
+              comparisonTotals[field] = comparisonTotals[field].toNumber();
+            }
+          });
+        }
+
+        // Проверка на недопустимые итоговые значения (жёлтый фон, если нули)
+        function getTotalsZeroClass(field, value) {
+          if (
+            (field === 'Сумма' && isZeroOrInvalid(value, 'Сумма')) ||
+            (field === 'Вес брутто' && isZeroOrInvalid(value, 'Вес брутто')) ||
+            (field === 'Вес нетто' && isZeroOrInvalid(value, 'Вес нетто'))
+          ) {
+            return 'bg-yellow-100 border border-yellow-400 rounded p-1';
+          }
+          return '';
         }
 
         // Создаем строку итогов
@@ -316,30 +391,26 @@
               const width = globalColumnWidths[header] || '7%';
               
               if (totals.hasOwnProperty(header)) {
-                // Округляем до 2 знаков после запятой, чтобы убрать лишние нули
-                const roundedValue = Math.round(totals[header] * 100) / 100;
-                const value = roundedValue.toLocaleString('ru-RU', {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 2
-                });
-                const roundedComparisonValue = comparisonTotals.hasOwnProperty(header) ? Math.round(comparisonTotals[header] * 100) / 100 : null;
-                const comparisonValue = roundedComparisonValue ? roundedComparisonValue.toLocaleString('ru-RU', {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 2
-                }) : '';
+                const value = formatNumber(totals[header]);
+                const comparisonValue = comparisonTotals.hasOwnProperty(header) ? formatNumber(comparisonTotals[header]) : '';
                 
-                let cellClass = '';
-                if (!comparisonValue) {
-                  cellClass = 'bg-purple-100 border border-purple-300 rounded p-1'; // нет данных для сравнения - фиолетовый
+                // Проверка на "нуль" для итогов
+                let zeroClass = getTotalsZeroClass(header, totals[header]);
+                let cellClass = zeroClass;
+                if (zeroClass) {
+                  cellClass += ' border-2';
+                } else if (!comparisonValue) {
+                  cellClass = 'bg-purple-100 border border-purple-300 rounded p-1';
                 } else if (compareValues(value, comparisonValue, header)) {
-                  cellClass = 'bg-green-100 border border-green-300 rounded p-1'; // равны - зеленый
+                  cellClass = 'bg-green-100 border border-green-300 rounded p-1';
                 } else {
-                  cellClass = 'bg-red-100 border border-red-300 rounded p-1'; // неравны - красный
+                  cellClass = 'bg-red-100 border border-red-300 rounded p-1';
                 }
                 
                 return `<td class="px-2 py-2 bg-slate-300 text-sm text-slate-800 whitespace-nowrap border-r border-slate-200" style="width: ${width}; min-width: ${width}; max-width: ${width};">
                   <div class="${cellClass}">
                     <span>${value}</span>
+                    ${zeroClass ? `<div class="text-xs text-yellow-800 mt-1">Ошибка: итог не должен быть нулевым</div>` : ''}
                   </div>
                 </td>`;
               } else if (header === 'Код ТН ВЭД') {
@@ -401,7 +472,6 @@
             empty.classList.remove("hidden");
             return;
           }
-
 
           // Таблица XML данных в формате ExcelData (если доступна)
           if (data && data.xml_data && data.xml_data.containers && Object.keys(data.xml_data.containers).length > 0) {
@@ -593,43 +663,67 @@
                     railDocDate = (railDoc.DocCreationDate || '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
                   }
                 }
+                // Проверка: если код отправления не равен CN, показываем ошибку красным цветом
+                const hasDepartureError = departureCode && departureCode.toUpperCase() !== 'CN';
+                const errorBorderClass = hasDepartureError ? 'border-red-400' : 'border-slate-200';
+                const errorBgClass = hasDepartureError ? 'bg-red-50' : 'bg-white';
+                const errorTextClass = hasDepartureError ? 'text-red-600' : 'text-slate-600';
+                const errorTextSemiboldClass = hasDepartureError ? 'text-red-800' : 'text-slate-800';
+                const errorTextSmallClass = hasDepartureError ? 'text-red-700' : 'text-slate-600';
+                const errorTextTinyClass = hasDepartureError ? 'text-red-600' : 'text-slate-500';
+                const errorBadgeBgClass = hasDepartureError ? 'bg-red-100 border-red-300' : 'bg-slate-50 border-slate-200';
+                const errorBadgeTextClass = hasDepartureError ? 'text-red-900' : 'text-slate-900';
+                const errorLineClass = hasDepartureError ? 'from-red-200 via-red-300 to-red-200' : 'from-slate-200 via-slate-300 to-slate-200';
+                const errorArrowClass = hasDepartureError ? 'text-red-500' : 'text-slate-500';
+                
+                // Проверка: номер ЖД накладной должен быть ровно 8 символов
+                const hasRailDocError = railDocId && railDocId.length !== 8;
+                const railDocErrorBorderClass = hasRailDocError ? 'border-red-400' : 'border-slate-200';
+                const railDocErrorBgClass = hasRailDocError ? 'bg-red-50' : 'bg-white';
+                const railDocErrorTextClass = hasRailDocError ? 'text-red-600' : 'text-slate-600';
+                const railDocErrorTextSemiboldClass = hasRailDocError ? 'text-red-800' : 'text-slate-800';
+                const railDocErrorTextSmallClass = hasRailDocError ? 'text-red-700' : 'text-slate-600';
+                const railDocErrorFieldBgClass = hasRailDocError ? 'bg-red-100 border-red-300' : 'bg-slate-50 border-slate-200';
+                const railDocErrorFieldTextClass = hasRailDocError ? 'text-red-900' : 'text-slate-900';
+                
                 // Показываем блоки, даже если часть данных отсутствует
                 infoHtml += `
                   <div class="mt-3">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <!-- Блок Страны -->
-                      <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
-                        <div class="px-4 py-2 border-b border-slate-200 flex items-center">
-                          <svg class="w-4 h-4 text-slate-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div class="${errorBgClass} rounded-lg border-2 ${errorBorderClass} shadow-sm">
+                        <div class="px-4 py-2 border-b ${errorBorderClass} flex items-center">
+                          <svg class="w-4 h-4 ${errorTextClass} mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a10 10 0 100 20 10 10 0 000-20z"/>
                           </svg>
-                          <span class="text-sm font-semibold text-slate-800">Страны</span>
+                          <span class="text-sm font-semibold ${errorTextSemiboldClass}">Страны</span>
                         </div>
                         <div class="p-4">
-                          <div class="text-xs font-medium text-slate-600 mb-2">Маршрут</div>
+                          <div class="text-xs font-medium ${errorTextSmallClass} mb-2">Маршрут</div>
                           <div class="flex items-center gap-3">
                             <!-- Отправление -->
                             <div class="flex flex-col items-start">
-                              <span class="text-[10px] uppercase tracking-wide text-slate-500 mb-1">Отправление</span>
-                              <span class="inline-flex items-center rounded-full px-3 py-1 bg-slate-50 border border-slate-200 text-sm font-semibold text-slate-900">
+                              <span class="text-[10px] uppercase tracking-wide ${errorTextTinyClass} mb-1">Отправление</span>
+                              <span class="inline-flex items-center rounded-full px-3 py-1 ${errorBadgeBgClass} border ${errorBadgeTextClass} text-sm font-semibold">
                                 ${departureCode ? departureCode.replace(/</g,'&lt;').replace(/>/g,'&gt;') : 'Нет данных'}
                               </span>
                             </div>
                             <!-- Линия маршрута с стрелкой -->
                             <div class="relative flex-1 h-7 flex items-center">
-                              <div class="w-full h-[2px] bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200"></div>
-                              <svg class="absolute left-1/2 -translate-x-1/2 w-5 h-5 text-slate-500 bg-white rounded-full shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                              <div class="w-full h-[2px] bg-gradient-to-r ${errorLineClass}"></div>
+                              <svg class="absolute left-1/2 -translate-x-1/2 w-5 h-5 ${errorArrowClass} bg-white rounded-full shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                               </svg>
                             </div>
                             <!-- Назначение -->
                             <div class="flex flex-col items-end">
-                              <span class="text-[10px] uppercase tracking-wide text-slate-500 mb-1">Назначение</span>
-                              <span class="inline-flex items-center rounded-full px-3 py-1 bg-slate-50 border border-slate-200 text-sm font-semibold text-slate-900">
+                              <span class="text-[10px] uppercase tracking-wide ${errorTextTinyClass} mb-1">Назначение</span>
+                              <span class="inline-flex items-center rounded-full px-3 py-1 ${errorBadgeBgClass} border ${errorBadgeTextClass} text-sm font-semibold">
                                 ${destinationCode ? destinationCode.replace(/</g,'&lt;').replace(/>/g,'&gt;') : 'Нет данных'}
                               </span>
                             </div>
                           </div>
+                          ${hasDepartureError ? '<div class="mt-2 text-xs font-medium text-red-700">Ошибка: страна отправления должна быть CN (Китай)</div>' : ''}
                         </div>
                       </div>
                       <!-- Блок Пломбы -->
@@ -652,22 +746,23 @@
                         </div>
                       </div>
                       <!-- Блок ЖД накладная -->
-                      <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
-                        <div class="px-4 py-2 border-b border-slate-200 flex items-center">
-                          <svg class="w-4 h-4 text-slate-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div class="${railDocErrorBgClass} rounded-lg border-2 ${railDocErrorBorderClass} shadow-sm">
+                        <div class="px-4 py-2 border-b ${railDocErrorBorderClass} flex items-center">
+                          <svg class="w-4 h-4 ${railDocErrorTextClass} mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0117 4.707V19a2 2 0 01-2 2z"/>
                           </svg>
-                          <span class="text-sm font-semibold text-slate-800">ЖД накладная</span>
+                          <span class="text-sm font-semibold ${railDocErrorTextSemiboldClass}">ЖД накладная</span>
                         </div>
                         <div class="p-4 space-y-3">
                           <div>
-                            <div class="text-xs font-medium text-slate-600 mb-1">Номер</div>
-                            <div class="bg-slate-50 border border-slate-200 rounded p-1"><div class="text-sm text-slate-900">${railDocId || 'Нет данных'}</div></div>
+                            <div class="text-xs font-medium ${railDocErrorTextSmallClass} mb-1">Номер</div>
+                            <div class="${railDocErrorFieldBgClass} border rounded p-1"><div class="text-sm ${railDocErrorFieldTextClass}">${railDocId || 'Нет данных'}</div></div>
                           </div>
                           <div>
-                            <div class="text-xs font-medium text-slate-600 mb-1">Дата</div>
-                            <div class="bg-slate-50 border border-slate-200 rounded p-1"><div class="text-sm text-slate-900">${railDocDate || 'Нет данных'}</div></div>
+                            <div class="text-xs font-medium ${railDocErrorTextSmallClass} mb-1">Дата</div>
+                            <div class="${railDocErrorFieldBgClass} border rounded p-1"><div class="text-sm ${railDocErrorFieldTextClass}">${railDocDate || 'Нет данных'}</div></div>
                           </div>
+                          ${hasRailDocError ? `<div class="text-xs font-medium text-red-700">Ошибка: номер ЖД накладной должен быть ровно 8 символов (текущая длина: ${railDocId.length})</div>` : ''}
                         </div>
                       </div>
                     </div>
@@ -708,7 +803,7 @@
           if (data.xml_documents && data.xml_documents.length > 0) {
             const documentsHtml = data.xml_documents.map(doc => {
               const kind = (doc.DocKindCode || '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
-              console.log(doc.DocName);
+              // console.log(doc.DocName);
               const name = (doc.DocName || '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
               const id = (doc.DocId || '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
               const date = (doc.DocCreationDate || '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -810,13 +905,10 @@
       // Функция для развертывания/свертывания текста в столбце "Коммерческое описание товара"
       function toggleTextExpansion(element) {
         const isExpanded = element.style.webkitLineClamp === 'none';
-        
         if (isExpanded) {
-          // Свернуть текст
           element.style.webkitLineClamp = '1';
           element.title = 'Нажмите для развертывания/свертывания';
         } else {
-          // Развернуть текст
           element.style.webkitLineClamp = 'none';
           element.title = 'Нажмите для развертывания/свертывания';
         }
