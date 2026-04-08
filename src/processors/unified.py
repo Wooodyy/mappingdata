@@ -196,7 +196,8 @@ def process_unified(file_content: bytes, CON_NUMBER: str = None) -> dict:
                 "Код ТН ВЭД": str(row.get('Unnamed: 1', '')).strip()[:6] if pd.notna(row.get('Unnamed: 1')) else '',
                 "Коммерческое описание товара": str(row.get('Unnamed: 2', '')).strip() if pd.notna(row.get('Unnamed: 2')) else '',
                 "Признак товара, свободного от применения запретов и ограничений (всегда 1)": 1,
-                "Информация об упаковке (0-БЕЗ, 1 С)": 1 if (weight_brutto > weight_netto) else 0,
+                "Информация об упаковке (0-БЕЗ, 1 С)":
+                    0 if row.get('Unnamed: 5', '').strip() in {"NE", "NF", "NG", "PP"} else (1 if weight_brutto >= weight_netto else 0),
                 #"Кол-во штук": float(row.get('Unnamed: 3', 0)) if pd.notna(row.get('Unnamed: 3')) else 0,
                 "Количество грузовых мест": quantity_places,
                 "Вид информации об упаковке (всегда 0)": 0,
@@ -219,7 +220,7 @@ def process_unified(file_content: bytes, CON_NUMBER: str = None) -> dict:
             
             sender_name = str(row.get('Unnamed: 13', '')).strip() + (f" П/П {str(row.get('Unnamed: 15', '')).strip()}" if pd.notna(row.get('Unnamed: 15')) and str(row.get('Unnamed: 15')).strip() else "")
             sender_address = str(row.get('Unnamed: 14', '')).strip()
-            recipient_name = str(row.get('Unnamed: 16', '')).strip() + (f" ДЛЯ {str(row.get('Unnamed: 18', '')).strip()}" if pd.notna(row.get('Unnamed: 18')) and str(row.get('Unnamed: 18')).strip() else "")
+            recipient_name = str(row.get('Unnamed: 16', '')).strip() + (f" П/П {str(row.get('Unnamed: 18', '')).strip()}" if pd.notna(row.get('Unnamed: 18')) and str(row.get('Unnamed: 18')).strip() else "")
             recipient_address = str(row.get('Unnamed: 17', '')).strip()
            
             # Сохраняем информацию об отправителе и получателе для каждого контейнера

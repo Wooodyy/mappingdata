@@ -22,10 +22,21 @@ def sort_records_by_criteria(records: List[dict]) -> List[dict]:
     return sorted(records, key=sort_key)
 
 
-def extract_xml_data_and_documents(xml_bytes: bytes, invoice_data=None) -> tuple[ExcelData, List[DocumentInfo]]:
+def extract_xml_data_and_documents(
+    xml_bytes: bytes,
+    invoice_data=None,
+    debug_container_transport: bool = False,
+) -> tuple[ExcelData, List[DocumentInfo], str]:
     """Извлекает данные из XML в формате ExcelData и отдельно документы."""
     try:
         root = ET.fromstring(xml_bytes)
+        # Транспортный рег. идентификатор (берем из "шапки" XML)
+        # Используем endswith() чтобы не зависеть от префиксов namespace (ns2/ns3/и т.п.)
+        transport_means_reg_id = ""
+        for ch in root.iter():
+            if ch.tag.endswith("TransportMeansRegId") and (ch.text or "").strip():
+                transport_means_reg_id = (ch.text or "").strip()
+                break
 
         # Находим все блоки с деталями товарных позиций
         goods_items = []
@@ -34,7 +45,19 @@ def extract_xml_data_and_documents(xml_bytes: bytes, invoice_data=None) -> tuple
                 goods_items.append(elem)
 
         if not goods_items:
-            return ExcelData(containers={}, totals=Totals(), calc=Calc(), sender_name="", sender_address="", recipient_name="", recipient_address=""), []
+            return (
+                ExcelData(
+                    containers={},
+                    totals=Totals(),
+                    calc=Calc(),
+                    sender_name="",
+                    sender_address="",
+                    recipient_name="",
+                    recipient_address="",
+                ),
+                [],
+                transport_means_reg_id,
+            )
 
         # Извлекаем данные отправителя из XML
         sender_name = ""
@@ -128,12 +151,24 @@ def extract_xml_data_and_documents(xml_bytes: bytes, invoice_data=None) -> tuple
                 if ch.tag.endswith(local_name) and (ch.text or "").strip():
                     return (ch.text or "").strip()
             return ""
+
+        def find_first_text_exact(parent: ET.Element, local_name: str) -> str:
+            """Ищет тег по точному local-name (без namespace)."""
+            for ch in parent.iter():
+                tag = ch.tag
+                parsed_local_name = tag.split("}", 1)[1] if "}" in tag else tag
+                if parsed_local_name == local_name and (ch.text or "").strip():
+                    return (ch.text or "").strip()
+            return ""
         
         def find_first_attribute(parent: ET.Element, local_name: str, attr_name: str) -> str:
             for ch in parent.iter():
                 if ch.tag.endswith(local_name) and attr_name in ch.attrib:
                     return ch.attrib[attr_name]
             return ""
+
+        # Массив значений ns2:ContainerId из каждого товара + TransportMeansRegId из шапки
+        container_transport_array: List[dict] = []
 
         # Извлекаем все документы из всего XML (один раз, без дубликатов)
         for elem in root.iter():
@@ -282,7 +317,8 @@ def extract_xml_data_and_documents(xml_bytes: bytes, invoice_data=None) -> tuple
             package_availability_code = find_first_text(item, "PackageAvailabilityCode")
             cargo_quantity = find_first_text(item, "CargoQuantity")
             package_quantity = find_first_text(item, "PackageQuantity")
-            container_id = find_first_text(item, "ContainerId")
+            # Берем именно точный тег ContainerId конкретного товара
+            container_id = find_first_text_exact(item, "ContainerId")
             value_amount = find_first_text(item, "CAValueAmount")
             currency = find_first_attribute(item, "CAValueAmount", "currencyCode")
             package_kind = find_first_text(item, "PackageKindCode")
@@ -290,6 +326,14 @@ def extract_xml_data_and_documents(xml_bytes: bytes, invoice_data=None) -> tuple
             # Создаем запись товара
             if not container_id:
                 container_id = "Без номера контейнера"
+
+            if debug_container_transport:
+                container_transport_array.append(
+                    {
+                        "TransportMeansRegId": transport_means_reg_id,
+                        "ContainerId": container_id,
+                    }
+                )
             
             record = {
                 "Код ТН ВЭД": int(commodity_code) if commodity_code and commodity_code.isdigit() else 0,
@@ -326,19 +370,37 @@ def extract_xml_data_and_documents(xml_bytes: bytes, invoice_data=None) -> tuple
             calc_weight=total_weight,
             calc_amount=total_amount
         )
+
+        if debug_container_transport:
+            # Печатаем массив один раз на обработку XML
+            print(container_transport_array)
         
-        return excel_data, documents
+        return excel_data, documents, transport_means_reg_id
 
     except Exception as e:
-        return ExcelData(containers={}, totals=Totals(), calc=Calc(), sender_name="", sender_address="", recipient_name="", recipient_address=""), []
+        return (
+            ExcelData(
+                containers={},
+                totals=Totals(),
+                calc=Calc(),
+                sender_name="",
+                sender_address="",
+                recipient_name="",
+                recipient_address="",
+            ),
+            [],
+            "",
+        )
 
 
 def unified_compare_handler(invoice_bytes: bytes, decl_bytes: bytes, invoice_name: str, decl_name: str) -> Dict:
     """Обработчик сравнения для Testoviy: извлекает данные из XML и обрабатывает инвойс через testoviy алгоритм."""
-    # Получаем номер первого контейнера из XML данных (предварительно)
-    temp_xml_data, _ = extract_xml_data_and_documents(decl_bytes)
-    first_container_number = None
-    if temp_xml_data.containers:
+    # Берем основной номер контейнера из "шапки" XML (TransportMeansRegId)
+    # и используем его для выбора контейнера в алгоритме обработки инвойса.
+    temp_xml_data, _, transport_means_reg_id = extract_xml_data_and_documents(decl_bytes)
+    first_container_number = transport_means_reg_id.strip() if transport_means_reg_id else None
+    if not first_container_number and temp_xml_data.containers:
+        # fallback на первый контейнер, если TransportMeansRegId пустой
         first_container_number = next(iter(temp_xml_data.containers.keys()))
     
     # Обрабатываем инвойс через алгоритм testoviy
@@ -352,14 +414,14 @@ def unified_compare_handler(invoice_bytes: bytes, decl_bytes: bytes, invoice_nam
         invoice_data = None
     
     # Обрабатываем XML декларацию с данными инвойса для валидации документов
-    xml_data, xml_documents = extract_xml_data_and_documents(decl_bytes, invoice_data)
+    xml_data, xml_documents, _ = extract_xml_data_and_documents(decl_bytes, invoice_data, debug_container_transport=False)
     
     # Сортируем записи в каждом контейнере по трем критериям
     for container_id, records in xml_data.containers.items():
         xml_data.containers[container_id] = sort_records_by_criteria(records)
-    
+
     # Создаем результат согласно требуемой структуре
-        result_data = {
+    result_data = {
         "success": True,
         "data": {
             "xml_data": {
@@ -368,15 +430,15 @@ def unified_compare_handler(invoice_bytes: bytes, decl_bytes: bytes, invoice_nam
                 "sender_name": xml_data.sender_name,
                 "sender_address": xml_data.sender_address,
                 "recipient_name": xml_data.recipient_name,
-                    "recipient_address": xml_data.recipient_address,
-                    "departure_country_code": xml_data.departure_country_code,
-                    "destination_country_code": xml_data.destination_country_code,
-                    "seal_quantity": xml_data.seal_quantity,
-                    "seal_ids": xml_data.seal_ids,
+                "recipient_address": xml_data.recipient_address,
+                "departure_country_code": xml_data.departure_country_code,
+                "destination_country_code": xml_data.destination_country_code,
+                "seal_quantity": xml_data.seal_quantity,
+                "seal_ids": xml_data.seal_ids,
             },
             "xml_documents": [doc.dict() for doc in xml_documents],
-            "invoice_data": None
-        }
+            "invoice_data": None,
+        },
     }
     # Сортируем записи в каждом контейнере по трем критериям
     if invoice_data:

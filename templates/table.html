@@ -538,6 +538,48 @@
             return num.toString();
         }
 
+        const KNOWN_PACKAGE_TYPES = ["BG", "BX", "CT", "PK", "CS", "PP", "FR", "PX", "NG", "NF", "44"];
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#39;");
+        }
+
+        function packageTypeOptionsHTML(currentValue) {
+            const v = (currentValue ?? "").toString().trim();
+            const hasCustom = v !== "" && !KNOWN_PACKAGE_TYPES.includes(v);
+            const options = [];
+
+            if (hasCustom) {
+                options.push(`<option value="${escapeHtml(v)}" selected>${escapeHtml(v)}</option>`);
+            }
+
+            KNOWN_PACKAGE_TYPES.forEach((t) => {
+                const selected = !hasCustom && v === t ? "selected" : "";
+                options.push(`<option value="${t}" ${selected}>${t}</option>`);
+            });
+
+            return options.join("\n");
+        }
+
+        function ensureSelectHasValue(selectEl, value) {
+            if (!selectEl) return;
+            const v = (value ?? "").toString().trim();
+            if (!v) return;
+            const exists = Array.from(selectEl.options).some((o) => o.value === v);
+            if (!exists) {
+                const opt = document.createElement("option");
+                opt.value = v;
+                opt.textContent = v;
+                selectEl.insertBefore(opt, selectEl.firstChild);
+            }
+            selectEl.value = v;
+        }
+
       function formatDate(dateString) {
         if (!dateString || dateString === "Не указана" || dateString.trim() === "") {
           return "Не указана";
@@ -951,17 +993,7 @@
                                                             data-row-index="${index}"
                                                             data-container="${containerNo}"
                                                         >
-                                                            <option value="BG" ${value === "BG" ? "selected" : ""}>BG</option>
-                                                            <option value="BX" ${value === "BX" ? "selected" : ""}>BX</option>
-                                                            <option value="CT" ${value === "CT" ? "selected" : ""}>CT</option>
-                                                            <option value="PK" ${value === "PK" ? "selected" : ""}>PK</option>
-                                                            <option value="CS" ${value === "CS" ? "selected" : ""}>CS</option>
-                                                            <option value="PP" ${value === "PP" ? "selected" : ""}>PP</option>
-                                                            <option value="FR" ${value === "FR" ? "selected" : ""}>FR</option>
-                                                            <option value="PX" ${value === "PX" ? "selected" : ""}>PX</option>
-                                                            <option value="NG" ${value === "NG" ? "selected" : ""}>NG</option>
-                                                            <option value="NF" ${value === "NF" ? "selected" : ""}>NF</option>
-                                                            <option value="44" ${value === "44" ? "selected" : ""}>44</option>
+                                                            ${packageTypeOptionsHTML(value)}
                                                         </select>
                                                     ` : key === "Информация об упаковке (0-БЕЗ, 1 С)" ? `
                                                         <select 
@@ -1480,7 +1512,9 @@
             document.getElementById('modal-tn-ved-code').value = rowData['Код ТН ВЭД'] || '';
             document.getElementById('modal-container-number').value = rowData['Номер контейнера'] || '';
             document.getElementById('modal-commercial-description').value = rowData['Коммерческое описание товара'] || '';
-            document.getElementById('modal-package-type').value = rowData['Вид упаковки '] || 'PK';
+            const modalPackageTypeSelect = document.getElementById('modal-package-type');
+            modalPackageTypeSelect.innerHTML = packageTypeOptionsHTML(rowData['Вид упаковки ']);
+            ensureSelectHasValue(modalPackageTypeSelect, rowData['Вид упаковки ']);
             document.getElementById('modal-package-info').value = rowData['Информация об упаковке (0-БЕЗ, 1 С)'] || '0';
             document.getElementById('modal-currency').value = rowData['Валюта'] || '';
             document.getElementById('modal-cargo-places').value = rowData['Количество грузовых мест'] || '';
