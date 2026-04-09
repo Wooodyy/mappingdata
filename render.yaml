@@ -7,3 +7,4 @@ services:
     branch: main  
     autoDeploy: true
     healthCheckPath: /
+    pythonVersion: 3.11
